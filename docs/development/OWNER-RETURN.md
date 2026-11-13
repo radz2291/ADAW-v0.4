@@ -25,7 +25,7 @@ available through `python -m app`. [Architecture boundaries](../architecture/BOU
 | G2 | Browser timeline, event and mixer controls, real plugin edits, proposals and playback, independent API client and CLI parity, selective undo, native Faust automation interleave, exact export review binding | Actual owner-approved RWT-09 scenario remains open |
 | G3 | Verified archive inventory and bytes, independent-song restore and edit, Faust/VST pipeline reuse on a second song, missing-plugin block and explicit rebind, interrupted-service lease reconciliation, Windows local launch, four validated track taps | Full permission audit and installed Windows application lifecycle remain open |
 | G4 | Measured gain-only matched comparison, two explicit engineering profiles and out-of-spec detection, separate musical projects | AWAITING_OWNER_REVIEW for controlled professional comparison. Reference, owner criteria and repeated professional assessment remain open |
-| G5 | Versioned offline tempo and meter map, exact endpoint calculation, a real second cue and linear post-fader sends | Sidechain, transport-synced plugins, recording and responsive live playback remain open |
+| G5 | Offline tempo and meter map, a real second cue, linear post-fader sends and a native Faust main/key routing test | VST sidechain, transport-synced plugins, recording and responsive live playback remain open |
 
 The permanent RWT-01 through RWT-12 definitions remain in the original package.
 Tests exercised real Faust drive and hold automation interleaved with an event move, same-field Dexed
@@ -78,6 +78,6 @@ stage and export paths retain their original provenance. Restored Studio audio
 uses the content store.
 
 Use the [execution ledger](EXECUTION.md), gate evidence, and permanent spec to
-resume. The next engineering work is a compatible sidechain fixture with
-independently measured main and key routing, followed by live transport tests.
+resume. The next engineering work is a compatible VST sidechain fixture and
+live transport tests.
 Professional listening evidence requires owner-supplied criteria.

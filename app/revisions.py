@@ -6,7 +6,7 @@ from app.errors import AdawError
 
 _MISSING = object()
 _ENTITY_LISTS = {"tracks", "buses", "events", "sections"}
-_PROCESSOR_IDENTITY = ("registry_id", "catalog_sha256", "state_sha256", "module_sha256")
+_PROCESSOR_IDENTITY = ("registry_id", "catalog_sha256", "state_sha256", "module_sha256", "key_bus")
 _TIMING_FIELDS = ("schema", "tempo", "ppq", "sample_rate", "length_ticks", "time_map")
 
 

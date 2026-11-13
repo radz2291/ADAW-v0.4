@@ -111,6 +111,9 @@ class ProjectService(Service):
                     else:
                         references.append((i["module_sha256"], "faust"))
                         validation = self._module_validation(db, i["module_sha256"])
+                        if "key_bus" in i:
+                            require(validation is not None and (validation["inputs"], validation["outputs"]) == (4, 2),
+                                    "Faust sidechain requires a validated four-input, two-output module")
                         if i.get("automation") and validation is None:
                             raise AdawError("MODULE_CAPABILITY_UNVERIFIED", "Automation requires a validated Faust catalog")
                         if validation is not None:

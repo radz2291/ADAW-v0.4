@@ -264,6 +264,36 @@ def test_offline_parallel_send_raises_rms_by_declared_linear_gain(project):
         validate(source)
 
 
+def test_faust_sidechain_routes_independent_main_and_key(project, tmp_path):
+    service, source = project
+    module = tmp_path / "sidechain.dsp"
+    module.write_text("duck(l,r,kl,kr) = l*g,r*g with { g = 1/(1+8*max(abs(kl),abs(kr))); };\nprocess = duck;",
+                      encoding="utf-8")
+    imported = service.import_file(module, "faust", "Generated main/key routing test", 30)
+    assert (imported["validation"]["inputs"], imported["validation"]["outputs"]) == (4, 2)
+    source["schema"] = "adaw.arrangement@2"
+    source["time_map"] = [{"tick": 0, "bpm": 144, "numerator": 4, "denominator": 4}]
+    key = copy.deepcopy(source["tracks"][0])
+    key.update(id="key", bus="trigger", events=[])
+    source["tracks"].append(key)
+    source["buses"].insert(0, {"id": "trigger", "gain_db": 0, "inserts": []})
+    source["buses"][1]["inserts"].append(
+        {"module_sha256": imported["sha256"], "parameters": {}, "key_bus": "trigger"})
+    graphs = []
+    for events in ([], [{"id": "trigger-hit", "start_tick": 0, "duration_ticks": 240,
+                         "note": 60, "velocity": 127}]):
+        key["events"] = events
+        service.validate_dependencies(source)
+        graph, _ = compile_graph(source, service.read_content)
+        render = service.render(graph, 30, record_nodes=["bus_drums_level"], benchmark=False)
+        stem = render["data"]["stems"]["bus_drums_level"]["sha256"]
+        signal, _ = sf.read(service.content / stem)
+        graphs.append(signal)
+    no_key, keyed = graphs
+    assert np.sqrt(np.mean(keyed[300:4200] ** 2)) < .75 * np.sqrt(np.mean(no_key[300:4200] ** 2))
+    assert np.allclose(keyed[5050:], no_key[5050:], atol=1e-7)
+
+
 def test_unknown_fields_duplicate_ids_and_bad_hash_rejected(project):
     service,source = project
     for mutate in (lambda s:s.update(hidden=True),

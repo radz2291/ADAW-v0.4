@@ -22,7 +22,14 @@ Version 2 can mix a post-fader stereo send into a later bus with an explicit
 gain from -120 through 0 dB. Ordered dependencies reject cycles. Both source
 and destination reach the master. A native fixture checks a -6 dB parallel
 send against the expected linear RMS ratio. This is a send path. Dedicated
-plugin sidechain input buses remain a separate capability.
+VST sidechain input buses remain a separate capability.
+
+A Faust bus insert may declare an earlier stereo key bus in version 2. The
+module must expose four inputs and two outputs in its isolated validation
+catalog. The engine receives stereo main first and stereo key second. The
+native test measures gain reduction during an independent key event and
+matches the unkeyed main after the event. The key bus retains its normal
+master route.
 
 Faust insert automation stores explicit tick/value hold points and uses the
 validated module catalog and render frame map. The pinned worker adapter passes

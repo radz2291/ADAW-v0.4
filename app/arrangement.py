@@ -129,6 +129,12 @@ def validate(source):
             require(send["bus"] not in upstream, "Duplicate bus send")
             upstream.add(send["bus"])
             number(send["gain_db"], -120, 0)
+        for insert in bus["inserts"]:
+            if "key_bus" in insert:
+                key_bus = insert["key_bus"]
+                require(source["schema"] == "adaw.arrangement@2"
+                        and key_bus in bus_positions and bus_positions[key_bus] < bus_positions[bus["id"]],
+                        "Faust sidechain must reference an earlier bus in arrangement v2")
     require(isinstance(source["tracks"], list) and source["tracks"], "Missing tracks")
     track_ids, event_ids = set(), set()
     for t in source["tracks"]:
@@ -140,7 +146,7 @@ def validate(source):
         require(type(t["protected"]) is bool, "Invalid protection flag")
         number(t["gain_db"])
         number(t["pan"], -1, 1)
-        validate_inserts(t["inserts"])
+        validate_inserts(t["inserts"], allow_key=False)
         inst = t["instrument"]
         if t["kind"] == "samples":
             fields(inst, ("asset_sha256", "fade_frames"))
@@ -180,7 +186,7 @@ def validate(source):
             "Each bus needs a track or a send")
     fields(source["master"], ("gain_db", "inserts"))
     number(source["master"]["gain_db"])
-    validate_inserts(source["master"]["inserts"])
+    validate_inserts(source["master"]["inserts"], allow_key=False)
     canonical(source)
     return source
 
@@ -192,7 +198,7 @@ def validate_parameters(parameters):
         number(value)
 
 
-def validate_inserts(inserts):
+def validate_inserts(inserts, allow_key=True):
     require(isinstance(inserts, list), "Invalid ordered inserts")
     for insert in inserts:
         if "registry_id" in insert:
@@ -204,8 +210,10 @@ def validate_inserts(inserts):
                 require(isinstance(key, str) and key.isdigit(), "Invalid plugin binding")
                 number(value, 0, 1)
         else:
-            fields(insert, ("module_sha256", "parameters"), ("automation",))
+            fields(insert, ("module_sha256", "parameters"), ("automation", "key_bus") if allow_key else ("automation",))
             sha(insert["module_sha256"])
+            if "key_bus" in insert:
+                identifier(insert["key_bus"])
             lanes = insert.get("automation", {})
             require(isinstance(lanes, dict), "Invalid Faust automation")
             for binding, points in lanes.items():
@@ -230,7 +238,7 @@ def compile_graph(source, read_content):
     def add(name, kind, inputs, config):
         nodes.append(dict(id=name, kind=kind, inputs=inputs, channels=2, config=config))
         return name
-    def processing(name, upstream, gain_db, pan, inserts):
+    def processing(name, upstream, gain_db, pan, inserts, available_keys=None):
         last = upstream
         for i, insert in enumerate(inserts):
             if "registry_id" in insert:
@@ -243,7 +251,10 @@ def compile_graph(source, read_content):
                                 for point in points), "Automation point outside arrangement")
                     config["automation"] = {key: [[frame(point["tick"]), point["value"]] for point in points]
                                             for key, points in insert["automation"].items()}
-                last = add(f"{name}_fx{i}", "faust", [last], config)
+                inputs = [last]
+                if "key_bus" in insert:
+                    inputs.append(available_keys[insert["key_bus"]])
+                last = add(f"{name}_fx{i}", "faust", inputs, config)
         gain = 10 ** (gain_db / 20)
         return add(name + "_level", "faust", [last], {"source": f"process = *( {gain*min(1,1-pan):.17g} ), *( {gain*min(1,1+pan):.17g} );", "parameters": {}})
     for t in source["tracks"]:
@@ -269,7 +280,7 @@ def compile_graph(source, read_content):
         for index, send in enumerate(b.get("send_from", [])):
             inputs.append(processing(f"bus_{b['id']}_send{index}", buses[send["bus"]], send["gain_db"], 0, []))
         summed = add("bus_"+b["id"], "faust", inputs, {"source": f"process = si.bus({2*len(inputs)}) :> si.bus(2);", "parameters": {}})
-        buses[b["id"]] = processing("bus_"+b["id"], summed, b["gain_db"], 0, b["inserts"])
+        buses[b["id"]] = processing("bus_"+b["id"], summed, b["gain_db"], 0, b["inserts"], buses)
     summed = add("mix", "faust", list(buses.values()), {"source": f"process = si.bus({2*len(buses)}) :> si.bus(2);", "parameters": {}})
     master = processing("master", summed, source["master"]["gain_db"], 0, source["master"]["inserts"])
     fade = source["fade_frames"]
