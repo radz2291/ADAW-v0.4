@@ -92,6 +92,22 @@ def test_apply_revalidates_import_after_proposal(project):
     assert service.source()[0] == before
 
 
+def test_arrangement_proposal_changes_sections_and_events_only(project):
+    service, original = project
+    cmd = command(service, "arrangement", 0)
+    sections = [dict(id="intro", start_tick=0, end_tick=1920, mood="sparse", swing=.5),
+                dict(id="drop", start_tick=1920, end_tick=3840, mood="full", swing=.56)]
+    events = [{**original["tracks"][0]["events"][0], "start_tick": 1920}]
+    cmd["operations"] = [dict(kind="set_arrangement", sections=sections, track_events={"kick": events})]
+    service.propose(cmd)
+    assert service.source()[1] == original
+    service.apply(cmd["command_id"])
+    expected = copy.deepcopy(original)
+    expected["sections"] = sections
+    expected["tracks"][0]["events"] = events
+    assert service.source()[1] == expected
+
+
 def test_compiler_maps_absolute_ticks_and_source_hash(project):
     service,source = project
     graph,stems = compile_graph(source,service.read_content)
@@ -123,6 +139,9 @@ def test_protected_motif_requires_separate_authorization(project,tmp_path):
     cmd = command(other,"protected",-4)
     cmd["operations"] = [dict(kind="move_event",track_id="kick",event_id="hit",start_tick=120)]
     with pytest.raises(AdawError,match="Protected"):
+        other.propose(cmd)
+    cmd["operations"] = [dict(kind="set_arrangement", sections=source["sections"], track_events={"kick": []})]
+    with pytest.raises(AdawError, match="Protected"):
         other.propose(cmd)
 
 

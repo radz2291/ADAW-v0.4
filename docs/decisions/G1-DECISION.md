@@ -1,5 +1,9 @@
 # G1 — Technical production path delivered; listening review pending
 
+Follow-up on 14 November 2026. The owner liked the overall idea, mix and master
+and flagged the arrangement. The second arrangement is ready for listening as a
+proposal preview. [Feedback and export evidence](../../evidence/gates/g1/arrangement-review/review.json).
+
 14 November 2026. The owner authorized G1 and selected modern electronic 808
 trap with changing structure/swing/moods, for a listening/demo WAV.
 

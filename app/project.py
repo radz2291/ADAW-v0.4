@@ -169,6 +169,18 @@ class ProjectService(Service):
                 require(len(matches) == 1, "Unknown bus")
                 matches[0]["inserts"].append(op["insert"])
                 continue
+            if op["kind"] == "set_arrangement":
+                fields(op, ("kind", "sections", "track_events"))
+                require(isinstance(op["track_events"], dict), "Expected event lists keyed by track ID")
+                tracks = {track["id"]: track for track in source["tracks"]}
+                for track_id, events in op["track_events"].items():
+                    require(track_id in tracks, "Unknown track")
+                    track = tracks[track_id]
+                    if track["protected"]:
+                        raise AdawError("ARTISTIC_BOUNDARY", "Protected track events cannot be changed by this operation")
+                    track["events"] = events
+                source["sections"] = op["sections"]
+                continue
             require(op.get("track_id") in {t["id"] for t in source["tracks"]}, "Unknown track")
             track = next(t for t in source["tracks"] if t["id"] == op["track_id"])
             if op["kind"] == "set_track_gain":
