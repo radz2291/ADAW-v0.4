@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adaw.local/contracts/quality-profile.v0.4.schema.json",
+  "title": "ADAW Draft Quality Profile v0.4",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "profile_id",
+    "version",
+    "destination",
+    "format",
+    "objective_checks",
+    "listening_review_required"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "adaw.quality_profile@0.4"
+    },
+    "profile_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "destination": {
+      "type": "string"
+    },
+    "format": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sample_rate",
+        "channels",
+        "container",
+        "bit_depth"
+      ],
+      "properties": {
+        "sample_rate": {
+          "type": "integer",
+          "minimum": 8000
+        },
+        "channels": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "container": {
+          "enum": [
+            "wav"
+          ]
+        },
+        "bit_depth": {
+          "enum": [
+            16,
+            24,
+            32
+          ]
+        }
+      }
+    },
+    "objective_checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "check_id",
+          "algorithm",
+          "constraint",
+          "required"
+        ],
+        "properties": {
+          "check_id": {
+            "type": "string"
+          },
+          "algorithm": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "constraint": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "listening_review_required": {
+      "type": "boolean"
+    },
+    "allowed_waivers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source_reference": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

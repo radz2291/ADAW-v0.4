@@ -1,0 +1,10 @@
+.venv/
+.local/
+__pycache__/
+.pytest_cache/
+*.egg-info/
+*.wav
+*.dll
+*.vst3/
+*.zip
+

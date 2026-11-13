@@ -1,0 +1,108 @@
+{
+  "package_version": "0.4",
+  "date": "2026-11-13",
+  "status": "proposed",
+  "file_count_excluding_manifest": 20,
+  "files": [
+    {
+      "path": "00-VISION.md",
+      "size_bytes": 8687,
+      "sha256": "dc4f2463d8f54f75201cc187ab18637b19032261eb654b7e926a891ad953b6a4"
+    },
+    {
+      "path": "01-PRD.md",
+      "size_bytes": 11733,
+      "sha256": "423d62ea6b9a6022097cdd543b5e129ab3ac4e1b2a9984ecd2cb4b770963d009"
+    },
+    {
+      "path": "02-ARCHITECTURE.md",
+      "size_bytes": 12044,
+      "sha256": "d927baaf732f838586d65146b4f8cd419f169148681d57736d998f95595fd462"
+    },
+    {
+      "path": "03-DAWDREAMER-VST-FAUST.md",
+      "size_bytes": 13661,
+      "sha256": "affb49b5a6ff10d016c8759f14d5a55a22fc1c5a00993ac079e79a6783572b47"
+    },
+    {
+      "path": "04-PROJECT-AND-REVISION-CONTRACT.md",
+      "size_bytes": 10557,
+      "sha256": "804dde3fe8a87cf26ba656df55dcc3a12e06c0b4e044f24992683332e749595e"
+    },
+    {
+      "path": "05-PRODUCTION-QUALITY.md",
+      "size_bytes": 10975,
+      "sha256": "f4f2cb01cceced29a5aefd4310488a56d235ec17a38ed5bf90ee8b9fbafe4cf3"
+    },
+    {
+      "path": "06-AGENT-INTERFACE.md",
+      "size_bytes": 9070,
+      "sha256": "333c234d8baf87ff784b4ec8ce211c2c9a185e79dee3d00d825de7dfdc8884bf"
+    },
+    {
+      "path": "07-IMPLEMENTATION-PLAN.md",
+      "size_bytes": 10287,
+      "sha256": "17588fef91b9275b296e5ca40bb85ae12152183815289b4866f766169ed68e67"
+    },
+    {
+      "path": "08-PERMANENT-REAL-WORLD-TESTS.md",
+      "size_bytes": 10906,
+      "sha256": "33bf40fecdc976bcb6989f521170554d05bab58d4ddaafb5a60a54ba8ede0407"
+    },
+    {
+      "path": "09-DECISIONS-AND-RISKS.md",
+      "size_bytes": 7890,
+      "sha256": "ab5713b98fe75312382f203120f8befbfe83185b18226adc987190330e176a1a"
+    },
+    {
+      "path": "AGENTS.md",
+      "size_bytes": 4206,
+      "sha256": "8b6f6be528e95c59411cd394664427db0b31234a74160e40c4f54d50c19311d2"
+    },
+    {
+      "path": "CODEX-START-HERE.md",
+      "size_bytes": 4491,
+      "sha256": "b57a7eeb15937bbe8c1b5905adb6d5330e8b28e5456b9f611e9fe28088458287"
+    },
+    {
+      "path": "README.md",
+      "size_bytes": 5840,
+      "sha256": "cc806ca82071b793032ee311fc4eb5ff40c31992b7ca97f60fd409733d96674e"
+    },
+    {
+      "path": "examples/illustrative-project.json",
+      "size_bytes": 1328,
+      "sha256": "4f655967c6bea8bc22973c45854de0f931b87e9202c8c1ab63b161bad06b2ddf"
+    },
+    {
+      "path": "examples/illustrative-technical-profile.json",
+      "size_bytes": 903,
+      "sha256": "3c97805fd2e9df1167c3e9bcb382403bb5a004253c48a24199d8e23a33244580"
+    },
+    {
+      "path": "reference/SOURCES.md",
+      "size_bytes": 3123,
+      "sha256": "5bc2d3d30b6613de1d6b5246bcfa6dd1cd27f9e92fa955a84a6d9ac2b7e0e64d"
+    },
+    {
+      "path": "schemas/agent-result.schema.json",
+      "size_bytes": 1065,
+      "sha256": "aa96305082c8290a7d329bc381449bbbaaa3eacd0d1b261d81d8ff4712ff269e"
+    },
+    {
+      "path": "schemas/plugin-capability.schema.json",
+      "size_bytes": 2922,
+      "sha256": "36dfaef7965f6d16e2319ff714870cdc4b9f04c14c890a3068ff12cb49367e5b"
+    },
+    {
+      "path": "schemas/project-manifest.schema.json",
+      "size_bytes": 8784,
+      "sha256": "92e40581eff323546996aab69dbb068b94e1a7cbe82ebe2a191810f139cc98ff"
+    },
+    {
+      "path": "schemas/quality-profile.schema.json",
+      "size_bytes": 2327,
+      "sha256": "e21c0b0455a5b6bc74989053c7947ea8298a737940744688a51839cc86248260"
+    }
+  ]
+}

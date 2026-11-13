@@ -1,0 +1,67 @@
+[
+  {
+    "url": "https://github.com/asb2m10/dexed/releases/download/v1.1.0/Dexed-1.1.0-win.zip",
+    "local_path": ".local/downloads/Dexed-1.1.0-win.zip",
+    "license": "GPL-3.0; archive LICENSE",
+    "publisher_sha256_verified": true,
+    "extract": [
+      {
+        "member": "Dexed.vst3",
+        "destination": ".local/plugins/dexed/Dexed.vst3"
+      },
+      {
+        "member": "LICENSE",
+        "destination": ".local/plugins/dexed/LICENSE"
+      }
+    ],
+    "sha256": "4773150a3dfa281d1caef583f493a41ed99ea95b054b5a3479780799ed6279cc"
+  },
+  {
+    "url": "https://www.airwindows.com/wp-content/uploads/WinVST64s.zip",
+    "local_path": ".local/downloads/WinVST64s.zip",
+    "license": "MIT; https://github.com/airwindows/airwindows/blob/master/LICENSE",
+    "publisher_sha256_verified": false,
+    "extract": [
+      {
+        "member": "WinVST64s/PurestGain64.dll",
+        "destination": ".local/plugins/airwindows/PurestGain64.dll"
+      }
+    ],
+    "sha256": "7f2ac4d2e460b82933024b1598b880b1738f3122e296814a1ce2e33c8becbb53"
+  },
+  {
+    "url": "https://github.com/baconpaul/airwin2rack/releases/download/DAWPlugin/AirwindowsConsolidated-2026-11-08-316a048-Windows.zip",
+    "local_path": ".local/downloads/AirwindowsConsolidated-316a048.zip",
+    "license": "GPL-3.0; archive LICENSE.gpl3",
+    "publisher_sha256_verified": true,
+    "extract": [
+      {
+        "member": "Airwindows Consolidated.vst3",
+        "destination": ".local/plugins/consolidated/Airwindows Consolidated.vst3"
+      },
+      {
+        "member": "LICENSE.gpl3",
+        "destination": ".local/plugins/consolidated/LICENSE.gpl3"
+      }
+    ],
+    "sha256": "ece84aff193b1d436fd46ad6c3047d276dc43ddf048e63684bd012b5daedd4a0"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/csteinmetz1/pyloudnorm/b8d67bfd3ce5deef872f688fcfa491a0ca69fddd/tests/data/1770-2_Comp_23LKFS_1000Hz_2ch.wav",
+    "local_path": ".local/calibration/1770-2_Comp_23LKFS_1000Hz_2ch.wav",
+    "usage": "Local meter calibration only; not redistributed; upstream BS.1770 compliance vectors",
+    "sha256": "dbb1d5234bcffad3e8f3ebf29663d2d04d8ed8629b50dd41fdc6be9d20b53924"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/csteinmetz1/pyloudnorm/b8d67bfd3ce5deef872f688fcfa491a0ca69fddd/tests/data/1770-2_Comp_AbsGateTest.wav",
+    "local_path": ".local/calibration/1770-2_Comp_AbsGateTest.wav",
+    "usage": "Local meter calibration only; not redistributed; upstream BS.1770 compliance vectors",
+    "sha256": "3abc54a67fc1a743d7a4b86a0c8b37e14e51928a6bfb099de3c2476afb74c120"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/csteinmetz1/pyloudnorm/b8d67bfd3ce5deef872f688fcfa491a0ca69fddd/tests/data/1770-2_Comp_RelGateTest.wav",
+    "local_path": ".local/calibration/1770-2_Comp_RelGateTest.wav",
+    "usage": "Local meter calibration only; not redistributed; upstream BS.1770 compliance vectors",
+    "sha256": "39b6ec1f20ec5b4f07da7c5473f0aae06a7e63c7ea81e0a13b9773cbf0c71a81"
+  }
+]

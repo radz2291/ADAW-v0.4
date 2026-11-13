@@ -1,0 +1,86 @@
+[
+  {
+    "name": "cffi",
+    "version": "2.1.1",
+    "wheel": "cffi-2.1.1-cp312-cp312-win_amd64.whl",
+    "sha256": "f53e442b08449d42821fa4a4fba000095af9f62742a500f978a9f557ec44339a"
+  },
+  {
+    "name": "colorama",
+    "version": "0.4.6",
+    "wheel": "colorama-0.4.6-py2.py3-none-any.whl",
+    "sha256": "4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"
+  },
+  {
+    "name": "dawdreamer",
+    "version": "0.9.0",
+    "wheel": "dawdreamer-0.9.0-cp312-cp312-win_amd64.whl",
+    "sha256": "0076ebe3de73d0888bc6e5cc08ddb95e71d738dc587afbc7df1bf542e945f5b9"
+  },
+  {
+    "name": "future",
+    "version": "1.0.0",
+    "wheel": "future-1.0.0-py3-none-any.whl",
+    "sha256": "929292d34f5872e70396626ef385ec22355a1fae8ad29e1a734c3e43f9fbc216"
+  },
+  {
+    "name": "iniconfig",
+    "version": "2.3.1",
+    "wheel": "iniconfig-2.3.1-py3-none-any.whl",
+    "sha256": "9121e2c1fdb355232495be3194c8dfe87ccc2d5dee45947b78e68f499790d7a7"
+  },
+  {
+    "name": "numpy",
+    "version": "2.2.6",
+    "wheel": "numpy-2.2.6-cp312-cp312-win_amd64.whl",
+    "sha256": "c1f9540be57940698ed329904db803cf7a402f3fc200bfe599334c9bd84a40b2"
+  },
+  {
+    "name": "packaging",
+    "version": "26.3",
+    "wheel": "packaging-26.3-py3-none-any.whl",
+    "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c"
+  },
+  {
+    "name": "pluggy",
+    "version": "1.7.0",
+    "wheel": "pluggy-1.7.0-py3-none-any.whl",
+    "sha256": "7dd7b0d8832ba3cb632c306926ded123429211b83641b35dc5c41ad2d34f9bec"
+  },
+  {
+    "name": "pycparser",
+    "version": "3.12",
+    "wheel": "pycparser-3.12-py3-none-any.whl",
+    "sha256": "a076f3f489b39b43ed13563a1dafe42447445bec2e294154ec5c57fcdda4c85e"
+  },
+  {
+    "name": "Pygments",
+    "version": "2.21.0",
+    "wheel": "pygments-2.21.0-py3-none-any.whl",
+    "sha256": "2363c69b61c4a97c838da3b130dcd6468f4848992b21a82f2a63ec34377137d9"
+  },
+  {
+    "name": "pyloudnorm",
+    "version": "0.1.1",
+    "wheel": "pyloudnorm-0.1.1-py3-none-any.whl",
+    "sha256": "d7f12ebdd097a464d87ce2878fc4d942f15f8233e26cc03f33fefa226f869a14"
+  },
+  {
+    "name": "pytest",
+    "version": "8.4.2",
+    "wheel": "pytest-8.4.2-py3-none-any.whl",
+    "sha256": "872f880de3fc3a5bdc88a11b39c9710c3497a547cfa9320bc3c5e62fbf272e79"
+  },
+  {
+    "name": "scipy",
+    "version": "1.15.3",
+    "wheel": "scipy-1.15.3-cp312-cp312-win_amd64.whl",
+    "sha256": "52092bc0472cfd17df49ff17e70624345efece4e1a12b23783a1ac59a1b728ed"
+  },
+  {
+    "name": "soundfile",
+    "version": "0.13.1",
+    "wheel": "soundfile-0.13.1-py2.py3-none-win_amd64.whl",
+    "sha256": "1e70a05a0626524a69e9f0f4dd2ec174b4e9567f4d8b6c11d38b5c289be36ee9"
+  }
+]

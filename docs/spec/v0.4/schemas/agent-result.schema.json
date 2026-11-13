@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adaw.local/contracts/agent-result.v0.4.schema.json",
+  "title": "ADAW Draft Agent Command Result v0.4",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "ok",
+    "request_id",
+    "operation",
+    "data",
+    "warnings",
+    "error",
+    "evidence_refs",
+    "time_utc"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "adaw.result@1"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "request_id": {
+      "type": "string"
+    },
+    "operation": {
+      "type": "string"
+    },
+    "data": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "error": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "time_utc": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
