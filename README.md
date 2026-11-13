@@ -4,11 +4,12 @@ New implementation; no v0.3 code reused. Working JSON CLI, immutable validated
 signal graphs, transactional service, killable DawDreamer workers, real Faust/VST
 renders and independent decoded-file measurement. **Not a finished DAW or cue.**
 
-See [G0 decision](G0-DECISION.md), [engine ADR](docs/decisions/ADR-0001-engine-adoption.md)
+See [G0 decision](docs/decisions/G0-DECISION.md), [engine ADR](docs/decisions/ADR-0001-engine-adoption.md)
 and [real run report](evidence/gates/g0/REPORT.md). The original specification is
-preserved under [docs/spec/v0.4](docs/spec/v0.4/README.md). Original root specification
-files remain for existing handoff links. `FILE-MANIFEST.json` describes the original
-specification package, not this updated README or the implementation.
+preserved once under [docs/spec/v0.4](docs/spec/v0.4/README.md), including its draft
+schemas, examples, references and original file manifest. New agents start with
+[AGENTS.md](AGENTS.md) and the [G0 assignment](docs/spec/v0.4/CODEX-START-HERE.md).
+The repository is [radz2291/ADAW-v0.4](https://github.com/radz2291/ADAW-v0.4).
 
 ## Setup
 
@@ -66,12 +67,20 @@ loads it in a separate worker. Missing, changed, unapproved or unprobed plugins 
 
 ## Source layout and limits
 
+- `docs/spec/v0.4/`: the original specification package; its manifest covers this directory only.
+- `docs/decisions/`: engine decisions and the G0 handoff disposition.
+- `evidence/gates/g0/`: historical run reports, logs and `graphs/run-001/` through `graphs/run-004/`.
 - `app/contracts.py`: immutable graph, canonical hashing, validation and timing.
 - `app/service.py`: SQLite source/revisions/jobs/registry and atomic content publication.
 - `app/worker.py`: DawDreamer adapter; Faust/VST/MIDI/state/automation.
 - `app/quality.py`: libsndfile + SciPy decode agreement, peak/RMS/DC and pyloudnorm.
 - `tools/`: setup, fixture acquisition, real-audio checks and independent hash verifier.
 - `tests/`: schema, timing, identity, permission and CLI regressions.
+
+`requirements.lock` is the sole installation lock. `pyproject.toml` declares the
+package and runtime dependencies. Run-specific graph files intentionally retain
+each run's inputs, even when two runs use the same graph; loose duplicate exports
+are not kept. Historical reports describe the repository at the time of their run.
 
 Workers retain the same Windows user's filesystem/network rights. Direct-process
 crash/timeout containment is tested; this is not a hardened sandbox, process-tree

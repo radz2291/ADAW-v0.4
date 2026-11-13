@@ -1,9 +1,9 @@
 # G0 decision — PARTIAL ADOPT
 
 The Windows-native engine foundation is implemented and tested. Final evidence:
-[run report](evidence/gates/g0/REPORT.md), [machine-readable results](evidence/gates/g0/run-004.json),
-[independent hash verification](evidence/gates/g0/verification-004.json),
-[ADR-0001](docs/decisions/ADR-0001-engine-adoption.md).
+[run report](../../evidence/gates/g0/REPORT.md), [machine-readable results](../../evidence/gates/g0/run-004.json),
+[independent hash verification](../../evidence/gates/g0/verification-004.json),
+[ADR-0001](ADR-0001-engine-adoption.md).
 
 15 bounded G0 checks and 14 regression tests pass. Real Faust, Dexed MIDI/state,
 VST effect gain/automation/state, multitrack routing, independent project reuse,

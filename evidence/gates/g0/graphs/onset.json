@@ -1,1 +1,0 @@
-{"block_size":256,"frames":48000,"nodes":[{"channels":2,"config":{"amplitude":0.1,"frequency_hz":997,"onset_frame":12345},"id":"timing","inputs":[],"kind":"tone"}],"output":"timing","sample_rate":48000,"schema":"adaw.g0.graph@1"}
