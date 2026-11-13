@@ -22,13 +22,13 @@ available through `python -m app`. [Architecture boundaries](../architecture/BOU
 
 | Gate | Verified in this checkpoint | Remaining acceptance |
 |---|---|---|
-| G2 | Browser timeline, event and mixer controls, real plugin edits, proposals and playback, independent API client and CLI parity, selective undo, exact export review binding | Full RWT-04 automation interleave and actual owner-approved RWT-09 scenario remain open |
-| G3 | Verified archive inventory and bytes, independent-song restore and edit, explicit VST rebind, interrupted-service lease reconciliation, Windows local launch, four validated track taps | Full permission audit, portable pipeline template with a verified missing-plugin scenario on a second song, and installed Windows lifecycle remain open |
+| G2 | Browser timeline, event and mixer controls, real plugin edits, proposals and playback, independent API client and CLI parity, selective undo, native Faust automation interleave, exact export review binding | Actual owner-approved RWT-09 scenario remains open |
+| G3 | Verified archive inventory and bytes, independent-song restore and edit, Faust/VST pipeline reuse on a second song, missing-plugin block and explicit rebind, interrupted-service lease reconciliation, Windows local launch, four validated track taps | Full permission audit and installed Windows application lifecycle remain open |
 | G4 | Measured gain-only matched comparison, two explicit engineering profiles and out-of-spec detection, separate musical projects | AWAITING_OWNER_REVIEW for controlled professional comparison. Reference, owner criteria and repeated professional assessment remain open |
-| G5 | Versioned offline tempo and meter map, exact endpoint calculation and a real second cue | Advanced sends and sidechain, transport-synced plugins, recording and responsive live playback remain open |
+| G5 | Versioned offline tempo and meter map, exact endpoint calculation, a real second cue and linear post-fader sends | Sidechain, transport-synced plugins, recording and responsive live playback remain open |
 
 The permanent RWT-01 through RWT-12 definitions remain in the original package.
-Tests exercised real Faust drive interleaved with an event move, same-field Dexed
+Tests exercised real Faust drive and hold automation interleaved with an event move, same-field Dexed
 conflict and owner-decision binding in disposable fixtures. Approved Dexed
 Output 0.8 to 0.4 changed browser-rendered RMS by a factor of 0.5. Native
 Consolidated catalog controls are exposed on Night Circuit. PurestGain opaque
@@ -53,6 +53,9 @@ bytes and the exact rendition.
   and preserved the source project. [Restore evidence](../../evidence/gates/g3/independent-project.json).
 * Four stereo float track taps share the render frame grid and precede bus and
   master processing. [Stem manifest](../../evidence/gates/g3/glass-current-stems.json).
+* Glass Current's independent copy reused Night Circuit's Faust and Consolidated
+  drum pipeline on the music bus with a different gain parameter. A restored
+  copy blocked render until the approved fingerprint was resolved. [Pipeline evidence](../../evidence/gates/g3/glass-current-vst-pipeline.json).
 * Both Glass Current engineering profiles passed. A deliberately tighter peak
   rule failed on the measured bytes. [Profile comparison](../../evidence/gates/g4/glass-current-profiles.json).
 
@@ -75,6 +78,6 @@ stage and export paths retain their original provenance. Restored Studio audio
 uses the content store.
 
 Use the [execution ledger](EXECUTION.md), gate evidence, and permanent spec to
-resume. The next engineering work is a reusable pipeline template and a second
-song with a tested VST dependency, followed by Faust automation and bounded
-routing tests. Professional listening evidence requires owner-supplied criteria.
+resume. The next engineering work is a compatible sidechain fixture with
+independently measured main and key routing, followed by live transport tests.
+Professional listening evidence requires owner-supplied criteria.

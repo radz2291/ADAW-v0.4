@@ -17,3 +17,15 @@ The compiler accumulates exact rational time and rounds event endpoints to
 frames. Version 1 keeps its original timing and graph format. This slice covers
 offline scheduling. VST transport tempo sync and live tempo changes require
 separate evidence.
+
+Version 2 can mix a post-fader stereo send into a later bus with an explicit
+gain from -120 through 0 dB. Ordered dependencies reject cycles. Both source
+and destination reach the master. A native fixture checks a -6 dB parallel
+send against the expected linear RMS ratio. This is a send path. Dedicated
+plugin sidechain input buses remain a separate capability.
+
+Faust insert automation stores explicit tick/value hold points and uses the
+validated module catalog and render frame map. The pinned worker adapter passes
+the resulting lane by Faust parameter address. The test measures distinct audio
+levels on either side of an automation point after a source merge.
+[DawDreamer 0.9.0 automation API](https://github.com/DBraun/DawDreamer/blob/v0.9.0/docs/user_guide/faust_processor.rst).

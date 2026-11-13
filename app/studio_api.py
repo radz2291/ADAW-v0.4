@@ -156,7 +156,7 @@ def make_server(root, port=0, studio_dir=None):
                         return
                     data = self.get_data(route)
                 self.send_json(200, {"ok": True, "data": data})
-            except (BrokenPipeError, ConnectionResetError):
+            except ConnectionError:
                 return
             except AdawError as exc:
                 status = {"NOT_FOUND": 404, "FORBIDDEN": 403, "CONFLICT": 409,

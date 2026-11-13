@@ -157,8 +157,11 @@ def test_real_faust_bus_drive_interleaves_with_event_move(project):
     agent = command(service, "ghost-hit", 0)
     agent["operations"] = [dict(kind="move_event", track_id="kick", event_id="hit", start_tick=120)]
     human = command(service, "raise-drive", 0)
-    human["operations"] = [dict(kind="set_bus_insert_parameter", bus_id="drums", insert_index=0,
-                                binding=binding, value=4)]
+    points = [{"tick": 0, "value": 1}, {"tick": 216, "value": 4}]
+    human["operations"] = [
+        dict(kind="set_bus_insert_parameter", bus_id="drums", insert_index=0, binding=binding, value=4),
+        dict(kind="set_faust_bus_automation", bus_id="drums", insert_index=0, binding=binding, points=points),
+    ]
     service.propose(agent)
     service.propose(human)
     service.apply(human["command_id"])
@@ -169,11 +172,15 @@ def test_real_faust_bus_drive_interleaves_with_event_move(project):
     assert rendition["manifest"]["revision"] == merged["revision"]
     assert np.count_nonzero(audio[:tick_sample(120, 144, 960, 48000)]) == 0
     assert np.max(np.abs(audio)) > .09
+    early = np.sqrt(np.mean(audio[3000:4000] ** 2))
+    late = np.sqrt(np.mean(audio[5200:6200] ** 2))
+    assert late > 3 * early > 0
     assert rendition["source"]["buses"][0]["inserts"][0]["parameters"][binding] == 4
     service.undo(merged["revision"])
     _, source = service.source()
     assert source["tracks"][0]["events"][0]["start_tick"] == 0
     assert source["buses"][0]["inserts"][0]["parameters"][binding] == 4
+    assert source["buses"][0]["inserts"][0]["automation"][binding] == points
 
     invalid = command(service, "invalid-drive", 0)
     invalid["operations"] = [{**human["operations"][0], "value": 100}]
@@ -238,6 +245,23 @@ def test_compiler_maps_absolute_ticks_and_source_hash(project):
     assert event["duration_frames"] == tick_sample(240,144,960,48000)
     assert stems == ["track_kick_level"]
     assert digest(canonical(graph)) == digest(canonical(compile_graph(copy.deepcopy(source),service.read_content)[0]))
+
+
+def test_offline_parallel_send_raises_rms_by_declared_linear_gain(project):
+    service, original = project
+    source = copy.deepcopy(original)
+    source["schema"] = "adaw.arrangement@2"
+    source["time_map"] = [{"tick": 0, "bpm": 144, "numerator": 4, "denominator": 4}]
+    source["buses"].append({"id": "parallel", "gain_db": 0, "inserts": [],
+                            "send_from": [{"bus": "drums", "gain_db": -6}]})
+    direct, _ = compile_graph(original, service.read_content)
+    parallel, _ = compile_graph(source, service.read_content)
+    first = service.render(direct, 30, benchmark=False)
+    second = service.render(parallel, 30, benchmark=False)
+    assert second["quality"]["rms"] / first["quality"]["rms"] == pytest.approx(1 + 10 ** (-6 / 20), abs=1e-6)
+    source["buses"][0]["send_from"] = [{"bus": "parallel", "gain_db": -6}]
+    with pytest.raises(AdawError, match="earlier bus"):
+        validate(source)
 
 
 def test_unknown_fields_duplicate_ids_and_bad_hash_rejected(project):

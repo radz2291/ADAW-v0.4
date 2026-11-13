@@ -118,7 +118,8 @@ class RenderGraph:
             elif node["kind"] in ("faust", "faust_synth"):
                 synth = node["kind"] == "faust_synth"
                 require(not synth or value["schema"] == "adaw.graph@2", "Synth requires graph v2")
-                fields(c, ("source", "parameters", "midi", "voices", "release_seconds") if synth else ("source", "parameters"))
+                fields(c, ("source", "parameters", "midi", "voices", "release_seconds") if synth else ("source", "parameters"),
+                       ("automation",) if value["schema"] == "adaw.graph@2" and not synth else ())
                 if synth:
                     require(not node["inputs"], "Synth cannot have audio inputs")
                     require(type(c["voices"]) is int and c["voices"] > 0, "Invalid voice count")
@@ -129,6 +130,19 @@ class RenderGraph:
                 for key, val in c["parameters"].items():
                     require(isinstance(key, str), "Parameter binding must be a string")
                     number(val)
+                lanes = c.get("automation", {})
+                require(isinstance(lanes, dict), "Invalid Faust automation")
+                for key, points in lanes.items():
+                    require(isinstance(key, str) and key and isinstance(points, list) and points,
+                            "Invalid Faust automation binding")
+                    previous = -1
+                    for point in points:
+                        require(isinstance(point, list) and len(point) == 2, "Invalid Faust automation point")
+                        frame, level = point
+                        require(type(frame) is int and previous < frame < value["frames"], "Invalid automation frame")
+                        number(level)
+                        previous = frame
+                    require(points[0][0] == 0, "Automation must start at frame zero")
             elif node["kind"] == "vst":
                 fields(c, ("registry_id", "parameters", "midi", "automation", "state_sha256"))
                 require(isinstance(c["registry_id"], str), "Invalid registry ID")

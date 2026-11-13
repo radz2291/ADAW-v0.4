@@ -121,6 +121,17 @@ class DawDreamerBackend:
                     if not d["min"] <= value <= d["max"]:
                         raise AdawError("VALIDATION_ERROR", "Faust value outside exposed range", binding=key)
                     p.set_parameter(key, value)
+                for key, points in c.get("automation", {}).items():
+                    if key not in addresses:
+                        raise AdawError("VALIDATION_ERROR", "Faust automation binding missing", binding=key)
+                    descriptor = addresses[key]
+                    lane = np.empty(g["frames"], dtype=np.float32)
+                    for i, (frame, value) in enumerate(points):
+                        if not descriptor["min"] <= value <= descriptor["max"]:
+                            raise AdawError("VALIDATION_ERROR", "Faust automation outside exposed range", binding=key)
+                        end = points[i + 1][0] if i + 1 < len(points) else g["frames"]
+                        lane[frame:end] = value
+                    p.set_automation(key, lane)
                 for note in c.get("midi", []):
                     p.add_midi_note(note["note"], note["velocity"], note["start_frame"] / g["sample_rate"], note["duration_frames"] / g["sample_rate"])
             else:

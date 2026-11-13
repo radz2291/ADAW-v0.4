@@ -111,10 +111,15 @@ class ProjectService(Service):
                     else:
                         references.append((i["module_sha256"], "faust"))
                         validation = self._module_validation(db, i["module_sha256"])
+                        if i.get("automation") and validation is None:
+                            raise AdawError("MODULE_CAPABILITY_UNVERIFIED", "Automation requires a validated Faust catalog")
                         if validation is not None:
                             catalog = {item["name"]: item for item in validation["catalog"]}
                             for binding, value in i["parameters"].items():
                                 self._validate_faust_parameter(catalog, binding, value)
+                            for binding, points in i.get("automation", {}).items():
+                                for point in points:
+                                    self._validate_faust_parameter(catalog, binding, point["value"])
             for content_hash, kind in references:
                 if not db.execute("SELECT 1 FROM g1_imports WHERE hash=? AND kind=?", (content_hash, kind)).fetchone():
                     raise AdawError("ASSET_MISSING", "Reference has no validated import", sha256=content_hash)
@@ -268,7 +273,7 @@ class ProjectService(Service):
                 fields(op, ("kind", "profile"))
                 source["profile"] = op["profile"]
                 continue
-            if op["kind"] in ("append_bus_insert", "set_bus_gain", "set_bus_insert_parameter"):
+            if op["kind"] in ("append_bus_insert", "set_bus_gain", "set_bus_insert_parameter", "set_faust_bus_automation"):
                 matches = [b for b in source["buses"] if b["id"] == op.get("bus_id")]
                 require(len(matches) == 1, "Unknown bus")
                 bus = matches[0]
@@ -279,6 +284,14 @@ class ProjectService(Service):
                     fields(op, ("kind", "bus_id", "value"))
                     number(op["value"])
                     bus["gain_db"] = op["value"]
+                elif op["kind"] == "set_faust_bus_automation":
+                    fields(op, ("kind", "bus_id", "insert_index", "binding", "points"))
+                    index = op["insert_index"]
+                    require(type(index) is int and 0 <= index < len(bus["inserts"]), "Unknown bus insert")
+                    insert = bus["inserts"][index]
+                    require("module_sha256" in insert, "Choose a Faust insert")
+                    require(isinstance(op["binding"], str) and op["binding"], "Invalid Faust binding")
+                    insert.setdefault("automation", {})[op["binding"]] = op["points"]
                 else:
                     fields(op, ("kind", "bus_id", "insert_index", "binding", "value"))
                     index = op["insert_index"]

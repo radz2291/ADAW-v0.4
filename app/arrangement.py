@@ -110,12 +110,25 @@ def validate(source):
     require(isinstance(source["buses"], list) and source["buses"], "Missing buses")
     bus_ids = set()
     for bus in source["buses"]:
-        fields(bus, ("id", "gain_db", "inserts"))
+        fields(bus, ("id", "gain_db", "inserts"), ("send_from",) if source["schema"] == "adaw.arrangement@2" else ())
         identifier(bus["id"])
         require(bus["id"] not in bus_ids, "Duplicate bus")
         bus_ids.add(bus["id"])
         number(bus["gain_db"])
         validate_inserts(bus["inserts"])
+    bus_positions = {bus["id"]: index for index, bus in enumerate(source["buses"])}
+    for bus in source["buses"]:
+        sends = bus.get("send_from", [])
+        require(isinstance(sends, list), "Expected a bus send list")
+        upstream = set()
+        for send in sends:
+            fields(send, ("bus", "gain_db"))
+            identifier(send["bus"])
+            require(send["bus"] in bus_positions and bus_positions[send["bus"]] < bus_positions[bus["id"]],
+                    "Post-fader send must reference an earlier bus")
+            require(send["bus"] not in upstream, "Duplicate bus send")
+            upstream.add(send["bus"])
+            number(send["gain_db"], -120, 0)
     require(isinstance(source["tracks"], list) and source["tracks"], "Missing tracks")
     track_ids, event_ids = set(), set()
     for t in source["tracks"]:
@@ -162,7 +175,9 @@ def validate(source):
             integer(e["velocity"], 1)
             require(e["note"] <= 127 and e["velocity"] <= 127, "Invalid MIDI range")
             require(e["start_tick"] + e["duration_ticks"] <= source["length_ticks"], "Event outside arrangement")
-    require(bus_ids == {t["bus"] for t in source["tracks"]}, "Empty buses unsupported")
+    require(bus_ids == ({t["bus"] for t in source["tracks"]} |
+                        {bus["id"] for bus in source["buses"] if bus.get("send_from")}),
+            "Each bus needs a track or a send")
     fields(source["master"], ("gain_db", "inserts"))
     number(source["master"]["gain_db"])
     validate_inserts(source["master"]["inserts"])
@@ -189,8 +204,21 @@ def validate_inserts(inserts):
                 require(isinstance(key, str) and key.isdigit(), "Invalid plugin binding")
                 number(value, 0, 1)
         else:
-            fields(insert, ("module_sha256", "parameters"))
+            fields(insert, ("module_sha256", "parameters"), ("automation",))
             sha(insert["module_sha256"])
+            lanes = insert.get("automation", {})
+            require(isinstance(lanes, dict), "Invalid Faust automation")
+            for binding, points in lanes.items():
+                require(isinstance(binding, str) and binding and isinstance(points, list) and points,
+                        "Invalid Faust automation lane")
+                previous = -1
+                for point in points:
+                    fields(point, ("tick", "value"))
+                    integer(point["tick"])
+                    require(point["tick"] > previous, "Automation ticks must increase")
+                    number(point["value"])
+                    previous = point["tick"]
+                require(points[0]["tick"] == 0, "Automation must start at tick zero")
         validate_parameters(insert["parameters"])
 
 
@@ -209,7 +237,13 @@ def compile_graph(source, read_content):
                 last = add(f"{name}_fx{i}", "vst", [last], {"registry_id": insert["registry_id"], "state_sha256": insert["state_sha256"],
                     "parameters": insert["parameters"], "midi": [], "automation": {}})
             else:
-                last = add(f"{name}_fx{i}", "faust", [last], {"source": read_content(insert["module_sha256"]).decode("utf-8"), "parameters": insert["parameters"]})
+                config = {"source": read_content(insert["module_sha256"]).decode("utf-8"), "parameters": insert["parameters"]}
+                if insert.get("automation"):
+                    require(all(point["tick"] < source["length_ticks"] for points in insert["automation"].values()
+                                for point in points), "Automation point outside arrangement")
+                    config["automation"] = {key: [[frame(point["tick"]), point["value"]] for point in points]
+                                            for key, points in insert["automation"].items()}
+                last = add(f"{name}_fx{i}", "faust", [last], config)
         gain = 10 ** (gain_db / 20)
         return add(name + "_level", "faust", [last], {"source": f"process = *( {gain*min(1,1-pan):.17g} ), *( {gain*min(1,1+pan):.17g} );", "parameters": {}})
     for t in source["tracks"]:
@@ -229,12 +263,14 @@ def compile_graph(source, read_content):
         dry = add("track_"+t["id"], t["kind"], [], config)
         ends[t["id"]] = processing("track_"+t["id"], dry, t["gain_db"], t["pan"], t["inserts"])
         stems.append(ends[t["id"]])
-    buses = []
+    buses = {}
     for b in source["buses"]:
         inputs = [ends[t["id"]] for t in source["tracks"] if t["bus"] == b["id"]]
+        for index, send in enumerate(b.get("send_from", [])):
+            inputs.append(processing(f"bus_{b['id']}_send{index}", buses[send["bus"]], send["gain_db"], 0, []))
         summed = add("bus_"+b["id"], "faust", inputs, {"source": f"process = si.bus({2*len(inputs)}) :> si.bus(2);", "parameters": {}})
-        buses.append(processing("bus_"+b["id"], summed, b["gain_db"], 0, b["inserts"]))
-    summed = add("mix", "faust", buses, {"source": f"process = si.bus({2*len(buses)}) :> si.bus(2);", "parameters": {}})
+        buses[b["id"]] = processing("bus_"+b["id"], summed, b["gain_db"], 0, b["inserts"])
+    summed = add("mix", "faust", list(buses.values()), {"source": f"process = si.bus({2*len(buses)}) :> si.bus(2);", "parameters": {}})
     master = processing("master", summed, source["master"]["gain_db"], 0, source["master"]["inserts"])
     fade = source["fade_frames"]
     add("output", "faust", [master], {"source": f"envelope = min(1,ba.time/{fade}.0)*max(0,min(1,({total-1}.0-ba.time)/{fade}.0)); process = *(envelope),*(envelope);", "parameters": {}})
