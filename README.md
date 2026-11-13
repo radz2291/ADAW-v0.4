@@ -1,10 +1,22 @@
-# ADAW v0.4 — G1 composition-to-master
+# ADAW v0.4
 
 New implementation; no v0.3 code reused. Working JSON CLI, immutable validated
 signal graphs, transactional service, killable DawDreamer workers, real Faust/VST
 renders and independent decoded-file measurement. G1 now produces an original
 75-second cue through editable source, proposals, revisions, real rendering and
-verified PCM24 export. **Owner listening review remains pending.**
+verified PCM24 export. The owner accepted G1 as a development milestone.
+Musical feedback and rendition approvals are tracked separately.
+
+The `adaw/g2-g5` integration branch adds a local Studio, portable archives,
+measured comparison tools and offline timing and routing features.
+
+```powershell
+.\tools\start_studio.ps1
+```
+
+Open [local Studio](http://127.0.0.1:8765/). Use `-Project` to choose a local
+project and `-ApiOnly` to run the service by itself. Project creation and asset
+import remain available in the CLI. [Owner handoff](docs/development/OWNER-RETURN.md).
 
 See the [G1 decision](docs/decisions/G1-DECISION.md),
 [implemented contract](docs/decisions/ADR-0002-g1-production-contract.md) and
@@ -146,18 +158,3 @@ Primary license/source links: [DawDreamer GPLv3](https://github.com/DBraun/DawDr
 [Airwindows MIT](https://github.com/airwindows/airwindows),
 [Consolidated GPLv3](https://github.com/baconpaul/airwin2rack/releases/tag/DAWPlugin),
 [pyloudnorm MIT](https://github.com/csteinmetz1/pyloudnorm).
-# Studio and integration branch
-
-From the checkout with its Windows Python environment installed:
-
-```powershell
-.\.venv\Scripts\python.exe -m app.studio_api --root .local/g1-night-circuit-v2 --port 8765
-```
-
-Open [local Studio](http://127.0.0.1:8765/). Choose a project directory at launch.
-Use `--api-only` to run the same service without the frontend. The existing
-`python -m app --root ... --timeout 180` commands work against that project.
-Project creation and asset import remain available in the CLI.
-
-See the [owner handoff](docs/development/OWNER-RETURN.md) for verified scope,
-portable project commands, audio evidence and remaining work.

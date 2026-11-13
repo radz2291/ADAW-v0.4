@@ -15,3 +15,11 @@ G2 work depends on real G1 source and the shared HTTP/CLI service. G3 restores
 verified content and resolves only named VSTs. G4 uses measured audio and awaits
 owner listening. G5 validates tempo and meter in the existing offline engine.
 Remaining acceptance items are listed in the handoff and permanent spec.
+
+The specialists completed their assignments and the lead integrated them.
+Browser, headless, native audio and archive evidence is recorded in the
+[checkpoint](../../evidence/gates/g2/checkpoint.json). The previous G0/G1
+evidence and original specification passed byte verification. A Windows
+recovery test observed delayed lock release after process exit. The test now
+checks eventual reconciliation within five seconds and keeps the original
+failure log.

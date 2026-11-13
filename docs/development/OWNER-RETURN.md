@@ -40,6 +40,21 @@ edits are staged first and apply by explicit action. Browser render requests
 remain open during offline processing. Review entries bind verified PCM export
 bytes and the exact rendition.
 
+| Permanent test | Current evidence |
+|---|---|
+| RWT-01 | Owner accepted G1 development. The original listening feedback and the arrangement preview are recorded separately |
+| RWT-02 | G1 measured kick/bass contexts and matched samples. Human comparison remains open |
+| RWT-03 | Two verified engineering profiles and a failing peak rule. Owner-selected profiles and approved source remain open |
+| RWT-04 | Disjoint native Faust automation and event merge, structured Dexed conflict, selective undo and exact revision render |
+| RWT-05 | Native authored Faust, validated import and denied-plugin fixture |
+| RWT-06 | Worker failures and interrupted-service reconciliation tested. Full host and vendor crash coverage remains open |
+| RWT-07 | Second original cue, reused modules, restored history and independent post-restore edit |
+| RWT-08 | AWAITING_OWNER_REVIEW. Gain-matched audio is available. A professional reference and criteria remain open |
+| RWT-09 | Exact approval scope and new-rendition isolation tested with a simulated owner decision on a disposable project |
+| RWT-10 | Protected event and cross-origin mutation rejection tested. Full permissions audit remains open |
+| RWT-11 | Real approved Dexed and Consolidated fixture paths, state and parameter tests. User collection compatibility remains untested |
+| RWT-12 | Faust and VST pipeline reused on a separate cue. Missing dependency blocked render and explicit rebind restored it. VST sidechain remains open |
+
 ## Listen and inspect
 
 * Night Circuit original and Arrangement 02 have matched copies in

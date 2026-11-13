@@ -1,0 +1,53 @@
+....................................F.....                               [100%]
+================================== FAILURES ===================================
+_______________ test_interrupted_owner_does_not_promote_worker ________________
+
+tmp_path = WindowsPath('C:/Users/RZ1/AppData/Local/Temp/pytest-of-RZ1/pytest-20/test_interrupted_owner_does_no0')
+
+    def test_interrupted_owner_does_not_promote_worker(tmp_path):
+        project = ProjectService(tmp_path)
+        script = ("import sys; from app.project import ProjectService; "
+                  "ProjectService(sys.argv[1]).run_worker("
+                  "{'operation':'fault_timeout','sleep_seconds':4},20)")
+        owner = subprocess.Popen([sys.executable, "-c", script, str(tmp_path)])
+        try:
+            deadline = time.monotonic() + 15
+            while time.monotonic() < deadline:
+                with closing(project.connect()) as db:
+                    row = db.execute("SELECT id FROM jobs WHERE status='running'").fetchone()
+                if row:
+                    break
+                time.sleep(.05)
+            assert row
+            job_id = row[0]
+            assert project.reconcile_jobs()["active"] == [job_id]
+            owner.kill()
+            owner.wait(timeout=10)
+>           assert project.reconcile_jobs()["interrupted"] == [job_id]
+E           AssertionError: assert [] == ['4328dfe8b09...1c22a6df4aac']
+E             
+E             Right contains one more item: '4328dfe8b0994a64b9d91c22a6df4aac'
+E             Use -v to get more diff
+
+tests\test_recovery.py:30: AssertionError
+============================== warnings summary ===============================
+tests/test_project.py::test_real_faust_bus_drive_interleaves_with_event_move
+tests/test_project.py::test_offline_parallel_send_raises_rms_by_declared_linear_gain
+tests/test_project.py::test_offline_parallel_send_raises_rms_by_declared_linear_gain
+tests/test_studio_api.py::test_independent_client_and_cli_share_one_project
+tests/test_studio_api.py::test_independent_client_and_cli_share_one_project
+tests/test_studio_api.py::test_independent_client_and_cli_share_one_project
+tests/test_studio_api.py::test_real_vst_parameter_http_cli_parity
+  C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\quality.py:18: WavFileWarning: Chunk (non-data) not understood, skipping it.
+    other_rate, other = wavfile.read(path)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 5 durations =============================
+40.72s call     tests/test_studio_api.py::test_real_vst_parameter_http_cli_parity
+18.95s call     tests/test_studio_api.py::test_independent_client_and_cli_share_one_project
+9.21s call     tests/test_studio_api.py::test_archive_rejects_altered_member_and_manifest
+1.79s call     tests/test_project.py::test_offline_parallel_send_raises_rms_by_declared_linear_gain
+1.60s call     tests/test_recovery.py::test_interrupted_owner_does_not_promote_worker
+=========================== short test summary info ===========================
+FAILED tests/test_recovery.py::test_interrupted_owner_does_not_promote_worker
+1 failed, 41 passed, 7 warnings in 79.37s (0:01:19)
