@@ -13,6 +13,13 @@ Read [G1 decision](docs/decisions/G1-DECISION.md) and
 [G1 contract ADR](docs/decisions/ADR-0002-g1-production-contract.md) for the current
 implementation. G1 technical delivery does not imply owner musical approval.
 
+The owner accepted G1 as a development milestone and authorized work through G5.
+Use the integration branch and [execution ledger](docs/development/EXECUTION.md)
+for current work. Studio is a replaceable client of the published local service.
+It must not own persisted project decisions, native audio or production workflows.
+Keep the frontend-absent integration test as a permanent regression.
+Read the [boundary map](docs/architecture/BOUNDARIES.md) before moving modules.
+
 Repository organization:
 
 - `docs/spec/v0.4/`: original specification, schemas, examples, references and manifest.

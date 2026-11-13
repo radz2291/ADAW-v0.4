@@ -146,3 +146,18 @@ Primary license/source links: [DawDreamer GPLv3](https://github.com/DBraun/DawDr
 [Airwindows MIT](https://github.com/airwindows/airwindows),
 [Consolidated GPLv3](https://github.com/baconpaul/airwin2rack/releases/tag/DAWPlugin),
 [pyloudnorm MIT](https://github.com/csteinmetz1/pyloudnorm).
+# Studio and integration branch
+
+From the checkout with its Windows Python environment installed:
+
+```powershell
+.\.venv\Scripts\python.exe -m app.studio_api --root .local/g1-night-circuit-v2 --port 8765
+```
+
+Open [local Studio](http://127.0.0.1:8765/). Choose a project directory at launch.
+Use `--api-only` to run the same service without the frontend. The existing
+`python -m app --root ... --timeout 180` commands work against that project.
+Project creation and asset import remain available in the CLI.
+
+See the [owner handoff](docs/development/OWNER-RETURN.md) for verified scope,
+portable project commands, audio evidence and remaining work.

@@ -17,6 +17,7 @@ import uuid
 
 from app.contracts import RenderGraph, canonical, catalog_hash, digest, file_hash
 from app.errors import AdawError
+from app.job_leases import job_lease
 from app.quality import analyze
 
 REPO = Path(__file__).resolve().parent.parent
@@ -51,7 +52,9 @@ class Service:
             ''')
 
     def connect(self):
-        return sqlite3.connect(self.db_path)
+        db = sqlite3.connect(self.db_path)
+        db.execute("PRAGMA trusted_schema=OFF")
+        return db
 
     def inspect(self):
         with closing(self.connect()) as db:
@@ -81,6 +84,10 @@ class Service:
         registry_id = "plugin-" + identity["sha256"]
         with closing(self.connect()) as db, db:
             db.execute("INSERT OR IGNORE INTO plugins VALUES (?,?,?,NULL)", (registry_id, canonical(identity), provenance))
+            row = db.execute("SELECT identity FROM plugins WHERE id=?", (registry_id,)).fetchone()
+            if json.loads(row[0]).get("path") is None:
+                db.execute("UPDATE plugins SET identity=?,provenance=? WHERE id=?",
+                           (canonical(identity), provenance, registry_id))
         return {"registry_id": registry_id, **identity, "provenance": provenance}
 
     def plugin(self, registry_id):
@@ -89,6 +96,8 @@ class Service:
         if row is None:
             raise AdawError("PLUGIN_UNAPPROVED", "Plugin is not authorized", registry_id=registry_id)
         identity = json.loads(row[0])
+        if identity.get("path") is None:
+            raise AdawError("PLUGIN_MISSING", "Resolve and explicitly authorize the archived plugin", registry_id=registry_id)
         if binary_identity(identity["path"])["sha256"] != identity["sha256"]:
             raise AdawError("PLUGIN_CAPABILITY_UNVERIFIED", "Plugin files changed; reauthorize and probe")
         return {**identity, "provenance": row[1], "probe": json.loads(row[2]) if row[2] else None}
@@ -110,6 +119,12 @@ class Service:
                 raise AdawError("VALIDATION_ERROR", "Missing/corrupt plugin state", sha256=sha)
             shutil.copyfile(source, stage / (sha + ".state"))
         (stage / "request.json").write_bytes(canonical(request))
+        with job_lease(stage / "service.lease") as locked:
+            if not locked:
+                raise AdawError("CONFLICT", "Worker lease is already held")
+            return self._run_job(stage, job, timeout)
+
+    def _run_job(self, stage, job, timeout):
         with closing(self.connect()) as db, db:
             db.execute("INSERT INTO jobs VALUES (?, 'running', NULL)", (job,))
         start = time.perf_counter()
@@ -138,6 +153,32 @@ class Service:
             error = result["error"]
             raise AdawError(error["code"], error["message"], job_id=job, stage=str(stage), worker=result)
         return result
+
+    def reconcile_jobs(self):
+        """Only the process that owns a job may promote its worker result."""
+        with closing(self.connect()) as db:
+            jobs = [row[0] for row in db.execute("SELECT id FROM jobs WHERE status='running'")]
+        interrupted, active, untracked = [], [], []
+        for job in jobs:
+            if len(job) != 32 or any(ch not in "0123456789abcdef" for ch in job):
+                untracked.append(job)
+                continue
+            lease = self.staging / job / "service.lease"
+            if not lease.is_file():
+                untracked.append(job)
+                continue
+            with job_lease(lease) as locked:
+                if not locked:
+                    active.append(job)
+                    continue
+                result = {"ok": False, "job_id": job, "error": {
+                    "code": "SERVICE_INTERRUPTED", "message": "Worker owner exited before publishing a result"}}
+                with closing(self.connect()) as db, db:
+                    changed = db.execute("UPDATE jobs SET status='interrupted',result=? WHERE id=? AND status='running'",
+                                         (canonical(result), job)).rowcount
+                if changed:
+                    interrupted.append(job)
+        return {"interrupted": interrupted, "active": active, "untracked": untracked}
 
     def probe_plugin(self, registry_id, sample_rate, block_size, timeout):
         if type(sample_rate) is not int or type(block_size) is not int or sample_rate <= 0 or block_size <= 0:

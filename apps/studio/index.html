@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ADAW Studio</title>
+  <link rel="stylesheet" href="/studio.css">
+  <script type="module" src="/studio.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="identity"><span class="wordmark">ADAW</span><span class="studio-name">Studio</span></div>
+    <div class="project-identity">
+      <h1 id="project-title">Opening project…</h1>
+      <p id="project-context">Connecting to the local project service</p>
+    </div>
+    <div class="top-actions">
+      <button type="button" id="refresh">Refresh</button>
+      <button type="button" class="primary" id="render-head" disabled>Render head</button>
+    </div>
+  </header>
+  <main>
+    <p id="notice" class="notice" role="status" aria-live="polite" hidden></p>
+    <div class="workspace">
+      <section class="arrangement panel" aria-labelledby="arrangement-heading">
+        <div class="panel-heading">
+          <div><h2 id="arrangement-heading">Arrangement</h2><p id="timeline-context"></p></div>
+          <div class="arrangement-actions">
+            <label for="zoom">Zoom</label>
+            <select id="zoom"><option value="1">Fit</option><option value="2">2×</option><option value="4">4×</option></select>
+            <button type="button" id="back-head" hidden>View head</button>
+          </div>
+        </div>
+        <div class="timeline-viewport" id="timeline-viewport" tabindex="0" aria-label="Scrollable arrangement timeline">
+          <div class="timeline" id="timeline"></div>
+        </div>
+        <div class="transport" aria-label="Rendition playback">
+          <canvas id="waveform" width="960" height="48" role="img" aria-label="Waveform of the active rendition" hidden></canvas>
+          <div class="transport-main">
+            <button type="button" class="primary" id="play" disabled>Play</button>
+            <label class="sr-only" for="position">Playback position</label>
+            <input id="position" type="range" min="0" max="0" step=".01" value="0" disabled>
+            <span class="time" id="time">0:00 / 0:00</span>
+            <label for="volume" class="volume-label">Monitor</label>
+            <input id="volume" aria-label="Monitor volume" type="range" min="0" max="1" step=".01" value=".8">
+          </div>
+          <div class="transport-sources">
+            <div class="ab-group" aria-label="Active comparison source">
+              <button type="button" id="ab-a" aria-pressed="true">A</button>
+              <button type="button" id="ab-b" aria-pressed="false">B</button>
+            </div>
+            <label><span class="sr-only">Rendition A</span><select id="rendition-a"></select></label>
+            <label><span class="sr-only">Rendition B</span><select id="rendition-b"></select></label>
+            <span id="audio-context" class="audio-context"></span>
+          </div>
+          <audio id="audio" preload="metadata"></audio>
+        </div>
+      </section>
+      <aside class="inspector panel" aria-labelledby="inspector-heading">
+        <div class="panel-heading"><h2 id="inspector-heading">Inspector</h2><p id="inspector-context"></p></div>
+        <nav class="tabs" aria-label="Inspector views">
+          <button type="button" data-view="edit" aria-pressed="true">Events</button>
+          <button type="button" data-view="mix" aria-pressed="false">Mixer</button>
+          <button type="button" data-view="plugins" aria-pressed="false">Plugins</button>
+        </nav>
+        <div id="inspector-content" class="inspector-content"></div>
+      </aside>
+    </div>
+    <section class="review panel" aria-labelledby="review-heading">
+      <div class="panel-heading"><h2 id="review-heading">Production review</h2></div>
+      <div class="review-grid">
+        <section aria-labelledby="proposal-heading">
+          <div class="section-heading"><h3 id="proposal-heading">Proposals</h3></div>
+          <div id="proposals"></div>
+        </section>
+        <section aria-labelledby="revisions-heading">
+          <div class="section-heading"><h3 id="revisions-heading">Revisions</h3></div>
+          <div id="revisions"></div>
+        </section>
+        <section aria-labelledby="quality-heading">
+          <div class="section-heading"><h3 id="quality-heading">Audio evidence</h3><button type="button" id="measure" disabled>Analyze</button></div>
+          <div id="quality"></div>
+        </section>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

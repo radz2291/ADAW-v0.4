@@ -5,7 +5,8 @@ from app.project import ProjectService
 
 
 COMMANDS = {"project-create", "project-inspect", "history", "asset-import", "proposal-create", "proposal-apply",
-            "project-render", "analyze", "export", "job-status", "plugin-state-capture"}
+            "proposal-inspect", "project-undo", "project-parameters", "project-render",
+            "analyze", "export", "job-status", "plugin-state-capture"}
 
 
 def add_commands(sub):
@@ -21,6 +22,12 @@ def add_commands(sub):
     proposal.add_argument("--command", dest="command_file", required=True)
     apply = sub.add_parser("proposal-apply")
     apply.add_argument("--id", required=True)
+    proposal_inspect = sub.add_parser("proposal-inspect")
+    proposal_inspect.add_argument("--id", required=True)
+    undo = sub.add_parser("project-undo")
+    undo.add_argument("--revision", required=True)
+    parameters = sub.add_parser("project-parameters")
+    parameters.add_argument("--revision")
     render = sub.add_parser("project-render")
     render.add_argument("--revision")
     render.add_argument("--proposal")
@@ -51,6 +58,13 @@ def execute(args):
         return service.propose(json.loads(Path(args.command_file).read_text(encoding="utf-8")))
     if args.command == "proposal-apply":
         return service.apply(args.id)
+    if args.command == "proposal-inspect":
+        return service.inspect_proposal(args.id)
+    if args.command == "project-undo":
+        return service.undo(args.revision)
+    if args.command == "project-parameters":
+        revision, _ = service.source(args.revision)
+        return {"revision": revision, "plugins": service.parameter_catalogs(revision)}
     if args.command == "project-render":
         return service.render_project(args.timeout, args.revision, args.proposal)
     if args.command == "analyze":

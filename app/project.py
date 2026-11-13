@@ -1,4 +1,4 @@
-"""G1 authoritative service: validated imports, proposals, revisions and renditions."""
+"""Authoritative service for imports, proposals, revisions and renditions."""
 from contextlib import closing
 import io
 import json
@@ -9,6 +9,7 @@ import uuid
 from app.arrangement import validate, compile_graph, sha
 from app.contracts import canonical, catalog_hash, digest, fields, file_hash, number, require
 from app.errors import AdawError
+from app.revisions import merge_source
 from app.service import Service
 from app.quality import analyze_delivery
 
@@ -19,11 +20,13 @@ class ProjectService(Service):
         with closing(self.connect()) as db, db:
             db.executescript('''
                 CREATE TABLE IF NOT EXISTS g1_imports (hash TEXT PRIMARY KEY, kind TEXT NOT NULL, provenance TEXT NOT NULL);
+                CREATE TABLE IF NOT EXISTS g2_module_validation (hash TEXT PRIMARY KEY, validation BLOB NOT NULL);
                 CREATE TABLE IF NOT EXISTS g1_states (hash TEXT NOT NULL, plugin TEXT NOT NULL, catalog TEXT NOT NULL, PRIMARY KEY(hash,plugin,catalog));
                 CREATE TABLE IF NOT EXISTS g1_revisions (id TEXT PRIMARY KEY, parent TEXT, source BLOB NOT NULL, reason TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS g1_proposals (id TEXT PRIMARY KEY, payload BLOB NOT NULL, source BLOB NOT NULL, applied TEXT);
                 CREATE TABLE IF NOT EXISTS g1_renditions (id TEXT PRIMARY KEY, revision TEXT NOT NULL, report BLOB NOT NULL);
                 CREATE TABLE IF NOT EXISTS g1_exports (id TEXT PRIMARY KEY, rendition TEXT NOT NULL, report BLOB NOT NULL);
+                CREATE TABLE IF NOT EXISTS g2_undos (target TEXT PRIMARY KEY, applied TEXT NOT NULL);
             ''')
 
     def read_content(self, content_hash):
@@ -50,6 +53,8 @@ class ProjectService(Service):
         content_hash = self.put(data)
         with closing(self.connect()) as db, db:
             db.execute("INSERT OR IGNORE INTO g1_imports VALUES (?,?,?)", (content_hash, kind, provenance))
+            if kind == "faust":
+                db.execute("INSERT OR IGNORE INTO g2_module_validation VALUES (?,?)", (content_hash, canonical(details)))
         return {"sha256": content_hash, "kind": kind, "provenance": provenance, "validation": details}
 
     def capture_plugin_state(self, registry_id, timeout, sample_rate, block_size):
@@ -76,9 +81,15 @@ class ProjectService(Service):
         references = []
         with closing(self.connect()) as db:
             def check_plugin(inst):
-                identity = self.plugin(inst["registry_id"])
-                if not identity["probe"] or catalog_hash(identity["probe"]["parameters"]) != inst["catalog_sha256"]:
-                    raise AdawError("PLUGIN_CAPABILITY_UNVERIFIED", "Source catalog binding changed")
+                catalog = self._verified_catalog(inst)
+                indices = {parameter["index"] for parameter in catalog}
+                for binding in inst["parameters"]:
+                    try:
+                        index = int(binding)
+                    except ValueError as exc:
+                        raise AdawError("VALIDATION_ERROR", "Invalid VST parameter index", binding=binding) from exc
+                    if index not in indices:
+                        raise AdawError("VALIDATION_ERROR", "Missing VST parameter", binding=binding)
                 if not db.execute("SELECT 1 FROM g1_states WHERE hash=? AND plugin=? AND catalog=?", (inst["state_sha256"], inst["registry_id"], inst["catalog_sha256"])).fetchone():
                     raise AdawError("PLUGIN_CAPABILITY_UNVERIFIED", "State is not bound to this plugin/catalog")
                 self.read_content(inst["state_sha256"])
@@ -99,6 +110,11 @@ class ProjectService(Service):
                         check_plugin(i)
                     else:
                         references.append((i["module_sha256"], "faust"))
+                        validation = self._module_validation(db, i["module_sha256"])
+                        if validation is not None:
+                            catalog = {item["name"]: item for item in validation["catalog"]}
+                            for binding, value in i["parameters"].items():
+                                self._validate_faust_parameter(catalog, binding, value)
             for content_hash, kind in references:
                 if not db.execute("SELECT 1 FROM g1_imports WHERE hash=? AND kind=?", (content_hash, kind)).fetchone():
                     raise AdawError("ASSET_MISSING", "Reference has no validated import", sha256=content_hash)
@@ -109,6 +125,75 @@ class ProjectService(Service):
     def head(self, db):
         row = db.execute("SELECT value FROM metadata WHERE key='g1_head'").fetchone()
         return row[0] if row else None
+
+    def _verified_catalog(self, instance):
+        probe = self.plugin(instance["registry_id"])["probe"]
+        if not probe or catalog_hash(probe["parameters"]) != instance["catalog_sha256"]:
+            raise AdawError("PLUGIN_CAPABILITY_UNVERIFIED", "Source catalog binding changed",
+                            registry_id=instance["registry_id"])
+        return probe["parameters"]
+
+    @staticmethod
+    def _module_validation(db, content_hash):
+        row = db.execute("SELECT validation FROM g2_module_validation WHERE hash=?", (content_hash,)).fetchone()
+        return json.loads(row[0]) if row else None
+
+    @staticmethod
+    def _validate_faust_parameter(catalog, binding, value):
+        require(isinstance(binding, str) and binding in catalog, "Unknown Faust parameter binding")
+        parameter = catalog[binding]
+        number(value, parameter["min"], parameter["max"])
+
+    def _set_bus_parameter(self, insert, binding, value):
+        if "registry_id" in insert:
+            self._set_vst_parameter(insert, binding, value)
+            return
+        with closing(self.connect()) as db:
+            validation = self._module_validation(db, insert["module_sha256"])
+        if validation is None:
+            raise AdawError("MODULE_CAPABILITY_UNVERIFIED",
+                            "Import the existing Faust module again to record its validated control catalog",
+                            module_sha256=insert["module_sha256"])
+        catalog = {parameter["name"]: parameter for parameter in validation["catalog"]}
+        self._validate_faust_parameter(catalog, binding, value)
+        insert["parameters"][binding] = value
+
+    def parameter_catalogs(self, revision=None):
+        """Expose verified parameter bindings for the instrument and bus controls.
+
+        An unset normalized override inherits opaque plugin state. The stored
+        probe's factory/current value does not describe that instance state.
+        """
+        _, source = self.source(revision)
+        rows = []
+
+        def add(instance, **location):
+            row = {**location, "registry_id": instance["registry_id"],
+                   "catalog_sha256": instance["catalog_sha256"], "parameters": []}
+            rows.append(row)
+            try:
+                catalog = self._verified_catalog(instance)
+            except AdawError as error:
+                row["error"] = {"code": error.code, "message": str(error), "details": error.details}
+                return
+            overrides = {int(binding): value for binding, value in instance["parameters"].items()}
+            for parameter in catalog:
+                index = parameter["index"]
+                row["parameters"].append({
+                    **{key: parameter.get(key) for key in
+                       ("index", "name", "label", "isBoolean", "isDiscrete", "numSteps")},
+                    "value": overrides.get(index),
+                    "value_source": "override" if index in overrides else "opaque_state",
+                })
+
+        for track in source["tracks"]:
+            if track["kind"] == "vst":
+                add(track["instrument"], track_id=track["id"])
+        for bus in source["buses"]:
+            for index, insert in enumerate(bus["inserts"]):
+                if "registry_id" in insert:
+                    add(insert, bus_id=bus["id"], insert_index=index)
+        return rows
 
     def create(self, source):
         self.validate_dependencies(source)
@@ -122,11 +207,15 @@ class ProjectService(Service):
 
     def source(self, revision=None):
         with closing(self.connect()) as db:
-            revision = revision or self.head(db)
-            row = db.execute("SELECT source FROM g1_revisions WHERE id=?", (revision,)).fetchone()
+            revision = self.head(db) if revision is None else revision
+            return revision, json.loads(self._revision(db, revision)[1])
+
+    def _revision(self, db, revision):
+        require(revision is None or isinstance(revision, str), "Expected revision ID")
+        row = db.execute("SELECT parent,source FROM g1_revisions WHERE id=?", (revision,)).fetchone()
         if not row:
             raise AdawError("NOT_FOUND", "Revision not found", revision=revision)
-        return revision, json.loads(row[0])
+        return row
 
     def project_inspect(self):
         revision, source = self.source()
@@ -141,6 +230,18 @@ class ProjectService(Service):
                     "proposals": [{"id": r[0], "applied_revision": r[1]} for r in db.execute("SELECT id,applied FROM g1_proposals ORDER BY rowid")],
                     "renditions": [{"id": r[0], "revision": r[1]} for r in db.execute("SELECT id,revision FROM g1_renditions ORDER BY rowid")],
                     "exports": [{"id": r[0], "rendition": r[1]} for r in db.execute("SELECT id,rendition FROM g1_exports ORDER BY rowid")]}
+
+    def inspect_proposal(self, proposal_id):
+        with closing(self.connect()) as db:
+            command, source, applied = self._proposal(db, proposal_id)
+        return {"command": json.loads(command), "source": json.loads(source), "applied": applied}
+
+    def _proposal(self, db, proposal_id):
+        require(isinstance(proposal_id, str) and proposal_id, "Expected proposal ID")
+        row = db.execute("SELECT payload,source,applied FROM g1_proposals WHERE id=?", (proposal_id,)).fetchone()
+        if not row:
+            raise AdawError("NOT_FOUND", "Proposal not found", proposal_id=proposal_id)
+        return row
 
     def propose(self, command):
         fields(command, ("command_id", "base_revision", "reason", "operations"))
@@ -163,11 +264,26 @@ class ProjectService(Service):
                 number(op["value"])
                 source["master"]["gain_db"] = op["value"]
                 continue
-            if op["kind"] == "append_bus_insert":
-                fields(op, ("kind", "bus_id", "insert"))
-                matches = [b for b in source["buses"] if b["id"] == op["bus_id"]]
+            if op["kind"] == "set_delivery_profile":
+                fields(op, ("kind", "profile"))
+                source["profile"] = op["profile"]
+                continue
+            if op["kind"] in ("append_bus_insert", "set_bus_gain", "set_bus_insert_parameter"):
+                matches = [b for b in source["buses"] if b["id"] == op.get("bus_id")]
                 require(len(matches) == 1, "Unknown bus")
-                matches[0]["inserts"].append(op["insert"])
+                bus = matches[0]
+                if op["kind"] == "append_bus_insert":
+                    fields(op, ("kind", "bus_id", "insert"))
+                    bus["inserts"].append(op["insert"])
+                elif op["kind"] == "set_bus_gain":
+                    fields(op, ("kind", "bus_id", "value"))
+                    number(op["value"])
+                    bus["gain_db"] = op["value"]
+                else:
+                    fields(op, ("kind", "bus_id", "insert_index", "binding", "value"))
+                    index = op["insert_index"]
+                    require(type(index) is int and 0 <= index < len(bus["inserts"]), "Unknown bus insert")
+                    self._set_bus_parameter(bus["inserts"][index], op["binding"], op["value"])
                 continue
             if op["kind"] == "set_arrangement":
                 fields(op, ("kind", "sections", "track_events"))
@@ -212,8 +328,11 @@ class ProjectService(Service):
                 fields(op, ("kind", "track_id", "binding", "value"))
                 require(track["kind"] in ("faust_synth", "vst"), "Track has no exposed parameters")
                 require(isinstance(op["binding"], str) and op["binding"], "Missing parameter binding")
-                number(op["value"])
-                track["instrument"]["parameters"][op["binding"]] = op["value"]
+                if track["kind"] == "vst":
+                    self._set_vst_parameter(track["instrument"], op["binding"], op["value"])
+                else:
+                    number(op["value"])
+                    track["instrument"]["parameters"][op["binding"]] = op["value"]
             else:
                 raise AdawError("VALIDATION_ERROR", "Unsupported typed operation")
         self.validate_dependencies(source)
@@ -228,39 +347,83 @@ class ProjectService(Service):
                 db.execute("INSERT INTO g1_proposals VALUES (?,?,?,NULL)", (command["command_id"], payload, canonical(source)))
         return {"proposal_id": command["command_id"], "source_sha256": digest(canonical(source)), "operations": command["operations"], "head_changed": False}
 
+    def _set_vst_parameter(self, instance, binding, value):
+        catalog = self._verified_catalog(instance)
+        require(isinstance(binding, str) and binding in {str(item["index"]) for item in catalog},
+                "Unknown VST parameter binding")
+        number(value, 0, 1)
+        # Normalize any historical alias so one native index has one source field.
+        for key in list(instance["parameters"]):
+            if key != binding and int(key) == int(binding):
+                del instance["parameters"][key]
+        instance["parameters"][binding] = value
+
+    @staticmethod
+    def _revision_id(parent, source, command_id):
+        return "rev-" + digest(canonical({"parent": parent, "source": source, "command": command_id}))
+
+    def _commit(self, db, parent, source, command_id, reason):
+        revision = self._revision_id(parent, source, command_id)
+        db.execute("INSERT INTO g1_revisions VALUES (?,?,?,?)", (revision, parent, canonical(source), reason))
+        db.execute("UPDATE metadata SET value=? WHERE key='g1_head'", (revision,))
+        return revision
+
     def apply(self, proposal_id):
-        with closing(self.connect()) as db:
-            candidate = db.execute("SELECT source,applied FROM g1_proposals WHERE id=?", (proposal_id,)).fetchone()
-        if not candidate:
-            raise AdawError("NOT_FOUND", "Proposal not found")
-        # An already applied command remains idempotent even if an external plugin
-        # has subsequently disappeared; a new commit must revalidate dependencies.
-        if not candidate[1]:
-            self.validate_dependencies(json.loads(candidate[0]))
         with closing(self.connect()) as db, db:
             db.execute("BEGIN IMMEDIATE")
-            row = db.execute("SELECT payload,source,applied FROM g1_proposals WHERE id=?", (proposal_id,)).fetchone()
-            if not row:
-                raise AdawError("NOT_FOUND", "Proposal not found")
-            if row[2]:
-                return {"revision": row[2], "idempotent": True}
-            command = json.loads(row[0])
-            if self.head(db) != command["base_revision"]:
-                raise AdawError("STALE_REVISION", "Head changed; explicit new proposal required (no silent rebase)")
-            revision = "rev-" + digest(canonical({"parent": command["base_revision"], "source": json.loads(row[1]), "command": proposal_id}))
-            db.execute("INSERT INTO g1_revisions VALUES (?,?,?,?)", (revision, command["base_revision"], row[1], command["reason"]))
-            db.execute("UPDATE metadata SET value=? WHERE key='g1_head'", (revision,))
+            payload, snapshot, applied = self._proposal(db, proposal_id)
+            command = json.loads(payload)
+            base_revision = command["base_revision"]
+            preview = json.loads(snapshot)
+            if applied:
+                parent, committed = self._revision(db, applied)
+                changed = applied == self._revision_id(parent, json.loads(committed), proposal_id)
+                return self._apply_result(applied, base_revision, parent if changed else applied,
+                                          changed, committed != snapshot, idempotent=True)
+            head = self.head(db)
+            current = json.loads(self._revision(db, head)[1])
+            base = json.loads(self._revision(db, base_revision)[1])
+            merged = merge_source(base, current, preview, base_revision=base_revision, current_revision=head)
+            self.validate_dependencies(merged)
+            changed = canonical(merged) != canonical(current)
+            revision = self._commit(db, head, merged, proposal_id, command["reason"]) if changed else head
             db.execute("UPDATE g1_proposals SET applied=? WHERE id=?", (revision, proposal_id))
-        return {"revision": revision, "listening": "NOT_EVALUATED"}
+            return self._apply_result(revision, base_revision, head, changed, canonical(merged) != snapshot)
+
+    def _apply_result(self, revision, base, parent, changed, stale, idempotent=False):
+        return {"revision": revision, "listening": "NOT_EVALUATED", "rebased": parent != base,
+                "changed": changed, "preview_status": "STALE" if stale else "MATCHES_SOURCE",
+                "idempotent": idempotent}
+
+    def undo(self, revision):
+        """Apply the inverse of one committed revision onto the current head."""
+        require(isinstance(revision, str) and revision, "Expected revision ID")
+        with closing(self.connect()) as db, db:
+            db.execute("BEGIN IMMEDIATE")
+            previous = db.execute("SELECT applied FROM g2_undos WHERE target=?", (revision,)).fetchone()
+            if previous:
+                return {"revision": previous[0], "undone_revision": revision, "idempotent": True,
+                        "listening": "NOT_EVALUATED"}
+            parent, source = self._revision(db, revision)
+            require(parent is not None, "Initial revision cannot be undone")
+            head = self.head(db)
+            current = json.loads(self._revision(db, head)[1])
+            before = json.loads(self._revision(db, parent)[1])
+            merged = merge_source(json.loads(source), current, before,
+                                  base_revision=revision, current_revision=head)
+            applied = head
+            if canonical(merged) != canonical(current):
+                self.validate_dependencies(merged)
+                applied = self._commit(db, head, merged, {"undo": revision}, f"Undo {revision}")
+            db.execute("INSERT INTO g2_undos VALUES (?,?)", (revision, applied))
+            return {"revision": applied, "undone_revision": revision, "idempotent": False,
+                    "listening": "NOT_EVALUATED"}
 
     def render_project(self, timeout, revision=None, proposal_id=None):
-        require(not (revision and proposal_id), "Choose revision or proposal")
-        if proposal_id:
-            with closing(self.connect()) as db:
-                row = db.execute("SELECT source FROM g1_proposals WHERE id=?", (proposal_id,)).fetchone()
-            if not row:
-                raise AdawError("NOT_FOUND", "Proposal not found")
-            revision, source = "proposal:" + proposal_id, json.loads(row[0])
+        require(revision is None or proposal_id is None, "Choose revision or proposal")
+        if proposal_id is not None:
+            proposal = self.inspect_proposal(proposal_id)
+            revision, source = "proposal:" + proposal_id, proposal["source"]
         else:
             revision, source = self.source(revision)
         self.validate_dependencies(source)
@@ -288,6 +451,7 @@ class ProjectService(Service):
         return report
 
     def rendition(self, rendition_id):
+        require(isinstance(rendition_id, str) and rendition_id, "Expected rendition ID")
         with closing(self.connect()) as db:
             row = db.execute("SELECT report FROM g1_renditions WHERE id=?", (rendition_id,)).fetchone()
         if not row:
@@ -348,6 +512,7 @@ class ProjectService(Service):
         return result
 
     def job_status(self, job_id):
+        require(isinstance(job_id, str) and job_id, "Expected job ID")
         with closing(self.connect()) as db:
             row = db.execute("SELECT status,result FROM jobs WHERE id=?", (job_id,)).fetchone()
         if not row:

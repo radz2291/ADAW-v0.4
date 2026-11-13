@@ -1,9 +1,11 @@
 """Versioned G1 source contract and deterministic musical-time graph compiler.
 
-Fixed tempo/4:4 only. No implicit tempo, assets, processing or delivery targets.
+Version 1 is fixed tempo and meter. Version 2 adds an explicit tempo/meter map.
 The original v0.4 draft schema remains untouched; see ADR-0002.
 """
 import re
+from bisect import bisect_right
+from fractions import Fraction
 from app.contracts import canonical, digest, fields, number, require, tick_sample, RenderGraph
 
 
@@ -37,10 +39,50 @@ def validate_profile(p):
     return p
 
 
+def timing(source):
+    """Accumulate unrounded frame offsets and round each absolute event endpoint."""
+    if source["schema"] == "adaw.arrangement@1":
+        return lambda tick: tick_sample(tick, source["tempo"], source["ppq"], source["sample_rate"])
+    changes = source["time_map"]
+    require(isinstance(changes, list) and bool(changes), "Time map must start at tick zero")
+    tick_positions, frames, slopes = [], [], []
+    meter_origin = meter = None
+    for index, change in enumerate(changes):
+        fields(change, ("tick", "bpm", "numerator", "denominator"))
+        tick = change["tick"]
+        integer(tick)
+        number(change["bpm"], 1)
+        integer(change["numerator"], 1)
+        integer(change["denominator"], 1)
+        denominator = change["denominator"]
+        require(denominator & (denominator - 1) == 0 and (source["ppq"] * 4) % denominator == 0,
+                "Meter denominator must divide a whole note in ticks")
+        require(tick < source["length_ticks"] and (tick > tick_positions[-1] if index else tick == 0),
+                "Time map ticks must increase from zero within the project")
+        next_meter = (change["numerator"], denominator)
+        if not index:
+            require(change["bpm"] == source["tempo"], "Initial tempo must match the first map entry")
+        if meter != next_meter:
+            if meter:
+                bar_ticks = source["ppq"] * 4 * meter[0] // meter[1]
+                require((tick - meter_origin) % bar_ticks == 0, "Meter changes must start on a bar boundary")
+            meter_origin, meter = tick, next_meter
+        frames.append(frames[-1] + (tick - tick_positions[-1]) * slopes[-1] if index else Fraction(0))
+        tick_positions.append(tick)
+        slopes.append(Fraction(60 * source["sample_rate"], source["ppq"]) / Fraction(str(change["bpm"])))
+
+    def frame_at(tick):
+        i = bisect_right(tick_positions, tick) - 1
+        return round(frames[i] + (tick - tick_positions[i]) * slopes[i])
+
+    return frame_at
+
+
 def validate(source):
     fields(source, ("schema", "title", "brief", "tempo", "ppq", "sample_rate", "block_size", "length_ticks",
-                    "tail_frames", "fade_frames", "sections", "tracks", "buses", "master", "profile"))
-    require(source["schema"] == "adaw.arrangement@1", "Unsupported arrangement")
+                    "tail_frames", "fade_frames", "sections", "tracks", "buses", "master", "profile"), ("time_map",))
+    require(source["schema"] in ("adaw.arrangement@1", "adaw.arrangement@2"), "Unsupported arrangement")
+    require(("time_map" in source) == (source["schema"] == "adaw.arrangement@2"), "Time map requires arrangement version 2")
     require(isinstance(source["title"], str) and source["title"], "Missing title")
     require(isinstance(source["brief"], str) and source["brief"], "Missing brief")
     number(source["tempo"], 1)
@@ -49,7 +91,7 @@ def validate(source):
     integer(source["tail_frames"])
     validate_profile(source["profile"])
     require(source["profile"]["sample_rate"] == source["sample_rate"], "Profile sample rate mismatch; resampling not implicit")
-    frames = tick_sample(source["length_ticks"], source["tempo"], source["ppq"], source["sample_rate"]) + source["tail_frames"]
+    frames = timing(source)(source["length_ticks"]) + source["tail_frames"]
     require(source["fade_frames"] < frames // 2, "Fade too long")
     require(isinstance(source["sections"], list) and source["sections"], "Missing sections")
     end, ids = 0, set()
@@ -154,7 +196,7 @@ def validate_inserts(inserts):
 
 def compile_graph(source, read_content):
     validate(source)
-    frame = lambda tick: tick_sample(tick, source["tempo"], source["ppq"], source["sample_rate"])
+    frame = timing(source)
     total = frame(source["length_ticks"]) + source["tail_frames"]
     nodes, ends, stems = [], {}, []
     def add(name, kind, inputs, config):

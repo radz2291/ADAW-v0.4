@@ -9,6 +9,7 @@ from app.contracts import canonical, digest, tick_sample
 from app.errors import AdawError
 from app.project import ProjectService
 from app.quality import analyze, analyze_delivery, estimated_true_peak
+from app.revisions import merge_source
 
 
 @pytest.fixture
@@ -46,8 +47,13 @@ def test_proposal_isolated_stale_and_idempotent(project):
     applied = service.apply("first")
     assert service.apply("first")["revision"] == applied["revision"]
     assert service.propose(first)["idempotent"]
-    with pytest.raises(AdawError,match="Head changed"):
+    with pytest.raises(AdawError) as conflict:
         service.apply("second")
+    assert conflict.value.code == "CONFLICT"
+    assert conflict.value.details["conflicts"] == [
+        dict(path=["tracks", "kick", "gain_db"], reason="DIVERGENT_EDIT",
+             base=-3, current=-6, proposed=-9)
+    ]
     with pytest.raises(AdawError,match="reused"):
         service.propose({**first,"reason":"different payload"})
     assert len(service.history()["revisions"]) == 2
@@ -106,6 +112,122 @@ def test_arrangement_proposal_changes_sections_and_events_only(project):
     expected["sections"] = sections
     expected["tracks"][0]["events"] = events
     assert service.source()[1] == expected
+
+
+def test_disjoint_proposal_rebase_and_selective_undo(project):
+    service, original = project
+    move = command(service, "ghost-move", 0)
+    move["operations"] = [dict(kind="move_event", track_id="kick", event_id="hit", start_tick=120)]
+    saturation = command(service, "drum-bus", 0)
+    saturation["operations"] = [dict(kind="set_bus_gain", bus_id="drums", value=-2)]
+    service.propose(move)
+    preview = service.inspect_proposal("ghost-move")
+    service.propose(saturation)
+    bus_revision = service.apply("drum-bus")["revision"]
+    merged = service.apply("ghost-move")
+    assert merged["rebased"] and merged["preview_status"] == "STALE"
+    merged_revision, source = service.source()
+    assert merged["revision"] == merged_revision
+    assert source["tracks"][0]["events"][0]["start_tick"] == 120
+    assert source["buses"][0]["gain_db"] == -2
+    assert service.history()["revisions"][-1]["parent"] == bus_revision
+    assert service.inspect_proposal("ghost-move") == {**preview, "applied": merged_revision}
+    assert service.apply("ghost-move") == {**merged, "idempotent": True}
+
+    service.propose(command(service, "later-level", -8))
+    service.apply("later-level")
+    undone = service.undo(merged_revision)
+    expected = copy.deepcopy(original)
+    expected["buses"][0]["gain_db"] = -2
+    expected["tracks"][0]["gain_db"] = -8
+    assert service.source() == (undone["revision"], expected)
+    assert service.undo(merged_revision) == {**undone, "idempotent": True}
+
+
+def test_real_faust_bus_drive_interleaves_with_event_move(project):
+    service, _ = project
+    imported = service.import_file("fixtures/saturation.dsp", "faust", "G0 saturation fixture", 30)
+    binding = next(p["name"] for p in imported["validation"]["catalog"] if p["name"].endswith("/drive"))
+    add = command(service, "add-saturation", 0)
+    add["operations"] = [dict(kind="append_bus_insert", bus_id="drums",
+                              insert=dict(module_sha256=imported["sha256"], parameters={binding: 1}))]
+    service.propose(add)
+    service.apply(add["command_id"])
+
+    agent = command(service, "ghost-hit", 0)
+    agent["operations"] = [dict(kind="move_event", track_id="kick", event_id="hit", start_tick=120)]
+    human = command(service, "raise-drive", 0)
+    human["operations"] = [dict(kind="set_bus_insert_parameter", bus_id="drums", insert_index=0,
+                                binding=binding, value=4)]
+    service.propose(agent)
+    service.propose(human)
+    service.apply(human["command_id"])
+    merged = service.apply(agent["command_id"])
+    assert merged["rebased"] and merged["preview_status"] == "STALE"
+    rendition = service.render_project(30, revision=merged["revision"])
+    audio, _ = sf.read(service.content / rendition["render"]["data"]["audio_sha256"], always_2d=True)
+    assert rendition["manifest"]["revision"] == merged["revision"]
+    assert np.count_nonzero(audio[:tick_sample(120, 144, 960, 48000)]) == 0
+    assert np.max(np.abs(audio)) > .09
+    assert rendition["source"]["buses"][0]["inserts"][0]["parameters"][binding] == 4
+    service.undo(merged["revision"])
+    _, source = service.source()
+    assert source["tracks"][0]["events"][0]["start_tick"] == 0
+    assert source["buses"][0]["inserts"][0]["parameters"][binding] == 4
+
+    invalid = command(service, "invalid-drive", 0)
+    invalid["operations"] = [{**human["operations"][0], "value": 100}]
+    with pytest.raises(AdawError, match="Number above"):
+        service.propose(invalid)
+
+
+def test_convergent_proposals_do_not_create_phantom_revisions(project):
+    service, _ = project
+    service.propose(command(service, "first", -6))
+    service.propose(command(service, "second", -6))
+    first = service.apply("first")
+    second = service.apply("second")
+    assert second["revision"] == first["revision"]
+    assert second["rebased"] and not second["changed"]
+    assert second["preview_status"] == "MATCHES_SOURCE"
+    assert service.apply("second") == {**second, "idempotent": True}
+    assert len(service.history()["revisions"]) == 2
+
+
+def test_undo_conflict_preserves_later_same_field_edit(project):
+    service, _ = project
+    service.propose(command(service, "first", -6))
+    first = service.apply("first")
+    service.propose(command(service, "second", -9))
+    second = service.apply("second")
+    with pytest.raises(AdawError) as conflict:
+        service.undo(first["revision"])
+    assert conflict.value.code == "CONFLICT"
+    assert service.source()[0] == second["revision"]
+
+
+def test_timing_changes_conflict_with_event_and_other_timing_edits(project):
+    _, source = project
+    head = {**source, "schema": "adaw.arrangement@2", "time_map": [
+        dict(tick=0, bpm=144, numerator=4, denominator=4),
+        dict(tick=1920, bpm=96, numerator=4, denominator=4),
+    ]}
+    validate(head)
+    timing = {**source, "tempo": 120}
+    events = copy.deepcopy(source)
+    events["tracks"][0]["events"][0]["start_tick"] = 1920
+    for candidate in (timing, events):
+        with pytest.raises(AdawError) as conflict:
+            merge_source(source, head, candidate, base_revision="base", current_revision="head")
+        assert conflict.value.code == "CONFLICT"
+        assert any(item["path"] == ["time_map"] and item["reason"] == "TIMING_CONTEXT_CHANGED"
+                   for item in conflict.value.details["conflicts"])
+    gains = copy.deepcopy(source)
+    gains["tracks"][0]["gain_db"] = -7
+    merged = merge_source(source, head, gains, base_revision="base", current_revision="head")
+    assert merged["time_map"] == head["time_map"]
+    assert merged["tracks"][0]["gain_db"] == -7
+    validate(merged)
 
 
 def test_compiler_maps_absolute_ticks_and_source_hash(project):

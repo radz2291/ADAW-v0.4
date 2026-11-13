@@ -1,0 +1,18 @@
+.........................................                                [100%]
+============================== warnings summary ===============================
+tests/test_project.py::test_real_faust_bus_drive_interleaves_with_event_move
+tests/test_studio_api.py::test_independent_client_and_cli_share_one_project
+tests/test_studio_api.py::test_independent_client_and_cli_share_one_project
+tests/test_studio_api.py::test_independent_client_and_cli_share_one_project
+tests/test_studio_api.py::test_real_vst_parameter_http_cli_parity
+  C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\quality.py:18: WavFileWarning: Chunk (non-data) not understood, skipping it.
+    other_rate, other = wavfile.read(path)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 5 durations =============================
+46.41s call     tests/test_studio_api.py::test_real_vst_parameter_http_cli_parity
+19.12s call     tests/test_studio_api.py::test_independent_client_and_cli_share_one_project
+8.77s call     tests/test_studio_api.py::test_archive_rejects_altered_member_and_manifest
+1.66s call     tests/test_contracts.py::test_cli_invalid_command_is_json
+1.50s call     tests/test_project.py::test_real_faust_bus_drive_interleaves_with_event_move
+41 passed, 5 warnings in 82.83s (0:01:22)
