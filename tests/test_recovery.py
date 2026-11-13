@@ -27,7 +27,15 @@ def test_interrupted_owner_does_not_promote_worker(tmp_path):
         assert project.reconcile_jobs()["active"] == [job_id]
         owner.kill()
         owner.wait(timeout=10)
-        assert project.reconcile_jobs()["interrupted"] == [job_id]
+        # Windows may signal the exited process before releasing its byte-range lock.
+        deadline = time.monotonic() + 5
+        while True:
+            recovery = project.reconcile_jobs()
+            if recovery["interrupted"] or time.monotonic() >= deadline:
+                break
+            assert recovery["active"] == [job_id]
+            time.sleep(.05)
+        assert recovery["interrupted"] == [job_id]
         assert project.job_status(job_id)["status"] == "interrupted"
         assert project.job_status(job_id)["result"]["error"]["code"] == "SERVICE_INTERRUPTED"
         assert project.reconcile_jobs()["interrupted"] == []
