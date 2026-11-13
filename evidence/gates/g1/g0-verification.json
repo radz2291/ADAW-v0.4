@@ -1,0 +1,103 @@
+{
+  "status": "PASS",
+  "verified_renders": [
+    {
+      "name": "faust-bypass",
+      "audio_sha256": "95567611ef4a207b859b313155d3ba73c6e57a35bb5f1960295808eaf4d45cc0",
+      "frames": 768000,
+      "source_sha256": "78c92ed7da3d3167a7926b79b907da9564d1939e4192a2a0695daf4ad9001995"
+    },
+    {
+      "name": "faust-drive-1",
+      "audio_sha256": "7c65fc35089265976ce95a4cfdfac62138395d9a491c904af0b8ee837e221af1",
+      "frames": 768000,
+      "source_sha256": "c3b7a98bf95f6cf776c4cc7615f426eeac6db1aef7597e6becacf4ba60a21963"
+    },
+    {
+      "name": "faust-drive-4",
+      "audio_sha256": "d20ed1b2da2a06a1ba70de6eb567381b3e7254a0c72093431fe2a4cb6c37d0a1",
+      "frames": 768000,
+      "source_sha256": "86b62b07f4640404df953d6d28580035f316c6144e55869fdcb5c06f08108506"
+    },
+    {
+      "name": "faust-trim-half",
+      "audio_sha256": "c54268ad414baf1ac7f7cf00d63a80640904535dac987ab641786e697ccf4573",
+      "frames": 768000,
+      "source_sha256": "8c24c4cf0c2a96f2a358cb5d9ae3104cf2d6c7f6fad6b0c1c0259577831f5cdb"
+    },
+    {
+      "name": "faust-trim-reference",
+      "audio_sha256": "11cac4f5d61de70fabe1b7b3b1dc1c9cdcce48cad6265528cd639a7022200c76",
+      "frames": 768000,
+      "source_sha256": "614097a76e915b9c4c127a59a6f6b9b68b354ff1a8219f54f0787c5c546a1b11"
+    },
+    {
+      "name": "faust-repeat",
+      "audio_sha256": "9950501ca4799f4057d2e7886ca4a05cfd4073a3d4407434a8904496e03bd95f",
+      "frames": 768000,
+      "source_sha256": "86b62b07f4640404df953d6d28580035f316c6144e55869fdcb5c06f08108506"
+    },
+    {
+      "name": "onset",
+      "audio_sha256": "4dbc9c20db7b5e37c49b1e57edf2523f125b84982d936b187d8ba025a2fa12f7",
+      "frames": 48000,
+      "source_sha256": "f0a1bb17f0282eb16a0eda4db483e733f1054d9499336faeb2855a4e2733b6ff"
+    },
+    {
+      "name": "dexed-base",
+      "audio_sha256": "3826e9894ace975b6fae921471e18380765854fe8ef689217a99be5d5b59c233",
+      "frames": 192000,
+      "source_sha256": "e85726731faf103027bdbf994cae8a1fc0893a7596688ea31b94dc9c7c63a040"
+    },
+    {
+      "name": "dexed-output-lower",
+      "audio_sha256": "64ed0aff9d200083286a18f92443346f4a8e8f08ab62ca395a45b5b7c639643f",
+      "frames": 192000,
+      "source_sha256": "313dfc91a3c006bb9c0bd2fe8d6215b52cb7f40fd72e962413c2741ba035e68b"
+    },
+    {
+      "name": "dexed-restored",
+      "audio_sha256": "82a9c7aacbcd0499c083a5e8c5a738e77eb1b45d1bcd6ff5d7ddaaa6dd46d662",
+      "frames": 192000,
+      "source_sha256": "dc7ec8960fbb35c8f055e9a9658e54a48e96b6dee7a39cf1cecfbb07d1c0524b"
+    },
+    {
+      "name": "consolidated-base",
+      "audio_sha256": "e61959b805c33e5418d33eefc18b840f49ea99ecae47ee043ccf85764f2a21eb",
+      "frames": 192000,
+      "source_sha256": "92d279c7ecffc3a3aae6571a5ef8bd253dc76bf8ee282da48efb638ccca982fc"
+    },
+    {
+      "name": "consolidated-lower",
+      "audio_sha256": "6f59eda74cd25ab23491c2773ae2d9636e85673075b4b387490bb459850514f4",
+      "frames": 192000,
+      "source_sha256": "a6944307d0e531653bba6f73e79341fafda1c3d5729049ed0f74ef77f59450da"
+    },
+    {
+      "name": "consolidated-restored",
+      "audio_sha256": "7d47ae7cff91dfb88245e2c126fd525f5caf088ec2cc3be1c947d0a412b4d37a",
+      "frames": 192000,
+      "source_sha256": "850e89244f4f495dfabe5cb16be91f5379bc54e673a9ab384f893feb7d2b519b"
+    },
+    {
+      "name": "consolidated-automated",
+      "audio_sha256": "4e2e6e8b31544dbfbf02ee34eb30a75a6cd4390d6a133d81f83be8736e06124b",
+      "frames": 192000,
+      "source_sha256": "73f7bd82ce97fef3ec9fe3715318ddf6dcabb528ff3252de9ecd43fe43fb371e"
+    },
+    {
+      "name": "pipeline-project-a",
+      "audio_sha256": "9371f55e8cdf0418aa5608b2803cc82923e1cb7f74e47bc7af3636f58101a6da",
+      "frames": 768000,
+      "source_sha256": "1116c7299341f85d849316f56d42bd68d6762106055eb36e3a07a333bcded910"
+    },
+    {
+      "name": "pipeline-project-b",
+      "audio_sha256": "60794b6409c6263743464bf1fc6670f188c31202120488ba72133e7a37acb809",
+      "frames": 768000,
+      "source_sha256": "6182fcc7692436bcd4bec80a1c83112751876d1f496474a75a211fb24ba24379"
+    }
+  ],
+  "report_sha256": "21ec70bc85180fe075b408393084f08db6b9f7bf38098fdfb0451801df0b342d",
+  "note": "Verifies file/PCM/source/state identities, not human listening or all behavioral assertions."
+}

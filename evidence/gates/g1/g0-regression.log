@@ -1,0 +1,63 @@
+RUN G0-01.windows_environment
+PASS G0-01.windows_environment
+RUN RWT-05.faust_multitrack_subset
+C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\quality.py:18: WavFileWarning: Chunk (non-data) not understood, skipping it.
+  other_rate, other = wavfile.read(path)
+C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\quality.py:18: WavFileWarning: Chunk (non-data) not understood, skipping it.
+  other_rate, other = wavfile.read(path)
+C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\quality.py:18: WavFileWarning: Chunk (non-data) not understood, skipping it.
+  other_rate, other = wavfile.read(path)
+C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\quality.py:18: WavFileWarning: Chunk (non-data) not understood, skipping it.
+  other_rate, other = wavfile.read(path)
+C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\quality.py:18: WavFileWarning: Chunk (non-data) not understood, skipping it.
+  other_rate, other = wavfile.read(path)
+C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\quality.py:18: WavFileWarning: Chunk (non-data) not understood, skipping it.
+  other_rate, other = wavfile.read(path)
+PASS RWT-05.faust_multitrack_subset
+RUN RWT-06.invalid_faust_subset
+PASS RWT-06.invalid_faust_subset
+RUN RWT-05.removed_faust_binding_subset
+PASS RWT-05.removed_faust_binding_subset
+RUN RWT-06.abrupt_worker_exit_subset
+PASS RWT-06.abrupt_worker_exit_subset
+RUN RWT-06.worker_timeout_subset
+PASS RWT-06.worker_timeout_subset
+RUN RWT-06.service_reopen_subset
+PASS RWT-06.service_reopen_subset
+RUN RWT-06.stale_commit_subset
+PASS RWT-06.stale_commit_subset
+RUN G0-04.sample_timing
+C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\quality.py:18: WavFileWarning: Chunk (non-data) not understood, skipping it.
+  other_rate, other = wavfile.read(path)
+PASS G0-04.sample_timing
+RUN G0-04.loudness_calibration_subset
+PASS G0-04.loudness_calibration_subset
+RUN RWT-11.fixture_instrument_midi_state_subset
+C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\quality.py:18: WavFileWarning: Chunk (non-data) not understood, skipping it.
+  other_rate, other = wavfile.read(path)
+C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\quality.py:18: WavFileWarning: Chunk (non-data) not understood, skipping it.
+  other_rate, other = wavfile.read(path)
+C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\quality.py:18: WavFileWarning: Chunk (non-data) not understood, skipping it.
+  other_rate, other = wavfile.read(path)
+PASS RWT-11.fixture_instrument_midi_state_subset
+RUN RWT-11.fixture_effect_automation_state_subset
+C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\quality.py:18: WavFileWarning: Chunk (non-data) not understood, skipping it.
+  other_rate, other = wavfile.read(path)
+C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\quality.py:18: WavFileWarning: Chunk (non-data) not understood, skipping it.
+  other_rate, other = wavfile.read(path)
+C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\quality.py:18: WavFileWarning: Chunk (non-data) not understood, skipping it.
+  other_rate, other = wavfile.read(path)
+C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\quality.py:18: WavFileWarning: Chunk (non-data) not understood, skipping it.
+  other_rate, other = wavfile.read(path)
+PASS RWT-11.fixture_effect_automation_state_subset
+RUN RWT-12.fixture_pipeline_reuse_subset
+C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\quality.py:18: WavFileWarning: Chunk (non-data) not understood, skipping it.
+  other_rate, other = wavfile.read(path)
+C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\quality.py:18: WavFileWarning: Chunk (non-data) not understood, skipping it.
+  other_rate, other = wavfile.read(path)
+PASS RWT-12.fixture_pipeline_reuse_subset
+RUN RWT-05.plugin_permission_denial_subset
+PASS RWT-05.plugin_permission_denial_subset
+RUN RWT-12.missing_changed_dependency_subset
+PASS RWT-12.missing_changed_dependency_subset
+{"report": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\evidence\\gates\\g1\\g0-regression.json", "failed_checks": 0, "decision": "PARTIAL ADOPT"}

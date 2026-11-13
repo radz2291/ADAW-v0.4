@@ -1,0 +1,1 @@
+{"base_revision":"rev-0e50cbef2bdf4be181905fc65a23203951eb15f2f3546a6264822f22868430b7","command_id":"g1-stale","operations":[{"kind":"set_master_gain","value":0}],"reason":"deliberate stale injection"}

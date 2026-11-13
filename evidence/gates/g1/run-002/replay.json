@@ -1,0 +1,1 @@
+{"exact_pcm":false,"final":"rendition-b46fc75786a04352929b4367b2c277b7","grade":"D3","max_abs_delta":0.0027271509170532227,"reason":"Real native rerender; nondeterministic VST oscillators/state may differ. No portable exact-replay claim.","replay":"rendition-a556921c4f7f4181a747d26c591b1f30","rms_delta":0.00017913522579750472}

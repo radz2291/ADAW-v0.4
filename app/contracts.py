@@ -61,6 +61,15 @@ def tick_sample(tick, bpm, ppq, sample_rate):
     return round(Fraction(tick * 60 * sample_rate, ppq) / Fraction(str(bpm)))
 
 
+def validate_midi(notes, frames):
+    require(isinstance(notes, list), "Invalid MIDI")
+    for note in notes:
+        fields(note, ("note", "velocity", "start_frame", "duration_frames"))
+        require(all(type(v) is int for v in note.values()), "MIDI fields must be integers")
+        require(0 <= note["note"] <= 127 and 1 <= note["velocity"] <= 127, "Invalid MIDI note/velocity")
+        require(note["start_frame"] >= 0 and note["duration_frames"] > 0 and note["start_frame"] + note["duration_frames"] <= frames, "MIDI outside render range")
+
+
 @dataclass(frozen=True)
 class RenderGraph:
     source: bytes
@@ -76,7 +85,7 @@ class RenderGraph:
     @classmethod
     def parse(cls, value):
         fields(value, ("schema", "sample_rate", "block_size", "frames", "nodes", "output"))
-        require(value["schema"] == "adaw.g0.graph@1", "Unsupported graph schema")
+        require(value["schema"] in ("adaw.g0.graph@1", "adaw.graph@2"), "Unsupported graph schema")
         for key in ("sample_rate", "block_size", "frames"):
             require(type(value[key]) is int and value[key] > 0, f"Invalid {key}")
         require(isinstance(value["nodes"], list) and value["nodes"], "Graph is empty")
@@ -94,8 +103,27 @@ class RenderGraph:
                 number(c["frequency_hz"], 0, value["sample_rate"] / 2)
                 number(c["amplitude"], 0, 1)
                 require(type(c["onset_frame"]) is int and 0 <= c["onset_frame"] < value["frames"], "Invalid onset")
-            elif node["kind"] == "faust":
-                fields(c, ("source", "parameters"))
+            elif node["kind"] == "samples" and value["schema"] == "adaw.graph@2":
+                fields(c, ("events",))
+                require(not node["inputs"] and node["channels"] == 2, "Samples require stereo source routing")
+                require(isinstance(c["events"], list), "Invalid sample events")
+                for event in c["events"]:
+                    fields(event, ("asset_sha256", "start_frame", "duration_frames", "gain", "pan", "fade_frames"))
+                    require(isinstance(event["asset_sha256"], str) and re.fullmatch(r"[0-9a-f]{64}", event["asset_sha256"]), "Invalid asset hash")
+                    require(all(type(event[k]) is int for k in ("start_frame", "duration_frames", "fade_frames")), "Invalid frame type")
+                    require(0 <= event["start_frame"] < value["frames"] and 0 < event["duration_frames"] <= value["frames"] - event["start_frame"], "Sample outside render")
+                    require(0 <= event["fade_frames"] <= event["duration_frames"] // 2, "Invalid sample fade")
+                    number(event["gain"], 0)
+                    number(event["pan"], -1, 1)
+            elif node["kind"] in ("faust", "faust_synth"):
+                synth = node["kind"] == "faust_synth"
+                require(not synth or value["schema"] == "adaw.graph@2", "Synth requires graph v2")
+                fields(c, ("source", "parameters", "midi", "voices", "release_seconds") if synth else ("source", "parameters"))
+                if synth:
+                    require(not node["inputs"], "Synth cannot have audio inputs")
+                    require(type(c["voices"]) is int and c["voices"] > 0, "Invalid voice count")
+                    number(c["release_seconds"], 0)
+                    validate_midi(c["midi"], value["frames"])
                 require(isinstance(c["source"], str) and c["source"], "Empty Faust")
                 require(isinstance(c["parameters"], dict), "Invalid parameters")
                 for key, val in c["parameters"].items():
@@ -110,6 +138,7 @@ class RenderGraph:
                     require(isinstance(key, str) and key.isdigit(), "VST parameter index must be numeric")
                     number(val, 0, 1)
                 require(isinstance(c["midi"], list), "Invalid MIDI")
+                validate_midi(c["midi"], value["frames"])
                 for note in c["midi"]:
                     fields(note, ("note", "velocity", "start_frame", "duration_frames"))
                     require(all(type(v) is int for v in note.values()), "MIDI fields must be integers")

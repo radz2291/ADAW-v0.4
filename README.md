@@ -1,8 +1,16 @@
-# ADAW v0.4 — G0 Windows engine proof
+# ADAW v0.4 — G1 composition-to-master
 
 New implementation; no v0.3 code reused. Working JSON CLI, immutable validated
 signal graphs, transactional service, killable DawDreamer workers, real Faust/VST
-renders and independent decoded-file measurement. **Not a finished DAW or cue.**
+renders and independent decoded-file measurement. G1 now produces an original
+75-second cue through editable source, proposals, revisions, real rendering and
+verified PCM24 export. **Owner listening review remains pending.**
+
+See the [G1 decision](docs/decisions/G1-DECISION.md),
+[implemented contract](docs/decisions/ADR-0002-g1-production-contract.md) and
+[production evidence](evidence/gates/g1/REPORT.md). The current candidate is
+`.local/delivery/g1-v2/Night-Circuit-G1-review.wav`: modern electronic 808 trap,
+six sections with changing swing/mood, stereo 48 kHz/24-bit, 75 seconds.
 
 See [G0 decision](docs/decisions/G0-DECISION.md), [engine ADR](docs/decisions/ADR-0001-engine-adoption.md)
 and [real run report](evidence/gates/g0/REPORT.md). The original specification is
@@ -45,6 +53,42 @@ project databases remain in ignored `.local/` and are not committed or redistrib
 Use a new report name each run. The timeout is per worker, not a performance SLA.
 Reports retain artifact paths, hashes, parameters, source, meters and failure logs.
 
+## Reproduce G1
+
+Install the locked environment and prepare the approved fixture plugins as above.
+Use fresh project/input/evidence/delivery directories; do not overwrite a retained
+run. The composition recipe generates original samples and editable arrangement,
+imports through the service, and initializes the pinned Dexed instrument.
+
+```powershell
+.\.venv\Scripts\python.exe -m tools.compose_g1 --root .local/my-g1 --inputs .local/my-g1-inputs --timeout 90
+.\.venv\Scripts\python.exe -m app --root .local/my-g1 --timeout 180 project-render | Set-Content -Encoding utf8 .local/my-g1-baseline.json
+.\.venv\Scripts\python.exe -m tools.produce_g1 --root .local/my-g1 --baseline .local/my-g1-baseline.json --evidence evidence/gates/g1/my-run --delivery .local/delivery/my-g1 --timeout 180
+.\.venv\Scripts\python.exe -m tools.verify_g1 evidence/gates/g1/my-run
+```
+
+The recipe is separate from generic app behavior. Event IDs, pitches, velocities,
+durations, Faust source, parameters, track gains, inserts, routing, sections and
+profile are stored in the source. Native replay is D3: source is retained, but a
+fresh VST render can differ from the delivered file. Never replace an exact
+listening-approved artifact with a rerender under the same identity.
+
+Useful G1 commands (all use the existing JSON envelope):
+
+```powershell
+.\.venv\Scripts\python.exe -m app --root .local/g1-night-circuit-v2 --timeout 180 project-inspect
+.\.venv\Scripts\python.exe -m app --root .local/g1-night-circuit-v2 --timeout 180 history
+.\.venv\Scripts\python.exe -m app --root .local/g1-night-circuit-v2 --timeout 180 analyze --rendition rendition-b46fc75786a04352929b4367b2c277b7
+```
+
+Other commands: `project-create --source`, `asset-import --path --kind --provenance`,
+`proposal-create --command`, `proposal-apply --id`, `project-render --revision`
+or `--proposal`, `export --rendition --path`, `job-status --id`, and
+`plugin-state-capture --id --sample-rate --block-size`. Required arguments can be
+inspected with command help. `project-inspect` opens existing local project truth.
+CLI file paths are explicit grants by a trusted local operator; there is no
+untrusted remote command server.
+
 ## Working CLI
 
 Commands emit `adaw.result@1` JSON; failures return a nonzero exit code.
@@ -59,7 +103,8 @@ Worker diagnostics are captured in each job's stdout/stderr log files.
 `render` creates an uncommitted candidate. Only `--commit-fixture` with the correct
 `--base-revision` updates source head and last playable artifact atomically. These
 are G0 engineering commits, not owner musical approval. Proposal merging, musical
-approval and delivery export are not implemented.
+approval is not implemented. G1 uses separate proposal/revision/rendition commands
+above and implements delivery export with independent byte verification.
 
 `plugin-allow --path <exact-file-or-bundle> --provenance <approval>` authorizes one
 binary fingerprint. `plugin-probe --id <registry-id> --sample-rate 48000 --block-size 256`
@@ -73,6 +118,8 @@ loads it in a separate worker. Missing, changed, unapproved or unprobed plugins 
 - `app/contracts.py`: immutable graph, canonical hashing, validation and timing.
 - `app/service.py`: SQLite source/revisions/jobs/registry and atomic content publication.
 - `app/worker.py`: DawDreamer adapter; Faust/VST/MIDI/state/automation.
+- `app/arrangement.py`, `app/project.py`, `app/project_cli.py`: G1 source compiler,
+  validated imports, transactional proposals/revisions, rendition and export CLI.
 - `app/quality.py`: libsndfile + SciPy decode agreement, peak/RMS/DC and pyloudnorm.
 - `tools/`: setup, fixture acquisition, real-audio checks and independent hash verifier.
 - `tests/`: schema, timing, identity, permission and CLI regressions.
@@ -89,9 +136,10 @@ is exposed. CLI/service callers are trusted local operators.
 
 PurestGain's opaque state restoration fails on this engine; the failure is retained.
 Consolidated's wet algorithm is not sample-deterministic. Its strict state fixture
-uses Dry/Wet=0 plus active VST output gain with a declared tolerance. True peak,
-sidechains, arbitrary-plugin latency compensation, full service crash reconciliation,
-all-plugin compatibility, professional listening and G1 remain unproven.
+uses Dry/Wet=0 plus active VST output gain with a declared tolerance. G1 adds an
+analytic-test-calibrated true-peak estimate with a margin, not full EBU/ITU meter
+conformance. Sidechains, arbitrary-plugin latency compensation, full service crash
+reconciliation, all-plugin compatibility and professional listening remain unproven.
 
 Primary license/source links: [DawDreamer GPLv3](https://github.com/DBraun/DawDreamer/blob/v0.9.0/LICENSE),
 [Dexed GPLv3](https://github.com/asb2m10/dexed),

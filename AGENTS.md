@@ -8,7 +8,10 @@ All numbered documents in its required reading order are in `docs/spec/v0.4/`.
 The initial G0 assignment is [CODEX-START-HERE](docs/spec/v0.4/CODEX-START-HERE.md).
 Read the current [G0 decision](docs/decisions/G0-DECISION.md) and
 [engine ADR](docs/decisions/ADR-0001-engine-adoption.md) for the implementation handoff.
-The initial assignment remains G0-only unless the owner explicitly extends it.
+The owner explicitly extended the assignment to G1 on 13 November 2026.
+Read [G1 decision](docs/decisions/G1-DECISION.md) and
+[G1 contract ADR](docs/decisions/ADR-0002-g1-production-contract.md) for the current
+implementation. G1 technical delivery does not imply owner musical approval.
 
 Repository organization:
 

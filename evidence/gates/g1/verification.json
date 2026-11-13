@@ -1,0 +1,51 @@
+{
+  "status": "PASS",
+  "verified_renditions": [
+    {
+      "id": "rendition-ba0460e53c104a4fba916d9af130f81b",
+      "audio_sha256": "bcf99c564da6197370f6068f568dca4d8380f90e19daab74b26e2e596f2843e4",
+      "source_sha256": "81d65796e52d4aa7e117fbfd32a2efd17e9322aa7c0e0ee23d21621d2252bb81",
+      "frames": 3600000
+    },
+    {
+      "id": "rendition-742f631e9199420bbd8509632f38002c",
+      "audio_sha256": "27b16d4ece67d16828ab59c2b45f91e3c4dbb93f6e1a08cd711e36e1a01b75d3",
+      "source_sha256": "a59769cb2af5708580701bd3b305b214ab0e93d49718babc97c1a8245b4ef247",
+      "frames": 3600000
+    },
+    {
+      "id": "rendition-b46fc75786a04352929b4367b2c277b7",
+      "audio_sha256": "3ae04708334e07b616ca674c4c012c746d42fc42129dfbbac4219e2017b447d2",
+      "source_sha256": "35c99e574b0b049c74c15e3d528e5632df518c8e75d19697c9318843c40382ec",
+      "frames": 3600000
+    },
+    {
+      "id": "rendition-a556921c4f7f4181a747d26c591b1f30",
+      "audio_sha256": "f198fb0965fa073811447bee3752645b4578374f524633831c65fb102ef4edc6",
+      "source_sha256": "35c99e574b0b049c74c15e3d528e5632df518c8e75d19697c9318843c40382ec",
+      "frames": 3600000
+    },
+    {
+      "id": "rendition-d562e33d38f341c58e57431aa070df3d",
+      "audio_sha256": "ed49ee9afda9bbe5c672eb577a3c30ee4b4bd3036c5f8df35cb9ec4f89d35041",
+      "source_sha256": "8762e80372c1bd9b974c0cbe623716c36a694163e111832c9da0578ed900f0ee",
+      "frames": 3600000
+    },
+    {
+      "id": "rendition-df296fd8ee3644db9e5e54c4bf96a9a2",
+      "audio_sha256": "e4e5c5a8749ef2850eeee107bf66adda90ee308c16caf433074a0ecb85e8460e",
+      "source_sha256": "0e50cbef2bdf4be181905fc65a23203951eb15f2f3546a6264822f22868430b7",
+      "frames": 3600000
+    }
+  ],
+  "export_sha256": "39cd4a229d4367466be3cb44b718e67d91e44a7865eb0efe2ab42fb9c80e1991",
+  "errors_exercised": [
+    "STALE_REVISION",
+    "MODULE_COMPILE_FAILED",
+    "VALIDATION_ERROR",
+    "QUALITY_BLOCKED"
+  ],
+  "report_sha256": "c7f5d4b46fd8f9716c6013de79586541a0590362f710e0b55f46fdfd838af842",
+  "listening": "NOT_EVALUATED",
+  "scope": "Independent source/file/PCM/state/stem/dependency/measurement identities; no subjective sound judgment"
+}

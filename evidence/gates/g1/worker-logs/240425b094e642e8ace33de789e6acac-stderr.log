@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\worker.py", line 223, in main
+    data = backend.render(request, stage)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\worker.py", line 119, in render
+    raise AdawError("VALIDATION_ERROR", "Faust binding missing", binding=key)
+app.errors.AdawError: Faust binding missing

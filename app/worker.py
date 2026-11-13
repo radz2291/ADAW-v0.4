@@ -1,6 +1,7 @@
 """Killable native backend. No project database access; only job staging paths."""
 import importlib.metadata
 import json
+import math
 import os
 from pathlib import Path
 import platform
@@ -10,6 +11,22 @@ import traceback
 
 from app.contracts import RenderGraph, catalog_hash, digest, file_hash
 from app.errors import AdawError
+
+
+def report_safe(value, path="result", warnings=None):
+    """Represent invalid native metadata explicitly; never coerce it to success/0.
+
+    Controls and audio are separately required finite before this reporting step.
+    """
+    warnings = warnings if warnings is not None else []
+    if isinstance(value, float) and not math.isfinite(value):
+        warnings.append({"code": "NATIVE_METADATA_NONFINITE", "path": path, "value": str(value)})
+        return {"status": "UNAVAILABLE", "native_value": str(value)}
+    if isinstance(value, dict):
+        return {k: report_safe(v, path+"."+str(k), warnings) for k,v in value.items()}
+    if isinstance(value, list):
+        return [report_safe(v, path+f"[{i}]", warnings) for i,v in enumerate(value)]
+    return value
 
 
 class DawDreamerBackend:
@@ -56,9 +73,39 @@ class DawDreamerBackend:
                 source_hashes[n["id"]] = digest(pcm.astype("<f4").tobytes())
                 p = e.make_playback_processor(n["id"], pcm)
                 catalog = []
-            elif n["kind"] == "faust":
+            elif n["kind"] == "samples":
+                pcm = np.zeros((2, g["frames"]), dtype=np.float32)
+                cache = {}
+                for event in c["events"]:
+                    sha = event["asset_sha256"]
+                    if sha not in cache:
+                        path = stage / (sha + ".wav")
+                        if file_hash(path) != sha:
+                            raise AdawError("ASSET_MISSING", "Staged sample hash mismatch")
+                        sample, rate = sf.read(path, dtype="float32", always_2d=True)
+                        if rate != g["sample_rate"] or sample.shape[1] not in (1, 2) or not np.isfinite(sample).all():
+                            raise AdawError("VALIDATION_ERROR", "Sample requires matching rate, mono/stereo finite audio")
+                        cache[sha] = np.repeat(sample, 2, axis=1) if sample.shape[1] == 1 else sample
+                    sample = cache[sha]
+                    length = min(len(sample), event["duration_frames"])
+                    segment = sample[:length].T.copy()
+                    fade = min(event["fade_frames"], length // 2)
+                    if fade:
+                        segment[:, :fade] *= np.linspace(0, 1, fade)
+                        segment[:, -fade:] *= np.linspace(1, 0, fade)
+                    # Balance pan: center is unity; no implicit center attenuation.
+                    segment *= np.array([min(1, 1-event["pan"]), min(1, 1+event["pan"])])[:, None] * event["gain"]
+                    start = event["start_frame"]
+                    pcm[:, start:start+length] += segment
+                source_hashes[n["id"]] = digest(pcm.astype("<f4").tobytes())
+                p = e.make_playback_processor(n["id"], pcm)
+                catalog = []
+            elif n["kind"] in ("faust", "faust_synth"):
                 p = e.make_faust_processor(n["id"])
                 p.set_dsp_string(c["source"])
+                if n["kind"] == "faust_synth":
+                    p.num_voices = c["voices"]
+                    p.release_length = c["release_seconds"]
                 try:
                     if not p.compile():
                         raise RuntimeError("Faust compile returned false")
@@ -74,6 +121,8 @@ class DawDreamerBackend:
                     if not d["min"] <= value <= d["max"]:
                         raise AdawError("VALIDATION_ERROR", "Faust value outside exposed range", binding=key)
                     p.set_parameter(key, value)
+                for note in c.get("midi", []):
+                    p.add_midi_note(note["note"], note["velocity"], note["start_frame"] / g["sample_rate"], note["duration_frames"] / g["sample_rate"])
             else:
                 resolved = request["plugins"][c["registry_id"]]
                 p = e.make_plugin_processor(n["id"], resolved["path"])
@@ -97,6 +146,8 @@ class DawDreamerBackend:
                     if int(key) not in indices:
                         raise AdawError("VALIDATION_ERROR", "Missing VST parameter", binding=key)
                     p.set_parameter(int(key), value)
+                    if not math.isfinite(p.get_parameter(int(key))):
+                        raise AdawError("PLUGIN_CAPABILITY_UNVERIFIED", "Active VST control returned nonfinite value", binding=key)
                 for note in c["midi"]:
                     p.add_midi_note(note["note"], note["velocity"], note["start_frame"] / g["sample_rate"],
                                     note["duration_frames"] / g["sample_rate"])
@@ -109,7 +160,7 @@ class DawDreamerBackend:
                         lane[frame:end] = value
                     p.set_automation(int(key), lane)
             channels_in = sum(processors[i].get_num_output_channels() for i in n["inputs"])
-            if n["kind"] != "tone" and channels_in != p.get_num_input_channels():
+            if n["kind"] not in ("tone", "samples") and channels_in != p.get_num_input_channels():
                 raise AdawError("ROUTING_UNSUPPORTED", "Input channel mismatch", node=n["id"], supplied=channels_in, expected=p.get_num_input_channels())
             if p.get_num_output_channels() != n["channels"]:
                 raise AdawError("ROUTING_UNSUPPORTED", "Output channel mismatch", node=n["id"])
@@ -122,6 +173,8 @@ class DawDreamerBackend:
                 reports[n["id"]]["state_sha256"] = file_hash(state_path)
                 reports[n["id"]]["values"] = {str(d["index"]): p.get_parameter(d["index"]) for d in catalog}
             processors[n["id"]] = p
+            if n["id"] in request.get("record_nodes", []):
+                p.record = True
             graph.append((p, n["inputs"]))
         e.load_graph(graph)
         prepare_seconds = time.perf_counter() - started
@@ -130,19 +183,25 @@ class DawDreamerBackend:
             raise AdawError("RENDER_FAILED", "Engine returned false")
         cold = time.perf_counter() - start
         audio = e.get_audio().T.copy()
+        stems = {}
+        for node_id in request.get("record_nodes", []):
+            stem_path = stage / (node_id + ".wav")
+            sf.write(stem_path, e.get_audio(node_id).T, g["sample_rate"], subtype="FLOAT")
+            stems[node_id] = {"file": stem_path.name, "sha256": file_hash(stem_path)}
         start = time.perf_counter()
-        e.render(g["frames"] / g["sample_rate"])
-        warm = time.perf_counter() - start
+        if request.get("benchmark", True):
+            e.render(g["frames"] / g["sample_rate"])
+        warm = time.perf_counter() - start if request.get("benchmark", True) else None
         second = e.get_audio().T
         if audio.shape != (g["frames"], g["nodes"][-1]["channels"]) or not np.isfinite(audio).all():
             raise AdawError("RENDER_FAILED", "Unexpected shape or invalid samples", shape=list(audio.shape))
         sf.write(stage / "output.wav", audio, g["sample_rate"], subtype="FLOAT")
         return {"file": "output.wav", "audio_sha256": file_hash(stage / "output.wav"),
                 "pcm_sha256": digest(audio.astype("<f4").tobytes()),
-                "source_hashes": source_hashes, "nodes": reports,
+                "source_hashes": source_hashes, "nodes": reports, "stems": stems,
                 "timing": {"prepare_seconds": prepare_seconds, "cold_render_seconds": cold, "warm_render_seconds": warm},
-                "warm_pcm_identical": bool(np.array_equal(audio, second)),
-                "warm_max_abs_delta": float(np.max(np.abs(audio - second))),
+                "warm_pcm_identical": bool(np.array_equal(audio, second)) if request.get("benchmark", True) else None,
+                "warm_max_abs_delta": float(np.max(np.abs(audio - second))) if request.get("benchmark", True) else None,
                 "environment": self.environment()}
 
 
@@ -180,6 +239,9 @@ def main():
         traceback.print_exc()
         result = {"ok": False, "error": {"code": getattr(exc, "code", "RENDER_FAILED"),
                   "message": str(exc), "details": getattr(exc, "details", {})}}
+    warnings = []
+    result = report_safe(result, warnings=warnings)
+    result["warnings"] = warnings
     (stage / "result.json").write_text(json.dumps(result, indent=2, allow_nan=False), encoding="utf-8")
     return 0 if result["ok"] else 1
 

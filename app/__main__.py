@@ -7,6 +7,7 @@ import uuid
 
 from app.errors import AdawError
 from app.service import Service
+from app.project_cli import COMMANDS, add_commands, execute
 
 
 class Parser(argparse.ArgumentParser):
@@ -18,11 +19,12 @@ def main(argv=None):
     request_id = uuid.uuid4().hex
     operation = "parse"
     try:
-        parser = Parser(description="ADAW G0 engineering CLI; JSON output")
-        parser.add_argument("--root", required=True, help="Explicit G0 project/service directory")
+        parser = Parser(description="ADAW local music production CLI; JSON output")
+        parser.add_argument("--root", required=True, help="Explicit project/service directory")
         parser.add_argument("--timeout", type=float, required=True, help="Worker wall-clock deadline in seconds")
-        parser.add_argument("--json", action="store_true", help="JSON is always used in G0")
+        parser.add_argument("--json", action="store_true", help="JSON output is always used")
         sub = parser.add_subparsers(dest="command", required=True)
+        add_commands(sub)
         sub.add_parser("doctor")
         sub.add_parser("inspect")
         module = sub.add_parser("module-validate")
@@ -43,7 +45,9 @@ def main(argv=None):
         args = parser.parse_args(argv)
         operation = args.command
         service = Service(args.root)
-        if args.command == "doctor":
+        if args.command in COMMANDS:
+            data = execute(args)
+        elif args.command == "doctor":
             data = service.run_worker({"operation": "doctor"}, args.timeout)
         elif args.command == "inspect":
             data = service.inspect()
@@ -64,8 +68,10 @@ def main(argv=None):
         result = {"ok": False, "data": None, "error": {
             "code": getattr(exc, "code", "VALIDATION_ERROR"), "message": str(exc), "target": operation,
             "retryable": False, "details": getattr(exc, "details", {})}}
+    data = result.get("data") or {}
+    warnings = data.get("render", data).get("warnings", [])
     result.update(schema_version="adaw.result@1", request_id=request_id, operation=operation,
-                  warnings=[], evidence_refs=[], time_utc=datetime.now(timezone.utc).isoformat())
+                  warnings=warnings, evidence_refs=[], time_utc=datetime.now(timezone.utc).isoformat())
     print(json.dumps(result, ensure_ascii=False, allow_nan=False))
     return 0 if result["ok"] else 1
 

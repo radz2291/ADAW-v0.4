@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\worker.py", line 110, in render
+    if not p.compile():
+           ^^^^^^^^^^^
+RuntimeError: FaustProcessor::compile(): dawdreamer:4 : ERROR : syntax error, unexpected IDENT
+. Check the faustlibraries path: C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\.venv\Lib\site-packages\dawdreamer\faustlibraries
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\worker.py", line 223, in main
+    data = backend.render(request, stage)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\app\worker.py", line 113, in render
+    raise AdawError("MODULE_COMPILE_FAILED", str(exc), node=n["id"]) from exc
+app.errors.AdawError: FaustProcessor::compile(): dawdreamer:4 : ERROR : syntax error, unexpected IDENT
+. Check the faustlibraries path: C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4\.venv\Lib\site-packages\dawdreamer\faustlibraries

@@ -1,0 +1,11 @@
+llvm_dsp_poly_factory : fEffectFactory dawdreamer:12 : ERROR : undefined symbol : effect
+llvm_dsp_poly_factory : fEffectFactory dawdreamer:12 : ERROR : undefined symbol : effect
+Steal release voice : voice_date = 7 cur_date = 0 voice = 0 
+Steal release voice : voice_date = 14 cur_date = 0 voice = 0 
+Steal release voice : voice_date = 21 cur_date = 0 voice = 0 
+Steal release voice : voice_date = 59 cur_date = 0 voice = 0 
+Steal release voice : voice_date = 80 cur_date = 0 voice = 0 
+Steal playing voice : voice_date = 94 cur_date = 0 voice = -4 
+Playing pitch = 38 not found
+Steal release voice : voice_date = 101 cur_date = 0 voice = 0 
+Steal release voice : voice_date = 108 cur_date = 0 voice = 0 

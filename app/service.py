@@ -93,12 +93,17 @@ class Service:
             raise AdawError("PLUGIN_CAPABILITY_UNVERIFIED", "Plugin files changed; reauthorize and probe")
         return {**identity, "provenance": row[1], "probe": json.loads(row[2]) if row[2] else None}
 
-    def run_worker(self, request, timeout, staged_states=()):
+    def run_worker(self, request, timeout, staged_states=(), staged_assets=()):
         if not isinstance(timeout, (int, float)) or not 0 < timeout < float("inf"):
             raise AdawError("VALIDATION_ERROR", "Timeout must be finite and positive")
         job = uuid.uuid4().hex
         stage = self.staging / job
         stage.mkdir()
+        for sha in staged_assets:
+            source = self.content / sha
+            if not source.exists() or file_hash(source) != sha:
+                raise AdawError("ASSET_MISSING", "Missing/corrupt audio asset", sha256=sha)
+            shutil.copyfile(source, stage / (sha + ".wav"))
         for sha in staged_states:
             source = self.content / sha
             if not source.exists() or file_hash(source) != sha:
@@ -143,13 +148,15 @@ class Service:
             db.execute("UPDATE plugins SET probe=? WHERE id=?", (canonical(result["data"]), registry_id))
         return result
 
-    def render(self, graph, timeout, commit=False, base_revision=None):
+    def render(self, graph, timeout, commit=False, base_revision=None, record_nodes=(), benchmark=True):
         graph = RenderGraph.parse(graph)
         before = self.inspect()
         if commit and base_revision != before["head"]:
             raise AdawError("STALE_REVISION", "Explicit base revision does not match head")
-        plugins, states = {}, set()
+        plugins, states, assets = {}, set(), set()
         for node in graph.value["nodes"]:
+            if node["kind"] == "samples":
+                assets.update(e["asset_sha256"] for e in node["config"]["events"])
             if node["kind"] != "vst":
                 continue
             c = node["config"]
@@ -160,7 +167,10 @@ class Service:
                 "catalog_sha256": catalog_hash(identity["probe"]["parameters"])}
             if c["state_sha256"]:
                 states.add(c["state_sha256"])
-        result = self.run_worker({"operation": "render", "graph": graph.value, "plugins": plugins}, timeout, states)
+        if not set(record_nodes) <= {n["id"] for n in graph.value["nodes"]}:
+            raise AdawError("VALIDATION_ERROR", "Unknown stem node")
+        result = self.run_worker({"operation": "render", "graph": graph.value, "plugins": plugins,
+            "record_nodes": list(record_nodes), "benchmark": benchmark}, timeout, states, assets)
         stage = Path(result["stage"])
         data = result["data"]
         audio = stage / "output.wav"
@@ -170,6 +180,13 @@ class Service:
         if (quality["frames"], quality["sample_rate"], quality["channels"]) != (graph.value["frames"], graph.value["sample_rate"], graph.value["nodes"][-1]["channels"]):
             raise AdawError("INVALID_EXPORT", "Decoded audio differs from graph contract")
         audio_sha = self.put(audio.read_bytes())
+        for node_id, stem in data.get("stems", {}).items():
+            if node_id not in record_nodes:
+                raise AdawError("INVALID_EXPORT", "Unexpected stem")
+            path = stage / (node_id + ".wav")
+            if file_hash(path) != stem["sha256"]:
+                raise AdawError("INVALID_EXPORT", "Stem hash mismatch")
+            self.put(path.read_bytes())
         for node_id, report in data["nodes"].items():
             if "state_file" in report:
                 # Derive path from validated node ID, never trust worker-supplied path.

@@ -1,0 +1,2088 @@
+{
+  "scope": "G0 bounded engineering proof; fixture VSTs; no full permanent-test acceptance",
+  "time_utc": "2026-11-13T16:02:21.064744+00:00",
+  "checks": [
+    {
+      "id": "G0-01.windows_environment",
+      "status": "PASS",
+      "evidence": {
+        "ok": true,
+        "data": {
+          "os": "Windows-11-10.0.26100-SP0",
+          "machine": "AMD64",
+          "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+          "executable": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.venv\\Scripts\\python.exe",
+          "packages": {
+            "dawdreamer": "0.9.0",
+            "numpy": "2.2.6",
+            "scipy": "1.15.3",
+            "soundfile": "0.13.1",
+            "pyloudnorm": "0.1.1"
+          },
+          "native_module_sha256": "7ea9eaa679ef0e7f43166c75e2158a49735daf3b96ca5be1124a140e58ad3d81",
+          "import_seconds": 0.02512800000840798,
+          "isolation": "native subprocess crash containment only; same-user filesystem/network rights"
+        },
+        "warnings": [],
+        "job_id": "02375cb841a94525806def9f7238d6eb",
+        "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\02375cb841a94525806def9f7238d6eb",
+        "exit_code": 0,
+        "wall_seconds": 0.8110240000241902
+      }
+    },
+    {
+      "id": "RWT-05.faust_multitrack_subset",
+      "status": "PASS",
+      "evidence": {
+        "third_harmonic_ratio": {
+          "bypass": 1.9036645565140902e-11,
+          "drive_1": 0.0033003524575105298,
+          "drive_4": 0.046032552868973384
+        },
+        "trim_max_error": 0.0,
+        "fresh_worker_pcm_identical": true
+      }
+    },
+    {
+      "id": "RWT-06.invalid_faust_subset",
+      "status": "PASS",
+      "evidence": {
+        "expected_code": "MODULE_COMPILE_FAILED",
+        "head_unchanged": "721a6fb891dc4ec88c678ab928337991",
+        "last_playable_sha256": "d20ed1b2da2a06a1ba70de6eb567381b3e7254a0c72093431fe2a4cb6c37d0a1",
+        "details": {
+          "job_id": "9c5e54aee23640b99945f14058fb648c",
+          "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\9c5e54aee23640b99945f14058fb648c",
+          "worker": {
+            "ok": false,
+            "error": {
+              "code": "MODULE_COMPILE_FAILED",
+              "message": "FaustProcessor::compile(): dawdreamer:4 : ERROR : syntax error, unexpected IDENT\n. Check the faustlibraries path: C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.venv\\Lib\\site-packages\\dawdreamer\\faustlibraries",
+              "details": {
+                "node": "saturation"
+              }
+            },
+            "warnings": [],
+            "job_id": "9c5e54aee23640b99945f14058fb648c",
+            "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\9c5e54aee23640b99945f14058fb648c",
+            "exit_code": 1,
+            "wall_seconds": 1.1869357000105083
+          }
+        }
+      }
+    },
+    {
+      "id": "RWT-05.removed_faust_binding_subset",
+      "status": "PASS",
+      "evidence": {
+        "expected_code": "VALIDATION_ERROR",
+        "head_unchanged": "721a6fb891dc4ec88c678ab928337991",
+        "last_playable_sha256": "d20ed1b2da2a06a1ba70de6eb567381b3e7254a0c72093431fe2a4cb6c37d0a1",
+        "details": {
+          "job_id": "240425b094e642e8ace33de789e6acac",
+          "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\240425b094e642e8ace33de789e6acac",
+          "worker": {
+            "ok": false,
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "message": "Faust binding missing",
+              "details": {
+                "binding": "/ADAW_Saturation/drive"
+              }
+            },
+            "warnings": [],
+            "job_id": "240425b094e642e8ace33de789e6acac",
+            "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\240425b094e642e8ace33de789e6acac",
+            "exit_code": 1,
+            "wall_seconds": 1.1073365999909583
+          }
+        }
+      }
+    },
+    {
+      "id": "RWT-06.abrupt_worker_exit_subset",
+      "status": "PASS",
+      "evidence": {
+        "expected_code": "WORKER_CRASHED",
+        "head_unchanged": "721a6fb891dc4ec88c678ab928337991",
+        "last_playable_sha256": "d20ed1b2da2a06a1ba70de6eb567381b3e7254a0c72093431fe2a4cb6c37d0a1",
+        "details": {
+          "job_id": "1c4950adcb41440a823ba86e8a76969d",
+          "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\1c4950adcb41440a823ba86e8a76969d",
+          "worker": {
+            "ok": false,
+            "error": {
+              "code": "WORKER_CRASHED",
+              "message": "Worker exited without result"
+            },
+            "job_id": "1c4950adcb41440a823ba86e8a76969d",
+            "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\1c4950adcb41440a823ba86e8a76969d",
+            "exit_code": 73,
+            "wall_seconds": 0.7053331999923103
+          }
+        }
+      }
+    },
+    {
+      "id": "RWT-06.worker_timeout_subset",
+      "status": "PASS",
+      "evidence": {
+        "expected_code": "TIMEOUT",
+        "head_unchanged": "721a6fb891dc4ec88c678ab928337991",
+        "last_playable_sha256": "d20ed1b2da2a06a1ba70de6eb567381b3e7254a0c72093431fe2a4cb6c37d0a1",
+        "details": {
+          "job_id": "6c77223bfc0d4829b14c9943f89861e0",
+          "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\6c77223bfc0d4829b14c9943f89861e0",
+          "worker": {
+            "ok": false,
+            "error": {
+              "code": "TIMEOUT",
+              "message": "Worker exceeded explicit deadline"
+            },
+            "job_id": "6c77223bfc0d4829b14c9943f89861e0",
+            "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\6c77223bfc0d4829b14c9943f89861e0",
+            "exit_code": 1,
+            "wall_seconds": 0.5219881000230089
+          }
+        }
+      }
+    },
+    {
+      "id": "RWT-06.service_reopen_subset",
+      "status": "PASS",
+      "evidence": {
+        "reopened": {
+          "head": "721a6fb891dc4ec88c678ab928337991",
+          "last_playable": "d20ed1b2da2a06a1ba70de6eb567381b3e7254a0c72093431fe2a4cb6c37d0a1",
+          "revisions": [
+            {
+              "id": "44252124ef2044349b2c30bd637805fb",
+              "parent": null,
+              "audio_sha256": "9b88951ea57b8dbbefbeccdd514d46ceac281a49273e7ee316b149963a0394b8"
+            },
+            {
+              "id": "d2160ef0b9344081b7b8a1067fcc69e0",
+              "parent": "44252124ef2044349b2c30bd637805fb",
+              "audio_sha256": "d4ab0b5cc7e2df7419c13a0952eebccf02a918ac2cb760644bd13fa13604a5da"
+            },
+            {
+              "id": "b2b47c26f987471b98f3bc2b973a916d",
+              "parent": "d2160ef0b9344081b7b8a1067fcc69e0",
+              "audio_sha256": "4ac8e5f1e5ecb8b4fc8d73e568c54919c5f92608b1ada1209bb585ed63103a47"
+            },
+            {
+              "id": "f4c8df12f0b641098435f6f40c81baa8",
+              "parent": "b2b47c26f987471b98f3bc2b973a916d",
+              "audio_sha256": "a31adbc97d97aa5e49db83097aa00fbb3d71f77ea78fde5ceb050e058058e3a3"
+            },
+            {
+              "id": "42baf3f6a720439aac1b1fffdd53e190",
+              "parent": "f4c8df12f0b641098435f6f40c81baa8",
+              "audio_sha256": "c73fcd2abb2930a318cdf3a841f27611177084e2d4fbdaf6519b1f7b0c8c3f68"
+            },
+            {
+              "id": "235e2b221a204563ab67aa7f910a1f6a",
+              "parent": "42baf3f6a720439aac1b1fffdd53e190",
+              "audio_sha256": "57ae677430d64de5f54b9c7338d94d20700076cc31f68f78eb1490ab5fa36c30"
+            },
+            {
+              "id": "9439d952a16b4f4eb08eb37df93e6e48",
+              "parent": "235e2b221a204563ab67aa7f910a1f6a",
+              "audio_sha256": "2f1e8a5dc106e94bf5a4248528873bc4b98aa627ed9b3396069e3d0d6c2d302b"
+            },
+            {
+              "id": "a84a71402dea4b3f88f68f1c6de1b8ae",
+              "parent": "9439d952a16b4f4eb08eb37df93e6e48",
+              "audio_sha256": "fd2946496b797931a0d2bb90fc1f2856dc314f29d5a36d3ae56685f34f561ab3"
+            },
+            {
+              "id": "3e4e500e4dd942ca88f32a2d002fc570",
+              "parent": "a84a71402dea4b3f88f68f1c6de1b8ae",
+              "audio_sha256": "022294b6bb78047a26597de520a9790b04e13f76358c749f24dfae0ebdd72551"
+            },
+            {
+              "id": "6f08bae47e45431f9b88b821457c7e00",
+              "parent": "3e4e500e4dd942ca88f32a2d002fc570",
+              "audio_sha256": "5ab6359f97db393f776cf8f5b905e9ec62c281b0d21e3907c9c59980dc576aaa"
+            },
+            {
+              "id": "a006a11c75394c2784fc00cb9433fb41",
+              "parent": "6f08bae47e45431f9b88b821457c7e00",
+              "audio_sha256": "8eeaec8abd87be01aa69ce75f96824d91daefe0383951997a30a8ebbd9d1c86b"
+            },
+            {
+              "id": "cc89e52993c34b96a7b8c91190653860",
+              "parent": "a006a11c75394c2784fc00cb9433fb41",
+              "audio_sha256": "6585bad3ed1158fd40c80611f5925c036519be227efec57c6bf062b6839070b0"
+            },
+            {
+              "id": "9041fb96614a4b82b92b22e5424a0298",
+              "parent": "cc89e52993c34b96a7b8c91190653860",
+              "audio_sha256": "95567611ef4a207b859b313155d3ba73c6e57a35bb5f1960295808eaf4d45cc0"
+            },
+            {
+              "id": "721a6fb891dc4ec88c678ab928337991",
+              "parent": "9041fb96614a4b82b92b22e5424a0298",
+              "audio_sha256": "d20ed1b2da2a06a1ba70de6eb567381b3e7254a0c72093431fe2a4cb6c37d0a1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "RWT-06.stale_commit_subset",
+      "status": "PASS",
+      "evidence": {
+        "expected_code": "STALE_REVISION",
+        "head_unchanged": "721a6fb891dc4ec88c678ab928337991",
+        "last_playable_sha256": "d20ed1b2da2a06a1ba70de6eb567381b3e7254a0c72093431fe2a4cb6c37d0a1",
+        "details": {}
+      }
+    },
+    {
+      "id": "G0-04.sample_timing",
+      "status": "PASS",
+      "evidence": {
+        "requested_onset_frame": 12345,
+        "measured_onset_frame": 12345,
+        "block_size": 256
+      }
+    },
+    {
+      "id": "G0-04.loudness_calibration_subset",
+      "status": "PASS",
+      "evidence": {
+        "method": "Three upstream BS.1770 compliance vectors: tone, absolute gate, relative gate. Not a full meter conformance suite.",
+        "upstream_commit": "b8d67bfd3ce5deef872f688fcfa491a0ca69fddd",
+        "vectors": [
+          {
+            "file": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\calibration\\1770-2_Comp_23LKFS_1000Hz_2ch.wav",
+            "sha256": "dbb1d5234bcffad3e8f3ebf29663d2d04d8ed8629b50dd41fdc6be9d20b53924",
+            "expected_lufs": -23,
+            "measured_lufs": -23.034979296837957,
+            "tolerance_lu": 0.1
+          },
+          {
+            "file": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\calibration\\1770-2_Comp_AbsGateTest.wav",
+            "sha256": "3abc54a67fc1a743d7a4b86a0c8b37e14e51928a6bfb099de3c2476afb74c120",
+            "expected_lufs": -69.5,
+            "measured_lufs": -69.49297050885087,
+            "tolerance_lu": 0.1
+          },
+          {
+            "file": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\calibration\\1770-2_Comp_RelGateTest.wav",
+            "sha256": "39b6ec1f20ec5b4f07da7c5473f0aae06a7e63c7ea81e0a13b9773cbf0c71a81",
+            "expected_lufs": -10,
+            "measured_lufs": -10.070213867167258,
+            "tolerance_lu": 0.1
+          }
+        ]
+      }
+    },
+    {
+      "id": "RWT-11.fixture_instrument_midi_state_subset",
+      "status": "PASS",
+      "evidence": {
+        "base_rms": 0.028843532555742648,
+        "changed_rms": 0.014421766278955452,
+        "state_sha256": "bd53f5c0f11ec791c86c543d9417505aa7a359fd479a2f4c732da103edd2a17d",
+        "all_parameters_restored": true,
+        "restored_rms_ratio": 0.9999999998911149,
+        "fresh_worker_pcm_identical": false,
+        "max_abs_delta": 1.220703143189894e-05,
+        "replay_grade": "D3 environment-dependent; PCM not identical"
+      }
+    },
+    {
+      "id": "RWT-11.fixture_effect_automation_state_subset",
+      "status": "PASS",
+      "evidence": {
+        "base_rms": 0.07020935820282412,
+        "changed_rms": 0.03594719459275624,
+        "state_sha256": "cb340b98a0961669efa6024537820f63ffddb58de3ff1dbcb17813d2a753a5c3",
+        "restored_max_abs_delta": 2.4563925449250235e-08,
+        "automated_late_early_rms_ratio": 0.5120000455205571,
+        "configuration": "Dry/Wet=0; Output Level is active VST gain processing, not plugin bypass",
+        "automation": "hold lane at sample 96000; host/plugin smoothing not claimed sample-exact",
+        "fresh_worker_pcm_identical": false
+      }
+    },
+    {
+      "id": "RWT-12.fixture_pipeline_reuse_subset",
+      "status": "PASS",
+      "evidence": {
+        "first_head": "8381e80adeba42a0979e9362911500eb",
+        "second_head": "f61c1f4442e245be983766e3c4a63626",
+        "independent": true,
+        "template_source_sha256": "1116c7299341f85d849316f56d42bd68d6762106055eb36e3a07a333bcded910",
+        "tuned_source_sha256": "6182fcc7692436bcd4bec80a1c83112751876d1f496474a75a211fb24ba24379"
+      }
+    },
+    {
+      "id": "RWT-05.plugin_permission_denial_subset",
+      "status": "PASS",
+      "evidence": {
+        "expected_code": "PLUGIN_UNAPPROVED",
+        "head_unchanged": "8381e80adeba42a0979e9362911500eb",
+        "last_playable_sha256": "9371f55e8cdf0418aa5608b2803cc82923e1cb7f74e47bc7af3636f58101a6da",
+        "details": {
+          "registry_id": "not-authorized"
+        }
+      }
+    },
+    {
+      "id": "RWT-12.missing_changed_dependency_subset",
+      "status": "PASS",
+      "evidence": {
+        "missing": {
+          "expected_code": "PLUGIN_MISSING",
+          "head_unchanged": "8381e80adeba42a0979e9362911500eb",
+          "last_playable_sha256": "9371f55e8cdf0418aa5608b2803cc82923e1cb7f74e47bc7af3636f58101a6da",
+          "details": {
+            "path": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\dependency-fault\\dependency-fixture.dll"
+          }
+        },
+        "changed": {
+          "expected_code": "PLUGIN_CAPABILITY_UNVERIFIED",
+          "head_unchanged": "8381e80adeba42a0979e9362911500eb",
+          "last_playable_sha256": "9371f55e8cdf0418aa5608b2803cc82923e1cb7f74e47bc7af3636f58101a6da",
+          "details": {}
+        },
+        "native_load_attempted": false
+      }
+    }
+  ],
+  "renders": {
+    "faust-bypass": {
+      "ok": true,
+      "data": {
+        "file": "output.wav",
+        "audio_sha256": "95567611ef4a207b859b313155d3ba73c6e57a35bb5f1960295808eaf4d45cc0",
+        "pcm_sha256": "ca688fdb4898ca0622f46ef72a1f3421485ebe6eb9e1d42abf84c19ce348902f",
+        "source_hashes": {
+          "tone-a": "e22f73a77bdb385e519592ef12390e6dacf1cff35a007afd396e38fb60f4f5a6",
+          "tone-b": "a7bb9e00e68fa696bb4c2f6db824e80e2ebce14ad4414bf7c7c85136013b752e",
+          "bus": "e0acae0e70687edf99040ef32410bd4f55cf74544d70eb6b5c79d4b519082c30",
+          "master": "91d2029e7cb5a2d1ce41be9e94a773c8bd2f227bdf41d8e8d4c2447d427cffa7"
+        },
+        "nodes": {
+          "tone-a": {
+            "prepare_seconds": 0.049823899986222386,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "tone-b": {
+            "prepare_seconds": 0.041430899989791214,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "bus": {
+            "prepare_seconds": 0.02820970001630485,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "master": {
+            "prepare_seconds": 0.0186931999924127,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          }
+        },
+        "stems": {},
+        "timing": {
+          "prepare_seconds": 0.13844750000862405,
+          "cold_render_seconds": 0.0046341999841388315,
+          "warm_render_seconds": 0.00555610001902096
+        },
+        "warm_pcm_identical": true,
+        "warm_max_abs_delta": 0.0,
+        "environment": {
+          "os": "Windows-11-10.0.26100-SP0",
+          "machine": "AMD64",
+          "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+          "executable": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.venv\\Scripts\\python.exe",
+          "packages": {
+            "dawdreamer": "0.9.0",
+            "numpy": "2.2.6",
+            "scipy": "1.15.3",
+            "soundfile": "0.13.1",
+            "pyloudnorm": "0.1.1"
+          },
+          "native_module_sha256": "7ea9eaa679ef0e7f43166c75e2158a49735daf3b96ca5be1124a140e58ad3d81",
+          "import_seconds": 0.02036739999311976,
+          "isolation": "native subprocess crash containment only; same-user filesystem/network rights"
+        }
+      },
+      "warnings": [],
+      "job_id": "e8b9a78e5f6740ecb0ffd254f5005af8",
+      "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\e8b9a78e5f6740ecb0ffd254f5005af8",
+      "exit_code": 0,
+      "wall_seconds": 1.1768883999902755,
+      "source_sha256": "78c92ed7da3d3167a7926b79b907da9564d1939e4192a2a0695daf4ad9001995",
+      "quality": {
+        "audio_sha256": "95567611ef4a207b859b313155d3ba73c6e57a35bb5f1960295808eaf4d45cc0",
+        "frames": 768000,
+        "sample_rate": 48000,
+        "channels": 2,
+        "subtype": "FLOAT",
+        "duration_seconds": 16.0,
+        "sample_peak": 0.12499851733446121,
+        "sample_peak_dbfs": -18.06190276660381,
+        "rms": 0.07288689877915777,
+        "dc_per_channel": [
+          2.426648002910407e-15,
+          2.426648002910407e-15
+        ],
+        "integrated_lufs": -20.622535433856473,
+        "loudness_method": "pyloudnorm ITU-R BS.1770-4 K-weighting and gating; 400 ms blocks",
+        "analyzer_versions": {
+          "pyloudnorm": "0.1.1",
+          "soundfile": "0.13.1",
+          "scipy": "1.15.3",
+          "numpy": "2.2.6"
+        },
+        "independent_decode": "PASS: libsndfile and scipy.io.wavfile agree",
+        "true_peak": {
+          "status": "NOT_EVALUATED",
+          "reason": "No calibrated true-peak meter in G0 subset"
+        },
+        "delivery_profile_status": "UNKNOWN: no owner-selected thresholds",
+        "listening": "NOT_EVALUATED"
+      },
+      "audio_path": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\e8b9a78e5f6740ecb0ffd254f5005af8\\output.wav",
+      "committed": true,
+      "revision": "9041fb96614a4b82b92b22e5424a0298"
+    },
+    "faust-drive-1": {
+      "ok": true,
+      "data": {
+        "file": "output.wav",
+        "audio_sha256": "7c65fc35089265976ce95a4cfdfac62138395d9a491c904af0b8ee837e221af1",
+        "pcm_sha256": "d941d6234236e82b7cf7bcdc8c7a3cb1c2ffebff0a47d11b6f53e5e4dd58d6d1",
+        "source_hashes": {
+          "tone-a": "e22f73a77bdb385e519592ef12390e6dacf1cff35a007afd396e38fb60f4f5a6",
+          "saturation": "bbb711df9568a57d6564324005741739decd4044510df79abb12d6766bb5d27b",
+          "tone-b": "a7bb9e00e68fa696bb4c2f6db824e80e2ebce14ad4414bf7c7c85136013b752e",
+          "bus": "e0acae0e70687edf99040ef32410bd4f55cf74544d70eb6b5c79d4b519082c30",
+          "master": "91d2029e7cb5a2d1ce41be9e94a773c8bd2f227bdf41d8e8d4c2447d427cffa7"
+        },
+        "nodes": {
+          "tone-a": {
+            "prepare_seconds": 0.06213980002212338,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "saturation": {
+            "prepare_seconds": 0.04043779999483377,
+            "catalog_count": 2,
+            "catalog_sha256": "5e640dd9967bffec4701605b6dc71d94c48230a83dc4be8936a8990503169b2f",
+            "selected_values": {}
+          },
+          "tone-b": {
+            "prepare_seconds": 0.07082550000632182,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "bus": {
+            "prepare_seconds": 0.02868669998133555,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "master": {
+            "prepare_seconds": 0.014552700013155118,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          }
+        },
+        "stems": {},
+        "timing": {
+          "prepare_seconds": 0.21689840001636185,
+          "cold_render_seconds": 0.029576299973996356,
+          "warm_render_seconds": 0.029385200003162026
+        },
+        "warm_pcm_identical": true,
+        "warm_max_abs_delta": 0.0,
+        "environment": {
+          "os": "Windows-11-10.0.26100-SP0",
+          "machine": "AMD64",
+          "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+          "executable": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.venv\\Scripts\\python.exe",
+          "packages": {
+            "dawdreamer": "0.9.0",
+            "numpy": "2.2.6",
+            "scipy": "1.15.3",
+            "soundfile": "0.13.1",
+            "pyloudnorm": "0.1.1"
+          },
+          "native_module_sha256": "7ea9eaa679ef0e7f43166c75e2158a49735daf3b96ca5be1124a140e58ad3d81",
+          "import_seconds": 0.027493100002175197,
+          "isolation": "native subprocess crash containment only; same-user filesystem/network rights"
+        }
+      },
+      "warnings": [],
+      "job_id": "733a35b7e335401eaf30b0b55b617081",
+      "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\733a35b7e335401eaf30b0b55b617081",
+      "exit_code": 0,
+      "wall_seconds": 1.371642999991309,
+      "source_sha256": "c3b7a98bf95f6cf776c4cc7615f426eeac6db1aef7597e6becacf4ba60a21963",
+      "quality": {
+        "audio_sha256": "7c65fc35089265976ce95a4cfdfac62138395d9a491c904af0b8ee837e221af1",
+        "frames": 768000,
+        "sample_rate": 48000,
+        "channels": 2,
+        "subtype": "FLOAT",
+        "duration_seconds": 16.0,
+        "sample_peak": 0.0743425190448761,
+        "sample_peak_dbfs": -22.575254544452264,
+        "rms": 0.03921688116499535,
+        "dc_per_channel": [
+          9.701986899054068e-15,
+          9.701986899054068e-15
+        ],
+        "integrated_lufs": -25.865392666833465,
+        "loudness_method": "pyloudnorm ITU-R BS.1770-4 K-weighting and gating; 400 ms blocks",
+        "analyzer_versions": {
+          "pyloudnorm": "0.1.1",
+          "soundfile": "0.13.1",
+          "scipy": "1.15.3",
+          "numpy": "2.2.6"
+        },
+        "independent_decode": "PASS: libsndfile and scipy.io.wavfile agree",
+        "true_peak": {
+          "status": "NOT_EVALUATED",
+          "reason": "No calibrated true-peak meter in G0 subset"
+        },
+        "delivery_profile_status": "UNKNOWN: no owner-selected thresholds",
+        "listening": "NOT_EVALUATED"
+      },
+      "audio_path": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\733a35b7e335401eaf30b0b55b617081\\output.wav",
+      "committed": false
+    },
+    "faust-drive-4": {
+      "ok": true,
+      "data": {
+        "file": "output.wav",
+        "audio_sha256": "d20ed1b2da2a06a1ba70de6eb567381b3e7254a0c72093431fe2a4cb6c37d0a1",
+        "pcm_sha256": "773f37e89caac5bec6e8d2bc1fa6268d5fd8c51425a2db1573dd4849df6a6b45",
+        "source_hashes": {
+          "tone-a": "e22f73a77bdb385e519592ef12390e6dacf1cff35a007afd396e38fb60f4f5a6",
+          "saturation": "bbb711df9568a57d6564324005741739decd4044510df79abb12d6766bb5d27b",
+          "tone-b": "a7bb9e00e68fa696bb4c2f6db824e80e2ebce14ad4414bf7c7c85136013b752e",
+          "bus": "e0acae0e70687edf99040ef32410bd4f55cf74544d70eb6b5c79d4b519082c30",
+          "master": "91d2029e7cb5a2d1ce41be9e94a773c8bd2f227bdf41d8e8d4c2447d427cffa7"
+        },
+        "nodes": {
+          "tone-a": {
+            "prepare_seconds": 0.05433600000105798,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "saturation": {
+            "prepare_seconds": 0.03421479999087751,
+            "catalog_count": 2,
+            "catalog_sha256": "5e640dd9967bffec4701605b6dc71d94c48230a83dc4be8936a8990503169b2f",
+            "selected_values": {}
+          },
+          "tone-b": {
+            "prepare_seconds": 0.06471860001329333,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "bus": {
+            "prepare_seconds": 0.022481099993456155,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "master": {
+            "prepare_seconds": 0.015673300018534064,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          }
+        },
+        "stems": {},
+        "timing": {
+          "prepare_seconds": 0.19167189998552203,
+          "cold_render_seconds": 0.020207199995638803,
+          "warm_render_seconds": 0.024979500012705103
+        },
+        "warm_pcm_identical": true,
+        "warm_max_abs_delta": 0.0,
+        "environment": {
+          "os": "Windows-11-10.0.26100-SP0",
+          "machine": "AMD64",
+          "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+          "executable": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.venv\\Scripts\\python.exe",
+          "packages": {
+            "dawdreamer": "0.9.0",
+            "numpy": "2.2.6",
+            "scipy": "1.15.3",
+            "soundfile": "0.13.1",
+            "pyloudnorm": "0.1.1"
+          },
+          "native_module_sha256": "7ea9eaa679ef0e7f43166c75e2158a49735daf3b96ca5be1124a140e58ad3d81",
+          "import_seconds": 0.028140600014012307,
+          "isolation": "native subprocess crash containment only; same-user filesystem/network rights"
+        }
+      },
+      "warnings": [],
+      "job_id": "a175f93f3a574acebac118f2db94c97a",
+      "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\a175f93f3a574acebac118f2db94c97a",
+      "exit_code": 0,
+      "wall_seconds": 1.1754328999959398,
+      "source_sha256": "86b62b07f4640404df953d6d28580035f316c6144e55869fdcb5c06f08108506",
+      "quality": {
+        "audio_sha256": "d20ed1b2da2a06a1ba70de6eb567381b3e7254a0c72093431fe2a4cb6c37d0a1",
+        "frames": 768000,
+        "sample_rate": 48000,
+        "channels": 2,
+        "subtype": "FLOAT",
+        "duration_seconds": 16.0,
+        "sample_peak": 0.19100767374038696,
+        "sample_peak_dbfs": -14.378983692096782,
+        "rms": 0.12412899988002744,
+        "dc_per_channel": [
+          2.5604518505417672e-18,
+          2.5604518505417672e-18
+        ],
+        "integrated_lufs": -16.035587405912008,
+        "loudness_method": "pyloudnorm ITU-R BS.1770-4 K-weighting and gating; 400 ms blocks",
+        "analyzer_versions": {
+          "pyloudnorm": "0.1.1",
+          "soundfile": "0.13.1",
+          "scipy": "1.15.3",
+          "numpy": "2.2.6"
+        },
+        "independent_decode": "PASS: libsndfile and scipy.io.wavfile agree",
+        "true_peak": {
+          "status": "NOT_EVALUATED",
+          "reason": "No calibrated true-peak meter in G0 subset"
+        },
+        "delivery_profile_status": "UNKNOWN: no owner-selected thresholds",
+        "listening": "NOT_EVALUATED"
+      },
+      "audio_path": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\a175f93f3a574acebac118f2db94c97a\\output.wav",
+      "committed": true,
+      "revision": "721a6fb891dc4ec88c678ab928337991"
+    },
+    "faust-trim-half": {
+      "ok": true,
+      "data": {
+        "file": "output.wav",
+        "audio_sha256": "c54268ad414baf1ac7f7cf00d63a80640904535dac987ab641786e697ccf4573",
+        "pcm_sha256": "1daf66e5f4a54b1d2d047298fa18aeecd6b9e5dd3567f721fc720f723e5b60d0",
+        "source_hashes": {
+          "tone-a": "e22f73a77bdb385e519592ef12390e6dacf1cff35a007afd396e38fb60f4f5a6",
+          "saturation": "bbb711df9568a57d6564324005741739decd4044510df79abb12d6766bb5d27b",
+          "master": "91d2029e7cb5a2d1ce41be9e94a773c8bd2f227bdf41d8e8d4c2447d427cffa7"
+        },
+        "nodes": {
+          "tone-a": {
+            "prepare_seconds": 0.05574509999132715,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "saturation": {
+            "prepare_seconds": 0.03255259999423288,
+            "catalog_count": 2,
+            "catalog_sha256": "5e640dd9967bffec4701605b6dc71d94c48230a83dc4be8936a8990503169b2f",
+            "selected_values": {}
+          },
+          "master": {
+            "prepare_seconds": 0.012160199985373765,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          }
+        },
+        "stems": {},
+        "timing": {
+          "prepare_seconds": 0.10064709998550825,
+          "cold_render_seconds": 0.016033099993364885,
+          "warm_render_seconds": 0.014700799976708367
+        },
+        "warm_pcm_identical": true,
+        "warm_max_abs_delta": 0.0,
+        "environment": {
+          "os": "Windows-11-10.0.26100-SP0",
+          "machine": "AMD64",
+          "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+          "executable": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.venv\\Scripts\\python.exe",
+          "packages": {
+            "dawdreamer": "0.9.0",
+            "numpy": "2.2.6",
+            "scipy": "1.15.3",
+            "soundfile": "0.13.1",
+            "pyloudnorm": "0.1.1"
+          },
+          "native_module_sha256": "7ea9eaa679ef0e7f43166c75e2158a49735daf3b96ca5be1124a140e58ad3d81",
+          "import_seconds": 0.01913520001107827,
+          "isolation": "native subprocess crash containment only; same-user filesystem/network rights"
+        }
+      },
+      "warnings": [],
+      "job_id": "97806cd689e545de8ada7e392e7a5492",
+      "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\97806cd689e545de8ada7e392e7a5492",
+      "exit_code": 0,
+      "wall_seconds": 1.0539380999980494,
+      "source_sha256": "8c24c4cf0c2a96f2a358cb5d9ae3104cf2d6c7f6fad6b0c1c0259577831f5cdb",
+      "quality": {
+        "audio_sha256": "c54268ad414baf1ac7f7cf00d63a80640904535dac987ab641786e697ccf4573",
+        "frames": 768000,
+        "sample_rate": 48000,
+        "channels": 2,
+        "subtype": "FLOAT",
+        "duration_seconds": 16.0,
+        "sample_peak": 0.08300459384918213,
+        "sample_peak_dbfs": -21.61795742280599,
+        "rms": 0.0614318903639301,
+        "dc_per_channel": [
+          6.811680849002263e-18,
+          6.811680849002263e-18
+        ],
+        "integrated_lufs": -22.165461957950033,
+        "loudness_method": "pyloudnorm ITU-R BS.1770-4 K-weighting and gating; 400 ms blocks",
+        "analyzer_versions": {
+          "pyloudnorm": "0.1.1",
+          "soundfile": "0.13.1",
+          "scipy": "1.15.3",
+          "numpy": "2.2.6"
+        },
+        "independent_decode": "PASS: libsndfile and scipy.io.wavfile agree",
+        "true_peak": {
+          "status": "NOT_EVALUATED",
+          "reason": "No calibrated true-peak meter in G0 subset"
+        },
+        "delivery_profile_status": "UNKNOWN: no owner-selected thresholds",
+        "listening": "NOT_EVALUATED"
+      },
+      "audio_path": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\97806cd689e545de8ada7e392e7a5492\\output.wav",
+      "committed": false
+    },
+    "faust-trim-reference": {
+      "ok": true,
+      "data": {
+        "file": "output.wav",
+        "audio_sha256": "11cac4f5d61de70fabe1b7b3b1dc1c9cdcce48cad6265528cd639a7022200c76",
+        "pcm_sha256": "33011ca8c249859d734dafc68758b70f98686a69d4587e7172da038a5f350509",
+        "source_hashes": {
+          "tone-a": "e22f73a77bdb385e519592ef12390e6dacf1cff35a007afd396e38fb60f4f5a6",
+          "saturation": "bbb711df9568a57d6564324005741739decd4044510df79abb12d6766bb5d27b",
+          "master": "91d2029e7cb5a2d1ce41be9e94a773c8bd2f227bdf41d8e8d4c2447d427cffa7"
+        },
+        "nodes": {
+          "tone-a": {
+            "prepare_seconds": 0.05954389998805709,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "saturation": {
+            "prepare_seconds": 0.03147650000755675,
+            "catalog_count": 2,
+            "catalog_sha256": "5e640dd9967bffec4701605b6dc71d94c48230a83dc4be8936a8990503169b2f",
+            "selected_values": {}
+          },
+          "master": {
+            "prepare_seconds": 0.010593199986033142,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          }
+        },
+        "stems": {},
+        "timing": {
+          "prepare_seconds": 0.10179019998759031,
+          "cold_render_seconds": 0.015098600008059293,
+          "warm_render_seconds": 0.012863699987065047
+        },
+        "warm_pcm_identical": true,
+        "warm_max_abs_delta": 0.0,
+        "environment": {
+          "os": "Windows-11-10.0.26100-SP0",
+          "machine": "AMD64",
+          "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+          "executable": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.venv\\Scripts\\python.exe",
+          "packages": {
+            "dawdreamer": "0.9.0",
+            "numpy": "2.2.6",
+            "scipy": "1.15.3",
+            "soundfile": "0.13.1",
+            "pyloudnorm": "0.1.1"
+          },
+          "native_module_sha256": "7ea9eaa679ef0e7f43166c75e2158a49735daf3b96ca5be1124a140e58ad3d81",
+          "import_seconds": 0.02161969998269342,
+          "isolation": "native subprocess crash containment only; same-user filesystem/network rights"
+        }
+      },
+      "warnings": [],
+      "job_id": "0b1e9020307d44519b69e8709274664d",
+      "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\0b1e9020307d44519b69e8709274664d",
+      "exit_code": 0,
+      "wall_seconds": 1.1474196999915875,
+      "source_sha256": "614097a76e915b9c4c127a59a6f6b9b68b354ff1a8219f54f0787c5c546a1b11",
+      "quality": {
+        "audio_sha256": "11cac4f5d61de70fabe1b7b3b1dc1c9cdcce48cad6265528cd639a7022200c76",
+        "frames": 768000,
+        "sample_rate": 48000,
+        "channels": 2,
+        "subtype": "FLOAT",
+        "duration_seconds": 16.0,
+        "sample_peak": 0.16600918769836426,
+        "sample_peak_dbfs": -15.597357509526365,
+        "rms": 0.1228637807278602,
+        "dc_per_channel": [
+          1.3623361698004525e-17,
+          1.3623361698004525e-17
+        ],
+        "integrated_lufs": -16.144862044670408,
+        "loudness_method": "pyloudnorm ITU-R BS.1770-4 K-weighting and gating; 400 ms blocks",
+        "analyzer_versions": {
+          "pyloudnorm": "0.1.1",
+          "soundfile": "0.13.1",
+          "scipy": "1.15.3",
+          "numpy": "2.2.6"
+        },
+        "independent_decode": "PASS: libsndfile and scipy.io.wavfile agree",
+        "true_peak": {
+          "status": "NOT_EVALUATED",
+          "reason": "No calibrated true-peak meter in G0 subset"
+        },
+        "delivery_profile_status": "UNKNOWN: no owner-selected thresholds",
+        "listening": "NOT_EVALUATED"
+      },
+      "audio_path": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\0b1e9020307d44519b69e8709274664d\\output.wav",
+      "committed": false
+    },
+    "faust-repeat": {
+      "ok": true,
+      "data": {
+        "file": "output.wav",
+        "audio_sha256": "9950501ca4799f4057d2e7886ca4a05cfd4073a3d4407434a8904496e03bd95f",
+        "pcm_sha256": "773f37e89caac5bec6e8d2bc1fa6268d5fd8c51425a2db1573dd4849df6a6b45",
+        "source_hashes": {
+          "tone-a": "e22f73a77bdb385e519592ef12390e6dacf1cff35a007afd396e38fb60f4f5a6",
+          "saturation": "bbb711df9568a57d6564324005741739decd4044510df79abb12d6766bb5d27b",
+          "tone-b": "a7bb9e00e68fa696bb4c2f6db824e80e2ebce14ad4414bf7c7c85136013b752e",
+          "bus": "e0acae0e70687edf99040ef32410bd4f55cf74544d70eb6b5c79d4b519082c30",
+          "master": "91d2029e7cb5a2d1ce41be9e94a773c8bd2f227bdf41d8e8d4c2447d427cffa7"
+        },
+        "nodes": {
+          "tone-a": {
+            "prepare_seconds": 0.06096020000404678,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "saturation": {
+            "prepare_seconds": 0.026566999993519858,
+            "catalog_count": 2,
+            "catalog_sha256": "5e640dd9967bffec4701605b6dc71d94c48230a83dc4be8936a8990503169b2f",
+            "selected_values": {}
+          },
+          "tone-b": {
+            "prepare_seconds": 0.05216429999563843,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "bus": {
+            "prepare_seconds": 0.01910690002841875,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "master": {
+            "prepare_seconds": 0.01147210001363419,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          }
+        },
+        "stems": {},
+        "timing": {
+          "prepare_seconds": 0.17050490001565777,
+          "cold_render_seconds": 0.022597900009714067,
+          "warm_render_seconds": 0.026800999999977648
+        },
+        "warm_pcm_identical": true,
+        "warm_max_abs_delta": 0.0,
+        "environment": {
+          "os": "Windows-11-10.0.26100-SP0",
+          "machine": "AMD64",
+          "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+          "executable": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.venv\\Scripts\\python.exe",
+          "packages": {
+            "dawdreamer": "0.9.0",
+            "numpy": "2.2.6",
+            "scipy": "1.15.3",
+            "soundfile": "0.13.1",
+            "pyloudnorm": "0.1.1"
+          },
+          "native_module_sha256": "7ea9eaa679ef0e7f43166c75e2158a49735daf3b96ca5be1124a140e58ad3d81",
+          "import_seconds": 0.02088019999791868,
+          "isolation": "native subprocess crash containment only; same-user filesystem/network rights"
+        }
+      },
+      "warnings": [],
+      "job_id": "98301a67a5894f4f9eb3deabfe66dedc",
+      "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\98301a67a5894f4f9eb3deabfe66dedc",
+      "exit_code": 0,
+      "wall_seconds": 1.2678434000117704,
+      "source_sha256": "86b62b07f4640404df953d6d28580035f316c6144e55869fdcb5c06f08108506",
+      "quality": {
+        "audio_sha256": "9950501ca4799f4057d2e7886ca4a05cfd4073a3d4407434a8904496e03bd95f",
+        "frames": 768000,
+        "sample_rate": 48000,
+        "channels": 2,
+        "subtype": "FLOAT",
+        "duration_seconds": 16.0,
+        "sample_peak": 0.19100767374038696,
+        "sample_peak_dbfs": -14.378983692096782,
+        "rms": 0.12412899988002744,
+        "dc_per_channel": [
+          2.5604518505417672e-18,
+          2.5604518505417672e-18
+        ],
+        "integrated_lufs": -16.035587405912008,
+        "loudness_method": "pyloudnorm ITU-R BS.1770-4 K-weighting and gating; 400 ms blocks",
+        "analyzer_versions": {
+          "pyloudnorm": "0.1.1",
+          "soundfile": "0.13.1",
+          "scipy": "1.15.3",
+          "numpy": "2.2.6"
+        },
+        "independent_decode": "PASS: libsndfile and scipy.io.wavfile agree",
+        "true_peak": {
+          "status": "NOT_EVALUATED",
+          "reason": "No calibrated true-peak meter in G0 subset"
+        },
+        "delivery_profile_status": "UNKNOWN: no owner-selected thresholds",
+        "listening": "NOT_EVALUATED"
+      },
+      "audio_path": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\98301a67a5894f4f9eb3deabfe66dedc\\output.wav",
+      "committed": false
+    },
+    "onset": {
+      "ok": true,
+      "data": {
+        "file": "output.wav",
+        "audio_sha256": "4dbc9c20db7b5e37c49b1e57edf2523f125b84982d936b187d8ba025a2fa12f7",
+        "pcm_sha256": "803e86fab9d7137dae6c5b596151e9c5fe4ece4753f3a0603eecdfec6d95f432",
+        "source_hashes": {
+          "timing": "7433e5d5795127d7b511f2c576c8271c004829f8d10ea8a0721de809c1175bc3"
+        },
+        "nodes": {
+          "timing": {
+            "prepare_seconds": 0.008815100009087473,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          }
+        },
+        "stems": {},
+        "timing": {
+          "prepare_seconds": 0.008987999986857176,
+          "cold_render_seconds": 0.00018480001017451286,
+          "warm_render_seconds": 0.0001500000071246177
+        },
+        "warm_pcm_identical": true,
+        "warm_max_abs_delta": 0.0,
+        "environment": {
+          "os": "Windows-11-10.0.26100-SP0",
+          "machine": "AMD64",
+          "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+          "executable": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.venv\\Scripts\\python.exe",
+          "packages": {
+            "dawdreamer": "0.9.0",
+            "numpy": "2.2.6",
+            "scipy": "1.15.3",
+            "soundfile": "0.13.1",
+            "pyloudnorm": "0.1.1"
+          },
+          "native_module_sha256": "7ea9eaa679ef0e7f43166c75e2158a49735daf3b96ca5be1124a140e58ad3d81",
+          "import_seconds": 0.02198679998400621,
+          "isolation": "native subprocess crash containment only; same-user filesystem/network rights"
+        }
+      },
+      "warnings": [],
+      "job_id": "28250be6882a47339e8cad78dd88cad0",
+      "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\28250be6882a47339e8cad78dd88cad0",
+      "exit_code": 0,
+      "wall_seconds": 1.1211861000047065,
+      "source_sha256": "f0a1bb17f0282eb16a0eda4db483e733f1054d9499336faeb2855a4e2733b6ff",
+      "quality": {
+        "audio_sha256": "4dbc9c20db7b5e37c49b1e57edf2523f125b84982d936b187d8ba025a2fa12f7",
+        "frames": 48000,
+        "sample_rate": 48000,
+        "channels": 2,
+        "subtype": "FLOAT",
+        "duration_seconds": 1.0,
+        "sample_peak": 0.10000000149011612,
+        "sample_peak_dbfs": -19.99999987057016,
+        "rms": 0.06094049145722809,
+        "dc_per_channel": [
+          -2.9184173252569315e-05,
+          -2.9184173252569315e-05
+        ],
+        "integrated_lufs": -20.842263695837538,
+        "loudness_method": "pyloudnorm ITU-R BS.1770-4 K-weighting and gating; 400 ms blocks",
+        "analyzer_versions": {
+          "pyloudnorm": "0.1.1",
+          "soundfile": "0.13.1",
+          "scipy": "1.15.3",
+          "numpy": "2.2.6"
+        },
+        "independent_decode": "PASS: libsndfile and scipy.io.wavfile agree",
+        "true_peak": {
+          "status": "NOT_EVALUATED",
+          "reason": "No calibrated true-peak meter in G0 subset"
+        },
+        "delivery_profile_status": "UNKNOWN: no owner-selected thresholds",
+        "listening": "NOT_EVALUATED"
+      },
+      "audio_path": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\28250be6882a47339e8cad78dd88cad0\\output.wav",
+      "committed": false
+    },
+    "dexed-base": {
+      "ok": true,
+      "data": {
+        "file": "output.wav",
+        "audio_sha256": "3826e9894ace975b6fae921471e18380765854fe8ef689217a99be5d5b59c233",
+        "pcm_sha256": "569e548472aa8639cf117ab7d0c8aa42260aabc6684eb368050d1157bdff276c",
+        "source_hashes": {},
+        "nodes": {
+          "synth": {
+            "prepare_seconds": 0.3105924999981653,
+            "state_file": "synth.state",
+            "state_sha256": "4e21273694332414d261f31c77a6768c53f26631d0d905dddcceed55c5175dc2",
+            "catalog_count": 2264,
+            "catalog_sha256": "ba4c82c63e3007aa8a6d35a070a8b810ad1c4b722043a870d135497ca156a3df",
+            "selected_values": {
+              "0": 0.800000011920929,
+              "1": 1.0,
+              "4": 1.0,
+              "12": 0.5
+            }
+          }
+        },
+        "stems": {},
+        "timing": {
+          "prepare_seconds": 0.3322549000149593,
+          "cold_render_seconds": 0.018295999994734302,
+          "warm_render_seconds": 0.01973820000421256
+        },
+        "warm_pcm_identical": true,
+        "warm_max_abs_delta": 0.0,
+        "environment": {
+          "os": "Windows-11-10.0.26100-SP0",
+          "machine": "AMD64",
+          "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+          "executable": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.venv\\Scripts\\python.exe",
+          "packages": {
+            "dawdreamer": "0.9.0",
+            "numpy": "2.2.6",
+            "scipy": "1.15.3",
+            "soundfile": "0.13.1",
+            "pyloudnorm": "0.1.1"
+          },
+          "native_module_sha256": "7ea9eaa679ef0e7f43166c75e2158a49735daf3b96ca5be1124a140e58ad3d81",
+          "import_seconds": 0.02578570001060143,
+          "isolation": "native subprocess crash containment only; same-user filesystem/network rights"
+        }
+      },
+      "warnings": [],
+      "job_id": "a020117ab59340e0a016ad56f77542ed",
+      "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\a020117ab59340e0a016ad56f77542ed",
+      "exit_code": 0,
+      "wall_seconds": 1.5790481999865733,
+      "source_sha256": "e85726731faf103027bdbf994cae8a1fc0893a7596688ea31b94dc9c7c63a040",
+      "quality": {
+        "audio_sha256": "3826e9894ace975b6fae921471e18380765854fe8ef689217a99be5d5b59c233",
+        "frames": 192000,
+        "sample_rate": 48000,
+        "channels": 2,
+        "subtype": "FLOAT",
+        "duration_seconds": 4.0,
+        "sample_peak": 0.10066200792789459,
+        "sample_peak_dbfs": -19.942688217639635,
+        "rms": 0.028843532555742648,
+        "dc_per_channel": [
+          -3.0940751846957906e-10,
+          -3.0940751846957906e-10
+        ],
+        "integrated_lufs": -25.71561237878162,
+        "loudness_method": "pyloudnorm ITU-R BS.1770-4 K-weighting and gating; 400 ms blocks",
+        "analyzer_versions": {
+          "pyloudnorm": "0.1.1",
+          "soundfile": "0.13.1",
+          "scipy": "1.15.3",
+          "numpy": "2.2.6"
+        },
+        "independent_decode": "PASS: libsndfile and scipy.io.wavfile agree",
+        "true_peak": {
+          "status": "NOT_EVALUATED",
+          "reason": "No calibrated true-peak meter in G0 subset"
+        },
+        "delivery_profile_status": "UNKNOWN: no owner-selected thresholds",
+        "listening": "NOT_EVALUATED"
+      },
+      "audio_path": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\a020117ab59340e0a016ad56f77542ed\\output.wav",
+      "committed": false
+    },
+    "dexed-output-lower": {
+      "ok": true,
+      "data": {
+        "file": "output.wav",
+        "audio_sha256": "64ed0aff9d200083286a18f92443346f4a8e8f08ab62ca395a45b5b7c639643f",
+        "pcm_sha256": "bd59426b0a4013d644ff688f07bec3c6f28b765fa7a495c7e98c95fa8e81e6b6",
+        "source_hashes": {},
+        "nodes": {
+          "synth": {
+            "prepare_seconds": 0.2504412999842316,
+            "state_file": "synth.state",
+            "state_sha256": "bd53f5c0f11ec791c86c543d9417505aa7a359fd479a2f4c732da103edd2a17d",
+            "catalog_count": 2264,
+            "catalog_sha256": "ba4c82c63e3007aa8a6d35a070a8b810ad1c4b722043a870d135497ca156a3df",
+            "selected_values": {
+              "0": 0.4000000059604645,
+              "1": 1.0,
+              "4": 1.0,
+              "12": 0.5
+            }
+          }
+        },
+        "stems": {},
+        "timing": {
+          "prepare_seconds": 0.26719000001321547,
+          "cold_render_seconds": 0.021011800010455772,
+          "warm_render_seconds": 0.016481600003317
+        },
+        "warm_pcm_identical": false,
+        "warm_max_abs_delta": 1.2207032341393642e-05,
+        "environment": {
+          "os": "Windows-11-10.0.26100-SP0",
+          "machine": "AMD64",
+          "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+          "executable": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.venv\\Scripts\\python.exe",
+          "packages": {
+            "dawdreamer": "0.9.0",
+            "numpy": "2.2.6",
+            "scipy": "1.15.3",
+            "soundfile": "0.13.1",
+            "pyloudnorm": "0.1.1"
+          },
+          "native_module_sha256": "7ea9eaa679ef0e7f43166c75e2158a49735daf3b96ca5be1124a140e58ad3d81",
+          "import_seconds": 0.027346399991074577,
+          "isolation": "native subprocess crash containment only; same-user filesystem/network rights"
+        }
+      },
+      "warnings": [],
+      "job_id": "83bff27ce3cd484683ee19f2d2d40ab8",
+      "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\83bff27ce3cd484683ee19f2d2d40ab8",
+      "exit_code": 0,
+      "wall_seconds": 1.501353100000415,
+      "source_sha256": "313dfc91a3c006bb9c0bd2fe8d6215b52cb7f40fd72e962413c2741ba035e68b",
+      "quality": {
+        "audio_sha256": "64ed0aff9d200083286a18f92443346f4a8e8f08ab62ca395a45b5b7c639643f",
+        "frames": 192000,
+        "sample_rate": 48000,
+        "channels": 2,
+        "subtype": "FLOAT",
+        "duration_seconds": 4.0,
+        "sample_peak": 0.050331003963947296,
+        "sample_peak_dbfs": -25.96328813091926,
+        "rms": 0.014421766278955452,
+        "dc_per_channel": [
+          -1.4355139117854626e-10,
+          -1.4355139117854626e-10
+        ],
+        "integrated_lufs": -31.736212292090602,
+        "loudness_method": "pyloudnorm ITU-R BS.1770-4 K-weighting and gating; 400 ms blocks",
+        "analyzer_versions": {
+          "pyloudnorm": "0.1.1",
+          "soundfile": "0.13.1",
+          "scipy": "1.15.3",
+          "numpy": "2.2.6"
+        },
+        "independent_decode": "PASS: libsndfile and scipy.io.wavfile agree",
+        "true_peak": {
+          "status": "NOT_EVALUATED",
+          "reason": "No calibrated true-peak meter in G0 subset"
+        },
+        "delivery_profile_status": "UNKNOWN: no owner-selected thresholds",
+        "listening": "NOT_EVALUATED"
+      },
+      "audio_path": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\83bff27ce3cd484683ee19f2d2d40ab8\\output.wav",
+      "committed": false
+    },
+    "dexed-restored": {
+      "ok": true,
+      "data": {
+        "file": "output.wav",
+        "audio_sha256": "82a9c7aacbcd0499c083a5e8c5a738e77eb1b45d1bcd6ff5d7ddaaa6dd46d662",
+        "pcm_sha256": "53190b66322abfcd689628ee80552f43b002efd0b1862d4c120a1e291fe92e57",
+        "source_hashes": {},
+        "nodes": {
+          "synth": {
+            "prepare_seconds": 1.047542499989504,
+            "state_file": "synth.state",
+            "state_sha256": "bd53f5c0f11ec791c86c543d9417505aa7a359fd479a2f4c732da103edd2a17d",
+            "catalog_count": 2264,
+            "catalog_sha256": "dd3f2560724684ce0f5ccb6397b4494bbbad00f9103a1639f9694038410bc8f2",
+            "selected_values": {
+              "0": 0.4000000059604645,
+              "1": 1.0,
+              "4": 1.0,
+              "12": 0.5
+            }
+          }
+        },
+        "stems": {},
+        "timing": {
+          "prepare_seconds": 1.0706948000006378,
+          "cold_render_seconds": 0.014795800001593307,
+          "warm_render_seconds": 0.01922250000643544
+        },
+        "warm_pcm_identical": false,
+        "warm_max_abs_delta": 1.220703143189894e-05,
+        "environment": {
+          "os": "Windows-11-10.0.26100-SP0",
+          "machine": "AMD64",
+          "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+          "executable": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.venv\\Scripts\\python.exe",
+          "packages": {
+            "dawdreamer": "0.9.0",
+            "numpy": "2.2.6",
+            "scipy": "1.15.3",
+            "soundfile": "0.13.1",
+            "pyloudnorm": "0.1.1"
+          },
+          "native_module_sha256": "7ea9eaa679ef0e7f43166c75e2158a49735daf3b96ca5be1124a140e58ad3d81",
+          "import_seconds": 0.020174600009340793,
+          "isolation": "native subprocess crash containment only; same-user filesystem/network rights"
+        }
+      },
+      "warnings": [],
+      "job_id": "1ae7f4677a8746bd9a2cab6ce3ddb8d6",
+      "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\1ae7f4677a8746bd9a2cab6ce3ddb8d6",
+      "exit_code": 0,
+      "wall_seconds": 2.045228400005726,
+      "source_sha256": "dc7ec8960fbb35c8f055e9a9658e54a48e96b6dee7a39cf1cecfbb07d1c0524b",
+      "quality": {
+        "audio_sha256": "82a9c7aacbcd0499c083a5e8c5a738e77eb1b45d1bcd6ff5d7ddaaa6dd46d662",
+        "frames": 192000,
+        "sample_rate": 48000,
+        "channels": 2,
+        "subtype": "FLOAT",
+        "duration_seconds": 4.0,
+        "sample_peak": 0.050331003963947296,
+        "sample_peak_dbfs": -25.96328813091926,
+        "rms": 0.014421766277385136,
+        "dc_per_channel": [
+          -1.577914098080873e-10,
+          -1.577914098080873e-10
+        ],
+        "integrated_lufs": -31.736212292327803,
+        "loudness_method": "pyloudnorm ITU-R BS.1770-4 K-weighting and gating; 400 ms blocks",
+        "analyzer_versions": {
+          "pyloudnorm": "0.1.1",
+          "soundfile": "0.13.1",
+          "scipy": "1.15.3",
+          "numpy": "2.2.6"
+        },
+        "independent_decode": "PASS: libsndfile and scipy.io.wavfile agree",
+        "true_peak": {
+          "status": "NOT_EVALUATED",
+          "reason": "No calibrated true-peak meter in G0 subset"
+        },
+        "delivery_profile_status": "UNKNOWN: no owner-selected thresholds",
+        "listening": "NOT_EVALUATED"
+      },
+      "audio_path": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\1ae7f4677a8746bd9a2cab6ce3ddb8d6\\output.wav",
+      "committed": false
+    },
+    "consolidated-base": {
+      "ok": true,
+      "data": {
+        "file": "output.wav",
+        "audio_sha256": "e61959b805c33e5418d33eefc18b840f49ea99ecae47ee043ccf85764f2a21eb",
+        "pcm_sha256": "178f4d803e807070fb78596842c5b7e0cfc1829f50364abe546da116e04a1c53",
+        "source_hashes": {
+          "source": "a67cfe2d9d10585aa69053c1e301e3212940a9d60e2d5b494d8af3045cd1793b"
+        },
+        "nodes": {
+          "source": {
+            "prepare_seconds": 0.021670199988875538,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "gain": {
+            "prepare_seconds": 0.1947916999924928,
+            "state_file": "gain.state",
+            "state_sha256": "82027584ab190388a99012f6c4263805ec8c2d191aa44cc6747697b09e194fda",
+            "catalog_count": 14,
+            "catalog_sha256": "e8d0ab88fe536a4140b5ca93590e4c9fc5a783b6c0d03c7e3c5544e509a85317",
+            "selected_values": {
+              "0": 0.5,
+              "1": 0.5,
+              "4": 0.0,
+              "12": 0.5
+            }
+          }
+        },
+        "stems": {},
+        "timing": {
+          "prepare_seconds": 0.2239889999909792,
+          "cold_render_seconds": 0.0390315999975428,
+          "warm_render_seconds": 0.03686690001632087
+        },
+        "warm_pcm_identical": false,
+        "warm_max_abs_delta": 4.5584609864590675e-08,
+        "environment": {
+          "os": "Windows-11-10.0.26100-SP0",
+          "machine": "AMD64",
+          "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+          "executable": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.venv\\Scripts\\python.exe",
+          "packages": {
+            "dawdreamer": "0.9.0",
+            "numpy": "2.2.6",
+            "scipy": "1.15.3",
+            "soundfile": "0.13.1",
+            "pyloudnorm": "0.1.1"
+          },
+          "native_module_sha256": "7ea9eaa679ef0e7f43166c75e2158a49735daf3b96ca5be1124a140e58ad3d81",
+          "import_seconds": 0.030707199999596924,
+          "isolation": "native subprocess crash containment only; same-user filesystem/network rights"
+        }
+      },
+      "warnings": [],
+      "job_id": "7c7d2ff6f02e44f6b6d478d4bf1ba4c4",
+      "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\7c7d2ff6f02e44f6b6d478d4bf1ba4c4",
+      "exit_code": 0,
+      "wall_seconds": 1.2820446999976411,
+      "source_sha256": "92d279c7ecffc3a3aae6571a5ef8bd253dc76bf8ee282da48efb638ccca982fc",
+      "quality": {
+        "audio_sha256": "e61959b805c33e5418d33eefc18b840f49ea99ecae47ee043ccf85764f2a21eb",
+        "frames": 192000,
+        "sample_rate": 48000,
+        "channels": 2,
+        "subtype": "FLOAT",
+        "duration_seconds": 4.0,
+        "sample_peak": 0.09929103404283524,
+        "sample_peak_dbfs": -20.061799328485918,
+        "rms": 0.07020935820282412,
+        "dc_per_channel": [
+          1.0353801174062261e-11,
+          -8.739433969331041e-12
+        ],
+        "integrated_lufs": -20.10318648414324,
+        "loudness_method": "pyloudnorm ITU-R BS.1770-4 K-weighting and gating; 400 ms blocks",
+        "analyzer_versions": {
+          "pyloudnorm": "0.1.1",
+          "soundfile": "0.13.1",
+          "scipy": "1.15.3",
+          "numpy": "2.2.6"
+        },
+        "independent_decode": "PASS: libsndfile and scipy.io.wavfile agree",
+        "true_peak": {
+          "status": "NOT_EVALUATED",
+          "reason": "No calibrated true-peak meter in G0 subset"
+        },
+        "delivery_profile_status": "UNKNOWN: no owner-selected thresholds",
+        "listening": "NOT_EVALUATED"
+      },
+      "audio_path": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\7c7d2ff6f02e44f6b6d478d4bf1ba4c4\\output.wav",
+      "committed": false
+    },
+    "consolidated-lower": {
+      "ok": true,
+      "data": {
+        "file": "output.wav",
+        "audio_sha256": "6f59eda74cd25ab23491c2773ae2d9636e85673075b4b387490bb459850514f4",
+        "pcm_sha256": "1114e5481a4ccb20c4ef171ff7a21559001cfc82d6422082dc3280c22b30f359",
+        "source_hashes": {
+          "source": "a67cfe2d9d10585aa69053c1e301e3212940a9d60e2d5b494d8af3045cd1793b"
+        },
+        "nodes": {
+          "source": {
+            "prepare_seconds": 0.027290500001981854,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "gain": {
+            "prepare_seconds": 0.18040509999264032,
+            "state_file": "gain.state",
+            "state_sha256": "cb340b98a0961669efa6024537820f63ffddb58de3ff1dbcb17813d2a753a5c3",
+            "catalog_count": 14,
+            "catalog_sha256": "c298603a840db143c77e29966c19c38abb22e1dec05e3c5677521a952356712b",
+            "selected_values": {
+              "0": 0.5,
+              "1": 0.5,
+              "4": 0.0,
+              "12": 0.4000000059604645
+            }
+          }
+        },
+        "stems": {},
+        "timing": {
+          "prepare_seconds": 0.21460920001845807,
+          "cold_render_seconds": 0.02876529999775812,
+          "warm_render_seconds": 0.028920500015374273
+        },
+        "warm_pcm_identical": false,
+        "warm_max_abs_delta": 2.3339323362847608e-08,
+        "environment": {
+          "os": "Windows-11-10.0.26100-SP0",
+          "machine": "AMD64",
+          "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+          "executable": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.venv\\Scripts\\python.exe",
+          "packages": {
+            "dawdreamer": "0.9.0",
+            "numpy": "2.2.6",
+            "scipy": "1.15.3",
+            "soundfile": "0.13.1",
+            "pyloudnorm": "0.1.1"
+          },
+          "native_module_sha256": "7ea9eaa679ef0e7f43166c75e2158a49735daf3b96ca5be1124a140e58ad3d81",
+          "import_seconds": 0.01935689998208545,
+          "isolation": "native subprocess crash containment only; same-user filesystem/network rights"
+        }
+      },
+      "warnings": [],
+      "job_id": "19aae91f85aa47cda7f5875c77424efc",
+      "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\19aae91f85aa47cda7f5875c77424efc",
+      "exit_code": 0,
+      "wall_seconds": 1.223513599979924,
+      "source_sha256": "a6944307d0e531653bba6f73e79341fafda1c3d5729049ed0f74ef77f59450da",
+      "quality": {
+        "audio_sha256": "6f59eda74cd25ab23491c2773ae2d9636e85673075b4b387490bb459850514f4",
+        "frames": 192000,
+        "sample_rate": 48000,
+        "channels": 2,
+        "subtype": "FLOAT",
+        "duration_seconds": 4.0,
+        "sample_peak": 0.050837013870477676,
+        "sample_peak_dbfs": -25.87639935026828,
+        "rms": 0.03594719459275624,
+        "dc_per_channel": [
+          5.326431631984725e-12,
+          -4.263837509339378e-12
+        ],
+        "integrated_lufs": -25.917786493076616,
+        "loudness_method": "pyloudnorm ITU-R BS.1770-4 K-weighting and gating; 400 ms blocks",
+        "analyzer_versions": {
+          "pyloudnorm": "0.1.1",
+          "soundfile": "0.13.1",
+          "scipy": "1.15.3",
+          "numpy": "2.2.6"
+        },
+        "independent_decode": "PASS: libsndfile and scipy.io.wavfile agree",
+        "true_peak": {
+          "status": "NOT_EVALUATED",
+          "reason": "No calibrated true-peak meter in G0 subset"
+        },
+        "delivery_profile_status": "UNKNOWN: no owner-selected thresholds",
+        "listening": "NOT_EVALUATED"
+      },
+      "audio_path": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\19aae91f85aa47cda7f5875c77424efc\\output.wav",
+      "committed": false
+    },
+    "consolidated-restored": {
+      "ok": true,
+      "data": {
+        "file": "output.wav",
+        "audio_sha256": "7d47ae7cff91dfb88245e2c126fd525f5caf088ec2cc3be1c947d0a412b4d37a",
+        "pcm_sha256": "b73ce51a3b8bdfddef340face64efa082648f78b1b616e4f6ceb7380d5d2b419",
+        "source_hashes": {
+          "source": "a67cfe2d9d10585aa69053c1e301e3212940a9d60e2d5b494d8af3045cd1793b"
+        },
+        "nodes": {
+          "source": {
+            "prepare_seconds": 0.029784099984681234,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "gain": {
+            "prepare_seconds": 0.5697750999825075,
+            "state_file": "gain.state",
+            "state_sha256": "cb340b98a0961669efa6024537820f63ffddb58de3ff1dbcb17813d2a753a5c3",
+            "catalog_count": 14,
+            "catalog_sha256": "eaf78177b74c421900f944df67c766d8abbe2a2a35cafb55d4e0614588b990a8",
+            "selected_values": {
+              "0": 0.5,
+              "1": 0.5,
+              "4": 0.0,
+              "12": 0.4000000059604645
+            }
+          }
+        },
+        "stems": {},
+        "timing": {
+          "prepare_seconds": 0.6083934000052977,
+          "cold_render_seconds": 0.06647309998515993,
+          "warm_render_seconds": 0.05259880001540296
+        },
+        "warm_pcm_identical": false,
+        "warm_max_abs_delta": 2.4194411807343386e-08,
+        "environment": {
+          "os": "Windows-11-10.0.26100-SP0",
+          "machine": "AMD64",
+          "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+          "executable": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.venv\\Scripts\\python.exe",
+          "packages": {
+            "dawdreamer": "0.9.0",
+            "numpy": "2.2.6",
+            "scipy": "1.15.3",
+            "soundfile": "0.13.1",
+            "pyloudnorm": "0.1.1"
+          },
+          "native_module_sha256": "7ea9eaa679ef0e7f43166c75e2158a49735daf3b96ca5be1124a140e58ad3d81",
+          "import_seconds": 0.04556570001295768,
+          "isolation": "native subprocess crash containment only; same-user filesystem/network rights"
+        }
+      },
+      "warnings": [],
+      "job_id": "a9681a441a65478d87336076b9d016f6",
+      "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\a9681a441a65478d87336076b9d016f6",
+      "exit_code": 0,
+      "wall_seconds": 2.0015018999984022,
+      "source_sha256": "850e89244f4f495dfabe5cb16be91f5379bc54e673a9ab384f893feb7d2b519b",
+      "quality": {
+        "audio_sha256": "7d47ae7cff91dfb88245e2c126fd525f5caf088ec2cc3be1c947d0a412b4d37a",
+        "frames": 192000,
+        "sample_rate": 48000,
+        "channels": 2,
+        "subtype": "FLOAT",
+        "duration_seconds": 4.0,
+        "sample_peak": 0.050837013870477676,
+        "sample_peak_dbfs": -25.87639935026828,
+        "rms": 0.035947194602491114,
+        "dc_per_channel": [
+          -3.673869569097617e-12,
+          -3.930647741896369e-12
+        ],
+        "integrated_lufs": -25.917786490747513,
+        "loudness_method": "pyloudnorm ITU-R BS.1770-4 K-weighting and gating; 400 ms blocks",
+        "analyzer_versions": {
+          "pyloudnorm": "0.1.1",
+          "soundfile": "0.13.1",
+          "scipy": "1.15.3",
+          "numpy": "2.2.6"
+        },
+        "independent_decode": "PASS: libsndfile and scipy.io.wavfile agree",
+        "true_peak": {
+          "status": "NOT_EVALUATED",
+          "reason": "No calibrated true-peak meter in G0 subset"
+        },
+        "delivery_profile_status": "UNKNOWN: no owner-selected thresholds",
+        "listening": "NOT_EVALUATED"
+      },
+      "audio_path": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\a9681a441a65478d87336076b9d016f6\\output.wav",
+      "committed": false
+    },
+    "consolidated-automated": {
+      "ok": true,
+      "data": {
+        "file": "output.wav",
+        "audio_sha256": "4e2e6e8b31544dbfbf02ee34eb30a75a6cd4390d6a133d81f83be8736e06124b",
+        "pcm_sha256": "5f7252bb48c6e21ea52e2e9eb0059aaefeee4e614c9f24d7228f58365132cc07",
+        "source_hashes": {
+          "source": "a67cfe2d9d10585aa69053c1e301e3212940a9d60e2d5b494d8af3045cd1793b"
+        },
+        "nodes": {
+          "source": {
+            "prepare_seconds": 0.03145410001161508,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "gain": {
+            "prepare_seconds": 0.229424499993911,
+            "state_file": "gain.state",
+            "state_sha256": "82027584ab190388a99012f6c4263805ec8c2d191aa44cc6747697b09e194fda",
+            "catalog_count": 14,
+            "catalog_sha256": "9303f998de80ce00c4883a9f6f502315cd2c002f80857f2f18d10d87ba8d76eb",
+            "selected_values": {
+              "0": 0.5,
+              "1": 0.5,
+              "4": 0.0,
+              "12": 0.5
+            }
+          }
+        },
+        "stems": {},
+        "timing": {
+          "prepare_seconds": 0.26912170002469793,
+          "cold_render_seconds": 0.047942300006980076,
+          "warm_render_seconds": 0.04909700001007877
+        },
+        "warm_pcm_identical": false,
+        "warm_max_abs_delta": 4.5584609864590675e-08,
+        "environment": {
+          "os": "Windows-11-10.0.26100-SP0",
+          "machine": "AMD64",
+          "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+          "executable": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.venv\\Scripts\\python.exe",
+          "packages": {
+            "dawdreamer": "0.9.0",
+            "numpy": "2.2.6",
+            "scipy": "1.15.3",
+            "soundfile": "0.13.1",
+            "pyloudnorm": "0.1.1"
+          },
+          "native_module_sha256": "7ea9eaa679ef0e7f43166c75e2158a49735daf3b96ca5be1124a140e58ad3d81",
+          "import_seconds": 0.024838800018187612,
+          "isolation": "native subprocess crash containment only; same-user filesystem/network rights"
+        }
+      },
+      "warnings": [],
+      "job_id": "7ae78cb6bbf641d29a4aa4236bbc97a2",
+      "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\7ae78cb6bbf641d29a4aa4236bbc97a2",
+      "exit_code": 0,
+      "wall_seconds": 1.4982235000061337,
+      "source_sha256": "73f7bd82ce97fef3ec9fe3715318ddf6dcabb528ff3252de9ecd43fe43fb371e",
+      "quality": {
+        "audio_sha256": "4e2e6e8b31544dbfbf02ee34eb30a75a6cd4390d6a133d81f83be8736e06124b",
+        "frames": 192000,
+        "sample_rate": 48000,
+        "channels": 2,
+        "subtype": "FLOAT",
+        "duration_seconds": 4.0,
+        "sample_peak": 0.09929103404283524,
+        "sample_peak_dbfs": -20.061799328485918,
+        "rms": 0.0557743434689891,
+        "dc_per_channel": [
+          5.0746463096477495e-12,
+          -8.570073713187742e-12
+        ],
+        "integrated_lufs": -22.10241485501846,
+        "loudness_method": "pyloudnorm ITU-R BS.1770-4 K-weighting and gating; 400 ms blocks",
+        "analyzer_versions": {
+          "pyloudnorm": "0.1.1",
+          "soundfile": "0.13.1",
+          "scipy": "1.15.3",
+          "numpy": "2.2.6"
+        },
+        "independent_decode": "PASS: libsndfile and scipy.io.wavfile agree",
+        "true_peak": {
+          "status": "NOT_EVALUATED",
+          "reason": "No calibrated true-peak meter in G0 subset"
+        },
+        "delivery_profile_status": "UNKNOWN: no owner-selected thresholds",
+        "listening": "NOT_EVALUATED"
+      },
+      "audio_path": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\7ae78cb6bbf641d29a4aa4236bbc97a2\\output.wav",
+      "committed": false
+    },
+    "pipeline-project-a": {
+      "ok": true,
+      "data": {
+        "file": "output.wav",
+        "audio_sha256": "9371f55e8cdf0418aa5608b2803cc82923e1cb7f74e47bc7af3636f58101a6da",
+        "pcm_sha256": "c103070979b4e39d6ab4eab8b0e09fa195895eb43eb39733e2e63740d42364e6",
+        "source_hashes": {
+          "saturation": "bbb711df9568a57d6564324005741739decd4044510df79abb12d6766bb5d27b",
+          "tone-b": "a7bb9e00e68fa696bb4c2f6db824e80e2ebce14ad4414bf7c7c85136013b752e",
+          "bus": "e0acae0e70687edf99040ef32410bd4f55cf74544d70eb6b5c79d4b519082c30",
+          "master": "91d2029e7cb5a2d1ce41be9e94a773c8bd2f227bdf41d8e8d4c2447d427cffa7"
+        },
+        "nodes": {
+          "tone-a": {
+            "prepare_seconds": 0.33943530000397004,
+            "state_file": "tone-a.state",
+            "state_sha256": "bd53f5c0f11ec791c86c543d9417505aa7a359fd479a2f4c732da103edd2a17d",
+            "catalog_count": 2264,
+            "catalog_sha256": "ba4c82c63e3007aa8a6d35a070a8b810ad1c4b722043a870d135497ca156a3df",
+            "selected_values": {
+              "0": 0.4000000059604645,
+              "1": 1.0,
+              "4": 1.0,
+              "12": 0.5
+            }
+          },
+          "saturation": {
+            "prepare_seconds": 0.032523300003958866,
+            "catalog_count": 2,
+            "catalog_sha256": "5e640dd9967bffec4701605b6dc71d94c48230a83dc4be8936a8990503169b2f",
+            "selected_values": {}
+          },
+          "tone-b": {
+            "prepare_seconds": 0.04942029999801889,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "bus": {
+            "prepare_seconds": 0.013262799999210984,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "master": {
+            "prepare_seconds": 0.00999479999882169,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "final-gain": {
+            "prepare_seconds": 0.19122010000864975,
+            "state_file": "final-gain.state",
+            "state_sha256": "c8083ee20acd06e1e15604be06da64f60183047490b0939e4e977895d7ccf3d8",
+            "catalog_count": 14,
+            "catalog_sha256": "a753f752f8cb373bb59d52602973a4a5124418c132338e1605d3f0690d485aee",
+            "selected_values": {
+              "0": 0.5,
+              "1": 0.5,
+              "4": 1.0,
+              "12": 0.44999998807907104
+            }
+          }
+        },
+        "stems": {},
+        "timing": {
+          "prepare_seconds": 0.6737737999937963,
+          "cold_render_seconds": 0.18861529999412596,
+          "warm_render_seconds": 0.18344860000070184
+        },
+        "warm_pcm_identical": false,
+        "warm_max_abs_delta": 0.03137759491801262,
+        "environment": {
+          "os": "Windows-11-10.0.26100-SP0",
+          "machine": "AMD64",
+          "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+          "executable": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.venv\\Scripts\\python.exe",
+          "packages": {
+            "dawdreamer": "0.9.0",
+            "numpy": "2.2.6",
+            "scipy": "1.15.3",
+            "soundfile": "0.13.1",
+            "pyloudnorm": "0.1.1"
+          },
+          "native_module_sha256": "7ea9eaa679ef0e7f43166c75e2158a49735daf3b96ca5be1124a140e58ad3d81",
+          "import_seconds": 0.02725399998598732,
+          "isolation": "native subprocess crash containment only; same-user filesystem/network rights"
+        }
+      },
+      "warnings": [],
+      "job_id": "625a48562d464368a6449943cd107aeb",
+      "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\625a48562d464368a6449943cd107aeb",
+      "exit_code": 0,
+      "wall_seconds": 2.532814900012454,
+      "source_sha256": "1116c7299341f85d849316f56d42bd68d6762106055eb36e3a07a333bcded910",
+      "quality": {
+        "audio_sha256": "9371f55e8cdf0418aa5608b2803cc82923e1cb7f74e47bc7af3636f58101a6da",
+        "frames": 768000,
+        "sample_rate": 48000,
+        "channels": 2,
+        "subtype": "FLOAT",
+        "duration_seconds": 16.0,
+        "sample_peak": 0.026774359866976738,
+        "sample_peak_dbfs": -31.44561807346126,
+        "rms": 0.006270775379709283,
+        "dc_per_channel": [
+          1.9322166872484214e-07,
+          4.665892856827853e-08
+        ],
+        "integrated_lufs": -41.10406490719691,
+        "loudness_method": "pyloudnorm ITU-R BS.1770-4 K-weighting and gating; 400 ms blocks",
+        "analyzer_versions": {
+          "pyloudnorm": "0.1.1",
+          "soundfile": "0.13.1",
+          "scipy": "1.15.3",
+          "numpy": "2.2.6"
+        },
+        "independent_decode": "PASS: libsndfile and scipy.io.wavfile agree",
+        "true_peak": {
+          "status": "NOT_EVALUATED",
+          "reason": "No calibrated true-peak meter in G0 subset"
+        },
+        "delivery_profile_status": "UNKNOWN: no owner-selected thresholds",
+        "listening": "NOT_EVALUATED"
+      },
+      "audio_path": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\625a48562d464368a6449943cd107aeb\\output.wav",
+      "committed": true,
+      "revision": "8381e80adeba42a0979e9362911500eb"
+    },
+    "pipeline-project-b": {
+      "ok": true,
+      "data": {
+        "file": "output.wav",
+        "audio_sha256": "60794b6409c6263743464bf1fc6670f188c31202120488ba72133e7a37acb809",
+        "pcm_sha256": "310e23456de27e0a5e612638f7786f79bb656329a860cb24ebb04815aeb00d8d",
+        "source_hashes": {
+          "saturation": "bbb711df9568a57d6564324005741739decd4044510df79abb12d6766bb5d27b",
+          "tone-b": "a7bb9e00e68fa696bb4c2f6db824e80e2ebce14ad4414bf7c7c85136013b752e",
+          "bus": "e0acae0e70687edf99040ef32410bd4f55cf74544d70eb6b5c79d4b519082c30",
+          "master": "91d2029e7cb5a2d1ce41be9e94a773c8bd2f227bdf41d8e8d4c2447d427cffa7"
+        },
+        "nodes": {
+          "tone-a": {
+            "prepare_seconds": 0.24242539997794665,
+            "state_file": "tone-a.state",
+            "state_sha256": "bd53f5c0f11ec791c86c543d9417505aa7a359fd479a2f4c732da103edd2a17d",
+            "catalog_count": 2264,
+            "catalog_sha256": "ba4c82c63e3007aa8a6d35a070a8b810ad1c4b722043a870d135497ca156a3df",
+            "selected_values": {
+              "0": 0.4000000059604645,
+              "1": 1.0,
+              "4": 1.0,
+              "12": 0.5
+            }
+          },
+          "saturation": {
+            "prepare_seconds": 0.023232100007589906,
+            "catalog_count": 2,
+            "catalog_sha256": "5e640dd9967bffec4701605b6dc71d94c48230a83dc4be8936a8990503169b2f",
+            "selected_values": {}
+          },
+          "tone-b": {
+            "prepare_seconds": 0.04810749998432584,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "bus": {
+            "prepare_seconds": 0.014005700009875,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "master": {
+            "prepare_seconds": 0.013547200011089444,
+            "catalog_count": 0,
+            "catalog_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "selected_values": {}
+          },
+          "final-gain": {
+            "prepare_seconds": 0.19012319998000748,
+            "state_file": "final-gain.state",
+            "state_sha256": "533d4dd5f1e56bb604b1292a2d9abd247e852703f4674bbf9cb379e2b1dc5546",
+            "catalog_count": 14,
+            "catalog_sha256": "1f2399992145ed002cd6bc09cbfe013243d1404565aee5169252b92ac4a4a011",
+            "selected_values": {
+              "0": 0.5,
+              "1": 0.5,
+              "4": 1.0,
+              "12": 0.4000000059604645
+            }
+          }
+        },
+        "stems": {},
+        "timing": {
+          "prepare_seconds": 0.5593268999946304,
+          "cold_render_seconds": 0.24220989999594167,
+          "warm_render_seconds": 0.2067529000050854
+        },
+        "warm_pcm_identical": false,
+        "warm_max_abs_delta": 0.02203749120235443,
+        "environment": {
+          "os": "Windows-11-10.0.26100-SP0",
+          "machine": "AMD64",
+          "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+          "executable": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.venv\\Scripts\\python.exe",
+          "packages": {
+            "dawdreamer": "0.9.0",
+            "numpy": "2.2.6",
+            "scipy": "1.15.3",
+            "soundfile": "0.13.1",
+            "pyloudnorm": "0.1.1"
+          },
+          "native_module_sha256": "7ea9eaa679ef0e7f43166c75e2158a49735daf3b96ca5be1124a140e58ad3d81",
+          "import_seconds": 0.028696400026092306,
+          "isolation": "native subprocess crash containment only; same-user filesystem/network rights"
+        }
+      },
+      "warnings": [],
+      "job_id": "6f11c22e6d98457796950a2e54740105",
+      "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project-independent\\staging\\6f11c22e6d98457796950a2e54740105",
+      "exit_code": 0,
+      "wall_seconds": 2.259049399988726,
+      "source_sha256": "6182fcc7692436bcd4bec80a1c83112751876d1f496474a75a211fb24ba24379",
+      "quality": {
+        "audio_sha256": "60794b6409c6263743464bf1fc6670f188c31202120488ba72133e7a37acb809",
+        "frames": 768000,
+        "sample_rate": 48000,
+        "channels": 2,
+        "subtype": "FLOAT",
+        "duration_seconds": 16.0,
+        "sample_peak": 0.01880449242889881,
+        "sample_peak_dbfs": -34.51476769131225,
+        "rms": 0.004404166664714052,
+        "dc_per_channel": [
+          1.3570575524937743e-07,
+          3.2770237127215105e-08
+        ],
+        "integrated_lufs": -44.17321489013967,
+        "loudness_method": "pyloudnorm ITU-R BS.1770-4 K-weighting and gating; 400 ms blocks",
+        "analyzer_versions": {
+          "pyloudnorm": "0.1.1",
+          "soundfile": "0.13.1",
+          "scipy": "1.15.3",
+          "numpy": "2.2.6"
+        },
+        "independent_decode": "PASS: libsndfile and scipy.io.wavfile agree",
+        "true_peak": {
+          "status": "NOT_EVALUATED",
+          "reason": "No calibrated true-peak meter in G0 subset"
+        },
+        "delivery_profile_status": "UNKNOWN: no owner-selected thresholds",
+        "listening": "NOT_EVALUATED"
+      },
+      "audio_path": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project-independent\\staging\\6f11c22e6d98457796950a2e54740105\\output.wav",
+      "committed": true,
+      "revision": "f61c1f4442e245be983766e3c4a63626"
+    }
+  },
+  "listening": "NOT_EVALUATED",
+  "sidechain": "NOT_EVALUATED",
+  "owner_plugin_collection": "UNTESTED",
+  "known_limitations": [
+    "PurestGain VST2 opaque state restore fails in DawDreamer 0.9.0 because its loader creates a plugin editor. Original failure retained in run-001.json. No exception suppressed or parameter-only restore substituted.",
+    "Consolidated default wet processor has nonidentical fresh/warm PCM (run-003.json). Strict state test explicitly uses Dry/Wet=0 and its active Output Level gain; this does not certify the wet algorithm. Complete wet pipeline remains D3."
+  ],
+  "plugin_probes": {
+    "instrument": {
+      "identity": {
+        "registry_id": "plugin-9632e3f90d2fda672e70e235dacced05ded975206b468ad867292928155fc279",
+        "path": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\plugins\\dexed\\Dexed.vst3",
+        "files": {
+          "Contents/Resources/moduleinfo.json": "6f7fb05e437db734776585e69e378e50884ded65630730b0731ec75fed878a18",
+          "Contents/x86_64-win/Dexed.vst3": "b306439ad6385d9b27d737b37a7101724fdc1000cf5a8c781bfdb38d0cbe5a06",
+          "desktop.ini": "34b7fb2daafdf887abf4397c52a6c69ce5c233466ac8f3100708bcf6f4984a82",
+          "Plugin.ico": "cc92d40693dd1989f5c91a245783c647a2072d00aa387d6e94c830daf406afe8"
+        },
+        "sha256": "9632e3f90d2fda672e70e235dacced05ded975206b468ad867292928155fc279",
+        "provenance": "Owner requested online plugins for testing in this chat on 2026-11-13"
+      },
+      "load_seconds": 0.20646110002417117,
+      "inputs": 0,
+      "outputs": 2,
+      "parameter_count": 2264,
+      "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\6e318a1733ed4e26b5dcd854009a2054"
+    },
+    "effect": {
+      "identity": {
+        "registry_id": "plugin-c6e63d4af4b707815e16d3f5ec19cf5d90d6852f2663d1fa7fc9c7527588b214",
+        "path": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\plugins\\consolidated\\Airwindows Consolidated.vst3",
+        "files": {
+          "Contents/Resources/moduleinfo.json": "aec52ca2613d8c962d827290fb31e210f770906fb100f06096b3d24a7e87a185",
+          "Contents/x86_64-win/Airwindows Consolidated.vst3": "1cdd12fc84ea5709eae8ac49ed556605b570c692421a160767a89cc8cf59c048"
+        },
+        "sha256": "c6e63d4af4b707815e16d3f5ec19cf5d90d6852f2663d1fa7fc9c7527588b214",
+        "provenance": "Owner requested online plugins for testing in this chat on 2026-11-13"
+      },
+      "load_seconds": 0.20895670002209954,
+      "inputs": 2,
+      "outputs": 2,
+      "parameter_count": 14,
+      "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\27d15b2fe7e94707a0d8778c6353b5d0"
+    },
+    "limited_effect": {
+      "identity": {
+        "registry_id": "plugin-8f767721d31fc7aa0f241dfbf3a1a51f7ea610f58ecc39a588161cb958c1aadd",
+        "path": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\plugins\\airwindows\\PurestGain64.dll",
+        "files": {
+          "PurestGain64.dll": "a75dcf5b77421bfd1c881c21ed8334ea64edce344abb427758300d45d63c853e"
+        },
+        "sha256": "8f767721d31fc7aa0f241dfbf3a1a51f7ea610f58ecc39a588161cb958c1aadd",
+        "provenance": "Owner requested online plugins for testing in this chat on 2026-11-13"
+      },
+      "load_seconds": 0.16529459998128004,
+      "inputs": 2,
+      "outputs": 2,
+      "parameter_count": 2,
+      "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.local\\g0-project\\staging\\09aacb6fc97f45229f1e6a3a4a449447"
+    }
+  },
+  "failed_checks": 0,
+  "permanent_tests": {
+    "RWT-01": {
+      "status": "NOT_EVALUATED",
+      "note": "Full long-term scenario not evaluated at G0"
+    },
+    "RWT-02": {
+      "status": "NOT_EVALUATED",
+      "note": "Full long-term scenario not evaluated at G0"
+    },
+    "RWT-03": {
+      "status": "NOT_EVALUATED",
+      "note": "Full long-term scenario not evaluated at G0"
+    },
+    "RWT-04": {
+      "status": "NOT_EVALUATED",
+      "note": "Full long-term scenario not evaluated at G0"
+    },
+    "RWT-05": {
+      "status": "NOT_EVALUATED",
+      "note": "Full long-term scenario not evaluated at G0",
+      "g0_subset": "PASS",
+      "check_ids": [
+        "RWT-05.faust_multitrack_subset",
+        "RWT-05.removed_faust_binding_subset",
+        "RWT-05.plugin_permission_denial_subset"
+      ]
+    },
+    "RWT-06": {
+      "status": "NOT_EVALUATED",
+      "note": "Full long-term scenario not evaluated at G0",
+      "g0_subset": "PASS",
+      "check_ids": [
+        "RWT-06.invalid_faust_subset",
+        "RWT-06.abrupt_worker_exit_subset",
+        "RWT-06.worker_timeout_subset",
+        "RWT-06.service_reopen_subset",
+        "RWT-06.stale_commit_subset"
+      ]
+    },
+    "RWT-07": {
+      "status": "NOT_EVALUATED",
+      "note": "Full long-term scenario not evaluated at G0"
+    },
+    "RWT-08": {
+      "status": "NOT_EVALUATED",
+      "note": "Full long-term scenario not evaluated at G0"
+    },
+    "RWT-09": {
+      "status": "NOT_EVALUATED",
+      "note": "Full long-term scenario not evaluated at G0"
+    },
+    "RWT-10": {
+      "status": "NOT_EVALUATED",
+      "note": "Full long-term scenario not evaluated at G0"
+    },
+    "RWT-11": {
+      "status": "NOT_EVALUATED",
+      "note": "Full long-term scenario not evaluated at G0",
+      "g0_subset": "PASS",
+      "check_ids": [
+        "RWT-11.fixture_instrument_midi_state_subset",
+        "RWT-11.fixture_effect_automation_state_subset"
+      ]
+    },
+    "RWT-12": {
+      "status": "NOT_EVALUATED",
+      "note": "Full long-term scenario not evaluated at G0",
+      "g0_subset": "PASS",
+      "check_ids": [
+        "RWT-12.fixture_pipeline_reuse_subset",
+        "RWT-12.missing_changed_dependency_subset"
+      ]
+    }
+  },
+  "decision": "PARTIAL ADOPT"
+}

@@ -1,0 +1,5 @@
+{
+  "original_path": ".local/delivery/g1-v2/occupied.wav",
+  "retained_path": ".local/delivery/g1-v2-diagnostics/occupied.wav",
+  "reason": "Post-test organization: retain deliberate invalid WAV outside the listening delivery directory."
+}
