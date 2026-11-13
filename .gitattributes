@@ -1,6 +1,5 @@
-* text=auto
-*.py text eol=lf
-*.json text eol=lf
-*.md text eol=lf
-*.ps1 text eol=crlf
-
+# Preserve exact bytes: specification manifests and evidence contain SHA-256 hashes.
+# Do not normalize line endings when committing or checking out this Windows proof.
+* -text
+# Markdown's two trailing spaces are intentional line breaks in the supplied spec.
+*.md whitespace=-blank-at-eol
