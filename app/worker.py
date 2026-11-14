@@ -190,7 +190,11 @@ class DawDreamerBackend:
         e.load_graph(graph)
         prepare_seconds = time.perf_counter() - started
         start = time.perf_counter()
-        if not e.render(g["frames"] / g["sample_rate"]):
+        seconds = g["frames"] / g["sample_rate"]
+        if seconds * g["sample_rate"] < g["frames"]:
+            # DawDreamer truncates duration * sample rate to a frame count.
+            seconds = math.nextafter(seconds, math.inf)
+        if not e.render(seconds):
             raise AdawError("RENDER_FAILED", "Engine returned false")
         cold = time.perf_counter() - start
         audio = e.get_audio().T.copy()
@@ -201,7 +205,7 @@ class DawDreamerBackend:
             stems[node_id] = {"file": stem_path.name, "sha256": file_hash(stem_path)}
         start = time.perf_counter()
         if request.get("benchmark", True):
-            e.render(g["frames"] / g["sample_rate"])
+            e.render(seconds)
         warm = time.perf_counter() - start if request.get("benchmark", True) else None
         second = e.get_audio().T
         if audio.shape != (g["frames"], g["nodes"][-1]["channels"]) or not np.isfinite(audio).all():

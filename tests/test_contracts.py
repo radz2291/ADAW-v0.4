@@ -79,3 +79,12 @@ def test_cli_invalid_command_is_json(tmp_path):
     assert data["error"]["code"] == "VALIDATION_ERROR"
     assert data["schema_version"] == "adaw.result@1"
 
+
+def test_native_render_preserves_frame_count_at_rounding_boundary(tmp_path):
+    graph = {"schema": "adaw.g0.graph@1", "sample_rate": 48000, "block_size": 256,
+             "frames": 48005, "output": "tone",
+             "nodes": [{"id": "tone", "kind": "tone", "inputs": [], "channels": 2,
+                        "config": {"frequency_hz": 440, "amplitude": .1, "onset_frame": 0}}]}
+    assert (graph["frames"] / 48000) * 48000 < graph["frames"]
+    rendered = Service(tmp_path).render(graph, 30, benchmark=False)
+    assert rendered["quality"]["frames"] == graph["frames"]
