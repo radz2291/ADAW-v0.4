@@ -9,8 +9,22 @@ async function main() {
   assert.equal(new URL(origin).hostname, '127.0.0.1');
   const inspect = () => JSON.parse(execFileSync(python, ['-m','app','--root',root,'--timeout','30','project-inspect'],
     {cwd:'../..',encoding:'utf8',timeout:30000})).data;
-  const initial = inspect();
-  assert.equal(initial.source.title, 'Desktop UI fixture', 'Only run on a disposable fixture');
+  const guarded = inspect();
+  assert.equal(guarded.source.title, 'Desktop UI fixture', 'Only run on a disposable fixture');
+  const served=(await(await fetch(origin+'/api/v1/state')).json()).data.project;
+  assert.equal(served.revision,guarded.revision,'Server must serve the supplied disposable fixture');
+  assert.equal(served.last_playable_rendition,guarded.last_playable_rendition,'Fixture rendition identity must agree');
+  // Give the stock fixture a real exposed bus control for the Devices gesture.
+  // This setup is guarded above and persists only through ProjectService.
+  execFileSync(python,['-c',[
+    'from app.project import ProjectService', 'import sys', 'service=ProjectService(sys.argv[1])',
+    'revision,source=service.source()', 'assert source["title"]=="Desktop UI fixture"',
+    'if not source["buses"][0]["inserts"]:',
+    '    module=service.import_file("fixtures/saturation.dsp","faust","Disposable desktop device-control test",30)',
+    '    service.edit(dict(command_id="desktop-device-fixture",base_revision=revision,reason="Prepare disposable device control",operations=[dict(kind="append_bus_insert",bus_id="music",insert=dict(module_sha256=module["sha256"],parameters={}))]))',
+    '    service.render_project(60)',
+  ].join('\n'),root],{cwd:'../..',encoding:'utf8',timeout:90000});
+  const initial=inspect();
   mkdirSync(output,{recursive:true});
   const browser = await chromium.launch({channel:'msedge',headless:true});
   try {
@@ -30,11 +44,15 @@ async function main() {
     await page.goto(origin);
     await page.locator('#play:not([disabled])').waitFor();
     await page.waitForFunction(()=>Number.isFinite(document.getElementById('audio').duration));
-    await page.waitForFunction(()=>document.querySelector('audio-ui-fader input:not([disabled])'));
-    assert.equal(await page.locator('audio-ui-fader').count(),4);
+    assert.equal(await page.locator('[data-dock=piano]').getAttribute('aria-pressed'),'true');
+    assert.equal(await page.locator('#browser-panel').isVisible(),false);
+    await page.locator('[data-dock=mixer]').click();
+    await page.waitForFunction(()=>document.querySelector('#mix-console audio-ui-fader input:not([disabled])'));
+    assert.equal(await page.locator('#mix-console audio-ui-fader').count(),4);
     await page.locator('#zoom').selectOption('4');
     assert.ok(await page.locator('#timeline-viewport').evaluate(e=>e.scrollWidth>e.clientWidth));
     await page.locator('#zoom').selectOption('1');
+    await page.locator('#toggle-browser').click();
     await page.locator('#browser-search').fill('tone');
     assert.equal(await page.locator('.browser-item').count(),1);
     await page.locator('#browser-search').fill('');
@@ -54,7 +72,7 @@ async function main() {
     await page.keyboard.press('Home');
     assert.equal(await page.locator('#audio').evaluate(e=>e.paused),true);
 
-    const fader=page.locator('audio-ui-fader[data-entity=tone] input');
+    const fader=page.locator('#mix-console audio-ui-fader[data-entity=tone] input');
     await fader.focus();await saveGesture(()=>fader.press('ArrowDown'));
     assert.ok(Math.abs(inspect().source.tracks[0].gain_db-(initial.source.tracks[0].gain_db-.1))<1e-9);
     assert.match(await page.locator('#playback-state').textContent(),/Edits to hear/);
@@ -104,11 +122,22 @@ async function main() {
     await page.locator('audio-ui-piano-roll-grid').dblclick();await page.keyboard.press('ArrowUp');
     assert.equal(inspect().revision,protectedHead);
 
+    await page.locator('#track-tone').click();
+    await page.locator('[data-dock=devices]').click();
+    const drive=page.getByRole('spinbutton',{name:'music 1. Faust effect drive value',exact:true});
+    const deviceState=(await(await fetch(origin+'/api/v1/state')).json()).data;
+    const driveBinding=deviceState.plugins.find(row=>row.bus_id==='music'&&row.insert_index===0).parameters.find(p=>p.label==='drive').binding;
+    await drive.fill('1.25');
+    const deviceEdit=await saveGesture(()=>drive.press('Enter'));
+    assert.equal(deviceEdit.source.buses.find(bus=>bus.id==='music').inserts[0].parameters[driveBinding],1.25);
+    assert.ok(await page.locator('#inspector-content audio-ui-knob').count()>0,'Device cards use native controls');
+    await page.screenshot({path:output+'/devices.png',fullPage:true});
+
     // A historical view must lock every source fader, not only inspector inputs.
     await page.locator('#toggle-review').click();
     await page.getByRole('button',{name:'View source',exact:true}).last().click();
     await page.locator('#back-head').waitFor();
-    assert.equal(await page.locator('audio-ui-fader:not([disabled])').count(),0);
+    assert.equal(await page.locator('#mix-console audio-ui-fader:not([disabled])').count(),0);
     await page.locator('#back-head').click();
     const finalAudio=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/v1/render' && r.request().method()==='POST', {timeout:60000});
     await page.locator('#audition').click();
@@ -121,6 +150,7 @@ async function main() {
     assert.equal(r.data.revision,result.revision);
     await page.locator('#play').click();await page.waitForFunction(()=>document.getElementById('audio').currentTime>.1);
     await page.locator('#stop').click();
+    await page.locator('#playback-details > summary').click();
     await page.locator('#ab-a').click();await page.waitForFunction(()=>document.getElementById('playback-state').classList.contains('stale'));
     await page.locator('#ab-b').click();await page.waitForFunction(()=>!document.getElementById('playback-state').classList.contains('stale'));
     await page.locator('[data-dock=mixer]').click();
@@ -131,11 +161,11 @@ async function main() {
     assert.deepEqual(errors,[]);assert.deepEqual(remote,[]);
     console.log(JSON.stringify({status:'PASS',browser:'Edge headless',sourceRevision:initial.revision,
       finalRevision:result.revision,rendition:result.last_playable_rendition,checks:[
-        'library elements loaded','local assets only','zoom and browser filter','tempo/meter seek',
+        'Piano default and browser disclosure','library elements loaded','local assets only','zoom and browser filter','tempo/meter seek',
         'section loop playback','transport shortcuts','fader gesture -> direct save -> CLI',
         'note keyboard edit -> direct save -> CLI','pointer note resize','pointer note creation and snapped stable ID',
         'one-click audition matches edited source','direct deletion','undo restores deleted note','redo deletes again',
-        'protected track lock','historical revision lock',
+        'protected track lock','Devices dock numeric direct commit','native device knob cards','historical revision lock',
         'real Faust rerender/playback','A/B stale audio identity','390px overflow','no browser/CSP errors']}));
   } finally {await browser.close();}
 }

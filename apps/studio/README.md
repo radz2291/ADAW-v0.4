@@ -45,6 +45,16 @@ silent pitch reference. Browser loops are not sample accurate. Sample groups
 support end trim; leading sample trim and split are explicitly unsupported.
 Browser/inspector visibility and pane height persist locally; Help has Reset layout.
 
+The workspace opens with arrangement above a single contextual dock. Piano roll,
+Mix console and Devices share that dock; Properties is optional in Piano view.
+Browser and History open on demand. Compare & waveform contains the A/B players
+and WaveSurfer navigation. Escape closes History or comparison before clearing
+musical selection. Track headers and the mixer reuse one channel adapter; rail
+mix controls hide when the console is open. Faders retain numeric precision.
+Device cards use audio/ui knobs with direct numeric entry (Enter or blur saves).
+Sample waveforms use decoded native monitor stems mapped through the tempo map;
+missing or incompatible stems never produce a placeholder waveform.
+
 The frozen everyday rubric and independent round reports live under
 `docs/evaluation/` and `evidence/evaluation/`. Never change the rubric without an
 explicit owner request. Older evidence describes its historical build.

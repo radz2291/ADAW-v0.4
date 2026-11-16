@@ -55,3 +55,16 @@ round under evidence/evaluation; earlier failures are not overwritten.
 Scope remains local arrangement/mixing/audition, not full DAW feature parity,
 recording, live synthesis, hardened plugin sandboxing or owner musical approval.
 The original Glass Current project/export remain separate and unchanged.
+
+## BandLab presentation reference
+
+The owner's live BandLab demonstration clarified the expected hierarchy: compact
+transport, dominant arrangement and one contextual lower editor. The presentation
+pass adopts that hierarchy while keeping ADAW branding and service authority.
+Track headers and console share the channel adapter; only one set is presented
+in each dock mode. Browser, Properties, comparison and History are disclosures.
+Instrument parameters use the same validated catalogs in audio/ui knob cards.
+Measured sample peaks come from verified native stems and use canonical tick bins
+converted through the tempo map. They disappear when sound identity changes.
+No private BandLab project content is imported. This presentation reference does
+not replace or modify the frozen everyday acceptance rubric.
