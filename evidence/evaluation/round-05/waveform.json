@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "results": [
+    {
+      "width": 1440,
+      "time": 113.396785
+    },
+    {
+      "width": 1280,
+      "time": 113.396785
+    }
+  ],
+  "errors": []
+}

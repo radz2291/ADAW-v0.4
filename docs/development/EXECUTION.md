@@ -41,3 +41,13 @@ musical approval. The original Glass Current source and exported WAV are intact.
 The owner subsequently showed BandLab's effects and MIDI workspace as the expected
 visual finish. A further presentation pass follows this checkpoint, preserving
 the same frozen rubric and the audio/ui + WaveSurfer foundation.
+
+Presentation code `5df27f6` and comparison stacking fix `b3d96e3` now implement
+that direction. Independent [round 05](../../evidence/evaluation/round-05/REPORT.md)
+reaches **90/100 with all mandatory checks passing**. It adds focused waveform
+and integrity checks to unchanged round 04 evidence; it is not a claim of a new
+full-suite rerun after one CSS change. Round 04's 82-point incomplete assessment
+remains preserved. Remaining ten points concern pane sizing (4), unverified device
+workflow (4) and unverified shortcut behavior (2). The builder browser workflow
+passed 23 checks; backend regression passed 62 with one optional plugin skip.
+Original Glass source and exported WAV integrity were independently rechecked.

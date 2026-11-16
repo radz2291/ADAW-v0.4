@@ -13,8 +13,11 @@ transport, track-side controls and one Piano/Mixer/Devices dock. It retains
 audio/ui and WaveSurfer. Updated direct browser verification passed 23 checks;
 backend regression passed 62 with one optional native-plugin skip. The frozen
 rubric remains unchanged. Round 03's 98/100 is the preceding functional
-checkpoint; consult [round 04](../../evidence/evaluation/round-04/REPORT.md) for
-the presentation candidate's separate independent result and remaining issues.
+checkpoint. Presentation [round 05](../../evidence/evaluation/round-05/REPORT.md)
+reaches **90/100 with all mandatory checks passing**, after fixing comparison
+waveform overlap and completing integrity checks. It explicitly carries unchanged
+round 04 evidence across that CSS-only fix. Remaining points concern pane sizing,
+device workflow verification and shortcut verification; see the report.
 The running fork is [Glass Current Studio](http://127.0.0.1:8767/).
 
 The G1 development milestone is owner-accepted. Its original Night Circuit
