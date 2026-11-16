@@ -1,0 +1,107 @@
+{
+  "checks": [
+    {
+      "name": "F3A Space Home ruler waveform section text isolation",
+      "status": "FAIL",
+      "detail": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#waveform')\u001b[22m\n\u001b[2m    - locator resolved to <div id=\"waveform\" aria-label=\"Rendered audio waveform\">…</div>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <audio-ui-timeline-ruler class=\"lane\" data-fitted=\"\" data-timeline-lane=\"\">…</audio-ui-timeline-ruler> from <div class=\"workspace inspector-hidden\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <audio-ui-timeline-ruler class=\"lane\" data-fitted=\"\" data-timeline-lane=\"\">…</audio-ui-timeline-ruler> from <div class=\"workspace inspector-hidden\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    53 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <audio-ui-timeline-ruler class=\"lane\" data-fitted=\"\" data-timeline-lane=\"\">…</audio-ui-timeline-ruler> from <div class=\"workspace inspector-hidden\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n    at C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\v4-glass-probe.cjs:5:778\n    at async check (C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\v4-glass-probe.cjs:3:81)\n    at async C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\v4-glass-probe.cjs:5:1"
+    },
+    {
+      "name": "F3B tempo meter sample boundaries fullsong",
+      "status": "PASS",
+      "detail": [
+        {
+          "time": 0,
+          "displayed": "120 BPM · 4/4",
+          "position": "1.1"
+        },
+        {
+          "time": 0.000020833333333333333,
+          "displayed": "120 BPM · 4/4",
+          "position": "1.1"
+        },
+        {
+          "time": 95.99997916666666,
+          "displayed": "120 BPM · 4/4",
+          "position": "48.4"
+        },
+        {
+          "time": 96,
+          "displayed": "104 BPM · 4/4",
+          "position": "49.1"
+        },
+        {
+          "time": 96.00002083333334,
+          "displayed": "104 BPM · 4/4",
+          "position": "49.1"
+        },
+        {
+          "time": 114.46152083333332,
+          "displayed": "104 BPM · 4/4",
+          "position": "56.4"
+        },
+        {
+          "time": 114.46154166666666,
+          "displayed": "104 BPM · 3/4",
+          "position": "57.1"
+        },
+        {
+          "time": 114.4615625,
+          "displayed": "104 BPM · 3/4",
+          "position": "57.1"
+        },
+        {
+          "time": 128.30766666666665,
+          "displayed": "104 BPM · 3/4",
+          "position": "64.3"
+        },
+        {
+          "time": 128.3076875,
+          "displayed": "120 BPM · 4/4",
+          "position": "65.1"
+        },
+        {
+          "time": 128.30770833333332,
+          "displayed": "120 BPM · 4/4",
+          "position": "65.1"
+        }
+      ]
+    },
+    {
+      "name": "F4A visible loop wraps stop restarts no source mutation",
+      "status": "PASS"
+    },
+    {
+      "name": "F4B identified AB preserves position and stale identity",
+      "status": "PASS",
+      "detail": {
+        "a": "rev-b9147b180d54c340ee1a0e040e7faa6c0486b230360015d417de691198cae63e · rendition-007bf8c32b2e40ec82070d0f493b493b",
+        "b": "rev-d5125b81c64cde95cecae7c48b071781152d743ae6a2f6f53782599096cb21e5 · rendition-bcaf66f1960e440c83639ad555bdc709",
+        "state": "Latest mix"
+      }
+    },
+    {
+      "name": "U5A complete song search zoom playback no errors",
+      "status": "PASS",
+      "detail": 162.307688
+    },
+    {
+      "name": "U2A 1440 and1280 identifiable names selection and active editor",
+      "status": "PASS"
+    },
+    {
+      "name": "U5B 390 no overflow reachable playback review local-only",
+      "status": "PASS"
+    },
+    {
+      "name": "S3B exact export hash actual playback unchanged source",
+      "status": "PASS",
+      "detail": {
+        "hash": "ac56815f8cfbf86a8153e8231d110f7a8ebb679d685e367ac8e2638a574e362b",
+        "revision": "rev-b9147b180d54c340ee1a0e040e7faa6c0486b230360015d417de691198cae63e"
+      }
+    }
+  ],
+  "errors": [],
+  "remote": [],
+  "revision": "rev-b9147b180d54c340ee1a0e040e7faa6c0486b230360015d417de691198cae63e"
+}

@@ -1,0 +1,257 @@
+{
+  "checks": [
+    {
+      "name": "F1A gain mute solo measured signal response <=250ms",
+      "status": "PASS",
+      "detail": {
+        "combined": 0.04243112150367707,
+        "solo": 0.021034080506241913,
+        "quiet": 0.01065997016649053,
+        "soloMs": 160.5999999642372,
+        "gainMs": 117.5,
+        "muteMs": 138.80000001192093
+      }
+    },
+    {
+      "name": "F1B canonical render agrees muted solo and visible identity",
+      "status": "PASS",
+      "detail": {
+        "revision": "rev-a479012a3627be6e95c55947b901839630f13ede114da8a260c1493bd862f444",
+        "native": {
+          "sha256": "9504e30b935eb3b2a61068a2ee8012dbe19cb07be771b769c27f3c9c279df791",
+          "rate": 48000,
+          "frames": 313846,
+          "rms": [
+            0,
+            0
+          ],
+          "peak": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "name": "M1A complete channel controls persist reload",
+      "status": "PASS"
+    },
+    {
+      "name": "M1B multiple solos mute priority clear solos buses master",
+      "status": "PASS",
+      "detail": {
+        "solo": 0.021256049228305877,
+        "two": 0.04254732630344785,
+        "muted": 0.021024767512907966
+      }
+    },
+    {
+      "name": "M2 actual stereo silent louder clip pause and labels",
+      "status": "PASS",
+      "detail": {
+        "normal": {
+          "signal": {
+            "rms": 0.025442900845665088,
+            "peak": 0.03615947440266609,
+            "time": 11801.899999976158,
+            "state": "running"
+          },
+          "left": "-28.83555781707551",
+          "right": "-28.83555781707551"
+        },
+        "silence": {
+          "rms": 0,
+          "peak": 0,
+          "time": 12394.199999988079,
+          "state": "running"
+        },
+        "clipping": {
+          "signal": {
+            "rms": 5.324549154504762,
+            "peak": 7.511868953704834,
+            "time": 13182.399999976158,
+            "state": "running"
+          },
+          "text": "CLIP"
+        }
+      }
+    },
+    {
+      "name": "M4A actual pointer fader then keyboard gain",
+      "status": "PASS",
+      "detail": {
+        "pointer": -12,
+        "keyboard": -12.1
+      }
+    }
+  ],
+  "errors": [],
+  "measurement": "Actual WebAudio mix samples before evaluator-only silent hardware sink; no listening claim.",
+  "initial": {
+    "last_playable_rendition": "rendition-8f93ca06c36c4a80951825d9a08cd167",
+    "listening": "NOT_EVALUATED",
+    "revision": "rev-d9e2f9c800da7434461af6642801a547887a4908201214b7063a4580758f3c0d",
+    "source": {
+      "block_size": 256,
+      "brief": "Disposable evaluation only",
+      "buses": [
+        {
+          "gain_db": 0,
+          "id": "music",
+          "inserts": []
+        },
+        {
+          "gain_db": 0,
+          "id": "other",
+          "inserts": []
+        }
+      ],
+      "fade_frames": 240,
+      "length_ticks": 10560,
+      "master": {
+        "gain_db": 0,
+        "inserts": []
+      },
+      "ppq": 960,
+      "profile": {
+        "channels": 2,
+        "dither_seed": 1,
+        "id": "evaluation",
+        "max_dc": 0.001,
+        "max_estimated_true_peak_dbfs": -1,
+        "max_lufs": -10,
+        "max_sample_peak_dbfs": -1,
+        "min_lufs": -40,
+        "purpose": "test only",
+        "sample_rate": 48000,
+        "status": "temporary_engineering_profile",
+        "subtype": "PCM_24",
+        "true_peak_margin_db": 0.25
+      },
+      "sample_rate": 48000,
+      "schema": "adaw.arrangement@2",
+      "sections": [
+        {
+          "end_tick": 3840,
+          "id": "intro",
+          "mood": "test",
+          "start_tick": 0,
+          "swing": 0.5
+        },
+        {
+          "end_tick": 7680,
+          "id": "bridge",
+          "mood": "test",
+          "start_tick": 3840,
+          "swing": 0.5
+        },
+        {
+          "end_tick": 10560,
+          "id": "turn",
+          "mood": "test",
+          "start_tick": 7680,
+          "swing": 0.5
+        }
+      ],
+      "tail_frames": 24000,
+      "tempo": 120,
+      "time_map": [
+        {
+          "bpm": 120,
+          "denominator": 4,
+          "numerator": 4,
+          "tick": 0
+        },
+        {
+          "bpm": 104,
+          "denominator": 4,
+          "numerator": 4,
+          "tick": 3840
+        },
+        {
+          "bpm": 104,
+          "denominator": 4,
+          "numerator": 3,
+          "tick": 7680
+        }
+      ],
+      "title": "Independent interaction fixture",
+      "tracks": [
+        {
+          "bus": "music",
+          "events": [
+            {
+              "duration_ticks": 10560,
+              "id": "eval-0",
+              "note": 60,
+              "start_tick": 0,
+              "velocity": 90
+            }
+          ],
+          "gain_db": -12,
+          "id": "evaluation-midi",
+          "inserts": [],
+          "instrument": {
+            "module_sha256": "7858fc7dbf50f58280f8311c4e78e2a3d1b4787ea5ca763d46d89a00910667da",
+            "parameters": {},
+            "release_seconds": 0.2,
+            "voices": 8
+          },
+          "kind": "faust_synth",
+          "pan": 0,
+          "protected": false,
+          "role": "lead"
+        },
+        {
+          "bus": "other",
+          "events": [
+            {
+              "duration_ticks": 960,
+              "id": "sample-1",
+              "note": 60,
+              "start_tick": 0,
+              "velocity": 90
+            }
+          ],
+          "gain_db": -12,
+          "id": "evaluation-sample",
+          "inserts": [],
+          "instrument": {
+            "asset_sha256": "90b31a874b335fb5fc3c313a5b4a514acc90a49d4502960828a84c6d4f96628e",
+            "fade_frames": 24
+          },
+          "kind": "samples",
+          "pan": 0,
+          "protected": false,
+          "role": "sample"
+        },
+        {
+          "bus": "other",
+          "events": [
+            {
+              "duration_ticks": 10560,
+              "id": "protected-eval-0",
+              "note": 60,
+              "start_tick": 0,
+              "velocity": 90
+            }
+          ],
+          "gain_db": -12,
+          "id": "evaluation-protected",
+          "inserts": [],
+          "instrument": {
+            "module_sha256": "7858fc7dbf50f58280f8311c4e78e2a3d1b4787ea5ca763d46d89a00910667da",
+            "parameters": {},
+            "release_seconds": 0.2,
+            "voices": 8
+          },
+          "kind": "faust_synth",
+          "pan": 0,
+          "protected": true,
+          "role": "lead"
+        }
+      ]
+    },
+    "source_sha256": "d9e2f9c800da7434461af6642801a547887a4908201214b7063a4580758f3c0d"
+  }
+}

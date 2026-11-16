@@ -1,0 +1,65 @@
+{
+  "checks": [
+    {
+      "name": "U4A keyboard focus named surfaces dialog focus containment Escape",
+      "status": "PASS",
+      "detail": {
+        "dialog": [
+          {
+            "id": "close-help",
+            "inside": true,
+            "outline": "solid"
+          },
+          {
+            "id": "",
+            "inside": false,
+            "outline": "none"
+          },
+          {
+            "id": "reset-layout",
+            "inside": true,
+            "outline": "solid"
+          },
+          {
+            "id": "close-help",
+            "inside": true,
+            "outline": "solid"
+          }
+        ],
+        "essential": [
+          {
+            "tag": "BUTTON",
+            "id": "play",
+            "outline": "none",
+            "tabIndex": 0
+          },
+          {
+            "tag": "INPUT",
+            "id": "volume",
+            "outline": "solid",
+            "tabIndex": 0
+          },
+          {
+            "tag": "AUDIO-UI-PIANO-ROLL-GRID",
+            "id": "",
+            "outline": "solid",
+            "tabIndex": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "U3B shortcut reference matches clipboard resize octave select empty guidance",
+      "status": "FAIL",
+      "detail": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('audio-ui-piano-roll-note[note-id=\"eval-0\"]')\u001b[22m\n\u001b[2m    - locator resolved to <audio-ui-piano-roll-note tabindex=\"0\" role=\"button\" note-id=\"eval-0\" aria-pressed=\"false\" aria-label=\"C#4, 1.5 to 1.75\">…</audio-ui-piano-roll-note>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <audio-ui-piano-roll-note tabindex=\"0\" role=\"button\" aria-pressed=\"false\" aria-label=\"C#4, 1.63 to 2\" note-id=\"event-ce44e4cf-e1f5-409c-af3d-cc9eb8c8fc39\">…</audio-ui-piano-roll-note> intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <audio-ui-piano-roll-note tabindex=\"0\" role=\"button\" aria-pressed=\"false\" aria-label=\"C#4, 1.63 to 2\" note-id=\"event-ce44e4cf-e1f5-409c-af3d-cc9eb8c8fc39\">…</audio-ui-piano-roll-note> intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    55 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <audio-ui-piano-roll-note tabindex=\"0\" role=\"button\" aria-pressed=\"false\" aria-label=\"C#4, 1.63 to 2\" note-id=\"event-ce44e4cf-e1f5-409c-af3d-cc9eb8c8fc39\">…</audio-ui-piano-roll-note> intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n    at C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\v4-ergonomics-probe.cjs:6:410\n    at async check (C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\v4-ergonomics-probe.cjs:3:81)\n    at async C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\v4-ergonomics-probe.cjs:6:1"
+    },
+    {
+      "name": "M5B actual overflowing mixer retains unrelated scroll after edit",
+      "status": "PASS",
+      "detail": {
+        "scroll": 160
+      }
+    }
+  ],
+  "errors": []
+}

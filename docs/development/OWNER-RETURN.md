@@ -8,6 +8,15 @@ verified archive restore. Open port 8767 for that workspace. See
 [UI verification](../../evidence/ui/desktop/REPORT.md).
 The G2–G5 checkpoint below describes its historical integration delivery.
 
+The BandLab-referenced presentation is implemented at `5df27f6`: compact top
+transport, track-side controls and one Piano/Mixer/Devices dock. It retains
+audio/ui and WaveSurfer. Updated direct browser verification passed 23 checks;
+backend regression passed 62 with one optional native-plugin skip. The frozen
+rubric remains unchanged. Round 03's 98/100 is the preceding functional
+checkpoint; consult [round 04](../../evidence/evaluation/round-04/REPORT.md) for
+the presentation candidate's separate independent result and remaining issues.
+The running fork is [Glass Current Studio](http://127.0.0.1:8767/).
+
 The G1 development milestone is owner-accepted. Its original Night Circuit
 master and arrangement preview retain their recorded feedback and identities.
 Use the `adaw/g2-g5` branch. Its latest checkpoint and the tested code commit

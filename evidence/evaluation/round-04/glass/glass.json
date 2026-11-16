@@ -1,0 +1,52 @@
+{
+  "checks": [
+    {
+      "name": "F3A Space Home ruler waveform section text isolation",
+      "status": "FAIL",
+      "detail": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(await page.locator('#audio').evaluate(e=>e.currentTime)>1)\n\n    at C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\v4-glass-probe.cjs:5:504\n    at async check (C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\v4-glass-probe.cjs:3:81)\n    at async C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\v4-glass-probe.cjs:5:1"
+    },
+    {
+      "name": "F3B tempo meter sample boundaries fullsong",
+      "status": "FAIL",
+      "detail": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '— BPM'\n- '120 BPM · 4/4'\n\n    at C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\v4-glass-probe.cjs:6:661\n    at async check (C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\v4-glass-probe.cjs:3:81)\n    at async C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\v4-glass-probe.cjs:6:1"
+    },
+    {
+      "name": "F4A visible loop wraps stop restarts no source mutation",
+      "status": "FAIL",
+      "detail": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#loop')\u001b[22m\n\u001b[2m    - locator resolved to <button disabled id=\"loop\" type=\"button\" aria-pressed=\"false\" title=\"Loop intro (16 beats)\">Loop</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    51 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n    at C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\v4-glass-probe.cjs:7:184\n    at async check (C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\v4-glass-probe.cjs:3:81)\n    at async C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\v4-glass-probe.cjs:7:1"
+    },
+    {
+      "name": "F4B identified AB preserves position and stale identity",
+      "status": "PASS",
+      "detail": {
+        "a": "rev-d5125b81c64cde95cecae7c48b071781152d743ae6a2f6f53782599096cb21e5 · rendition-bcaf66f1960e440c83639ad555bdc709",
+        "b": "rev-d5125b81c64cde95cecae7c48b071781152d743ae6a2f6f53782599096cb21e5 · rendition-3f49a82c05a648e799a4f7344a828f09",
+        "state": "Edits to hear · Audition"
+      }
+    },
+    {
+      "name": "U5A complete song search zoom playback no errors",
+      "status": "PASS",
+      "detail": 162.307688
+    },
+    {
+      "name": "U2A 1440 and1280 identifiable names selection and active editor",
+      "status": "PASS"
+    },
+    {
+      "name": "U5B 390 no overflow reachable playback review local-only",
+      "status": "PASS"
+    },
+    {
+      "name": "S3B exact export hash actual playback unchanged source",
+      "status": "PASS",
+      "detail": {
+        "hash": "ac56815f8cfbf86a8153e8231d110f7a8ebb679d685e367ac8e2638a574e362b",
+        "revision": "rev-b9147b180d54c340ee1a0e040e7faa6c0486b230360015d417de691198cae63e"
+      }
+    }
+  ],
+  "errors": [],
+  "remote": [],
+  "revision": "rev-b9147b180d54c340ee1a0e040e7faa6c0486b230360015d417de691198cae63e"
+}

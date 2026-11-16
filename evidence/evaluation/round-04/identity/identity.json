@@ -1,0 +1,15 @@
+{
+  "initial": "rev-b9147b180d54c340ee1a0e040e7faa6c0486b230360015d417de691198cae63e · rendition-007bf8c32b2e40ec82070d0f493b493b",
+  "historical": {
+    "id": "rendition-559e5ebec8da4cc2b926d49e2a9b9ab0",
+    "revision": "rev-a6f7a2d291c32f6d780e5d3f2bea89ff225136aed8de9d9d8dbfaee5bc788b1c"
+  },
+  "during": {
+    "src": "/api/v1/renditions/rendition-007bf8c32b2e40ec82070d0f493b493b/audio",
+    "text": "Loading mix…",
+    "title": "",
+    "state": "Loading mix…"
+  },
+  "after": "rev-a6f7a2d291c32f6d780e5d3f2bea89ff225136aed8de9d9d8dbfaee5bc788b1c · rendition-559e5ebec8da4cc2b926d49e2a9b9ab0",
+  "status": "PASS"
+}
