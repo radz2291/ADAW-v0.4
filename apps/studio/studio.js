@@ -21,6 +21,9 @@ const ui = {
   rendition: null,
   loadedAudio: null,
   audioRequest: 0,
+  audioLoading: false,
+  resumeOnLoad: false,
+  playback: null,
   waveRequest: null,
   measurements: new Map(),
 };
@@ -500,14 +503,21 @@ function stage(operation, reason) {
       redoStack = [];
       await refresh({viewHead:true});
       settleMix(commandId); syncMix();
-      failedEdits.delete(commandId); syncRetry();
+      failedEdits.delete(commandId);
+      const savedFields=new Set(operations.map(mixKey).filter(Boolean));
+      for(const [failedId,retry] of failedEdits) {
+        if(retry.mixKeys?.length&&retry.mixKeys.every(key=>key&&savedFields.has(key)))failedEdits.delete(failedId);
+      }
+      syncRetry();
       notice('');
     } catch (error) {
       settleMix(commandId); syncMix();
-      failedEdits.set(commandId, () => {
+      const retry = () => {
         markMix(operations,commandId,true); syncMix();
         return enqueue(work).catch(()=>{});
-      });
+      };
+      retry.mixKeys=operations.map(mixKey);
+      failedEdits.set(commandId,retry);
       syncRetry();
       throw error;
     }
@@ -663,7 +673,7 @@ function updateTransport() {
   position.max = duration;
   position.value = Math.min(audio.currentTime, duration);
   position.disabled = !duration;
-  byId("play").disabled = !ui.loadedAudio;
+  byId("play").disabled = !ui.loadedAudio || ui.audioLoading;
   byId("play").textContent = audio.paused ? "Play" : "Pause";
   byId("time").textContent = `${timestamp(audio.currentTime)} / ${timestamp(duration)}`;
   desktop.sync();
@@ -708,34 +718,50 @@ async function loadWaveform(id, signal) {
 
 async function loadRendition({ preserve = false } = {}) {
   const id = byId(`rendition-${ui.slot}`).value;
-  for (const slot of ["a", "b"]) byId(`ab-${slot}`).setAttribute("aria-pressed", slot === ui.slot);
-  const time = preserve ? audio.currentTime : 0;
-  const resume = preserve && !audio.paused;
-  const request = ++ui.audioRequest;
+  const previous=ui.playback;
+  const time=preserve?audio.currentTime:0;
+  const resume=preserve&&(ui.audioLoading?ui.resumeOnLoad:!audio.paused);
+  const request=++ui.audioRequest;
   ui.waveRequest?.abort();
-  ui.rendition = null;
-  ui.loadedAudio = id || null;
-  drawWaveform();
-  drawQuality();
+  ui.resumeOnLoad=resume;
+  ui.audioLoading=Boolean(id);
+  ui.rendition=null;
+  ui.loadedAudio=id||null;
+  byId('audio-context').removeAttribute('title');
+  byId('audio-context').textContent=id?'Loading mix…':'Choose a mix to audition.';
+  for(const slot of ['a','b'])byId(`ab-${slot}`).setAttribute('aria-pressed',slot===ui.slot);
   audio.pause();
-  if (!id) {
-    audio.removeAttribute("src");
-    audio.load();
-    byId("audio-context").textContent = "Choose a rendition to audition.";
-    updateTransport();
-    return;
+  drawWaveform();drawQuality();updateTransport();
+  if(!id) {
+    ui.playback=null;audio.removeAttribute('src');audio.load();return;
   }
-  byId("audio-context").textContent = `Loading ${short(id)}…`;
-  audio.src = playSource(id);
-  if (time) {
-    audio.addEventListener("loadedmetadata", () => {
-      if (request === ui.audioRequest) audio.currentTime = Math.min(time, audio.duration || time);
-    }, { once: true });
+  let rendition;
+  try {
+    // Resolve identity before replacing audio. A failed lookup leaves the last
+    // verified bytes intact; an in-flight take never inherits a "latest" label.
+    rendition=await api(`/renditions/${idPath(id)}`);
+  } catch(error) {
+    if(request!==ui.audioRequest)return;
+    ui.audioLoading=false;
+    ui.rendition=previous?.rendition??null;ui.loadedAudio=previous?.id??null;
+    if(previous) {
+      ui.slot=previous.slot;byId(`rendition-${ui.slot}`).value=previous.id;
+      for(const slot of ['a','b'])byId(`ab-${slot}`).setAttribute('aria-pressed',slot===ui.slot);
+      byId('audio-context').textContent='Previous mix';
+      byId('audio-context').title=`${previous.rendition.revision} · ${previous.id}`;
+      ui.waveRequest=new AbortController();loadWaveform(previous.id,ui.waveRequest.signal).catch(()=>{});
+      if(ui.resumeOnLoad)audio.play().catch(()=>{});
+    } else byId('audio-context').textContent='Audio unavailable · try again';
+    drawQuality();updateTransport();throw error;
   }
-  if (resume) audio.play().catch(() => {});
-  const rendition = await api(`/renditions/${idPath(id)}`);
-  if (request !== ui.audioRequest) return;
-  ui.rendition = rendition;
+  if(request!==ui.audioRequest)return;
+  audio.src=playSource(id);
+  if(time)audio.addEventListener('loadedmetadata',()=>{
+    if(request===ui.audioRequest)audio.currentTime=Math.min(time,audio.duration||time);
+  },{once:true});
+  ui.rendition=rendition;ui.audioLoading=false;
+  ui.playback={id,rendition,slot:ui.slot};
+  if(ui.resumeOnLoad)audio.play().catch(()=>{});
   monitor.setMode('render');
   monitor.updateSource(mixSource());
   api(`/renditions/${idPath(id)}/monitor`).then(manifest => {

@@ -240,6 +240,10 @@ export function createDesktop({ ui, audio, byId, node, button, label, trackColor
     if (!source()) return;
     const matches = matching();
     const state = byId('playback-state');
+    if(ui.audioLoading) {
+      state.textContent='Loading mix…';state.classList.remove('stale');
+      byId('loop').disabled=true;byId('musical-position').textContent='—';byId('tempo-display').textContent='— BPM';return;
+    }
     state.textContent = !ui.rendition ? 'Ready to audition' : matches ? 'Latest mix' : 'Edits to hear · Audition';
     state.classList.toggle('stale',!!ui.rendition&&!matches);
     byId('loop').disabled=!matches||!Number.isFinite(audio.duration);
@@ -289,7 +293,7 @@ export function createDesktop({ ui, audio, byId, node, button, label, trackColor
   });
   byId('piano-section').addEventListener('change',e=>selectSection(e.target.value));
   byId('arrangement-timeline').addEventListener('change',e=>{if(e.target===byId('arrangement-timeline'))seek(e.detail.value);});
-  byId('stop').addEventListener('click',()=>{audio.pause();if(ui.loadedAudio)audio.currentTime=0;});
+  byId('stop').addEventListener('click',()=>{ui.resumeOnLoad=false;audio.pause();if(ui.loadedAudio)audio.currentTime=0;});
   byId('loop').addEventListener('click',()=>{
     looping=!looping;byId('loop').setAttribute('aria-pressed',String(looping));
     if(looping)seek(section().start_tick);
