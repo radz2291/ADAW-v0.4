@@ -1,11 +1,28 @@
 import WaveSurfer from 'wavesurfer.js';
+import { createChannelControls } from './channels.js';
+import { soundIdentity } from './monitor.js';
 
-// View policy, not audio-engine limits. Existing values outside fader travel expand it.
-const FADER = { min: -60, max: 12, step: .1 };
 
 export function createDesktop({ ui, audio, byId, node, button, label, trackColors, stage, notice,
   selectTrack, currentTrack, drawInspector, tickAtTime, timeChanges, liveMix, mixEntity }) {
-  let dock = 'mixer', sectionId = null, looping = false, wave = null, snap=.25, drawMode=false, group=null;
+  let dock = localStorage.getItem('adaw.studio.dock.v1') || 'piano', sectionId = null, looping = false, wave = null, snap=.25, drawMode=false, group=null;
+  let trackWaves=null;
+  function drawTrackWaveforms() {
+    for(const old of document.querySelectorAll('.track-waveform'))old.remove();
+    for(const lane of document.querySelectorAll('.has-waveform'))lane.classList.remove('has-waveform');
+    if(!source()||trackWaves?.key!==soundIdentity(source()))return;
+    for(const [id,peaks]of Object.entries(trackWaves.tracks)) {
+      const lane=document.querySelector(`.timeline-row[data-track-id="${CSS.escape(id)}"] .lane`);if(!lane)continue;
+      const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+      svg.setAttribute('class','track-waveform');svg.setAttribute('viewBox',`0 0 ${peaks.length} 100`);
+      svg.setAttribute('preserveAspectRatio','none');svg.setAttribute('aria-hidden','true');
+      const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d',peaks.map((value,i)=>`M${i},${50-Math.min(1,value)*45}V${50+Math.min(1,value)*45}`).join(''));
+      path.setAttribute('stroke','currentColor');path.setAttribute('stroke-width','1');svg.append(path);lane.append(svg);
+      lane.classList.add('has-waveform');
+    }
+  }
+  function setTrackWaveforms(value){trackWaves=value;drawTrackWaveforms();}
   const source = () => ui.view?.source;
   const section = () => source()?.sections.find(s => s.id === sectionId) ?? source()?.sections[0];
   const matching = () => ui.rendition?.revision === ui.view?.revision;
@@ -45,79 +62,37 @@ export function createDesktop({ ui, audio, byId, node, button, label, trackColor
       classes:'browser-section', attrs:{'aria-pressed': section()?.id === s.id, title: `${label(s.id)} · ${s.mood}`}
     }));
     root.append(node('h3', {text:'DEVICES', classes:'browser-heading'}));
-    root.append(button('Instruments & effects', () => {ui.inspector = 'plugins'; drawInspector();}, {classes:'browser-section'}));
+    root.append(button('Instruments & effects', () => selectDock('devices'), {classes:'browser-section'}));
   }
-  let mixerUpdates = [];
-  function syncMixer() { for (const update of mixerUpdates) update(); }
+  let mixerUpdates=[],railUpdates=[];
+  function syncMixer(){for(const update of [...mixerUpdates,...railUpdates])update();}
+  const controls=(entity,kind,key,compact=false)=>createChannelControls({entity,kind,key,compact,
+    title:label(entity.id??'master'),readOnly:ui.view.revision!==ui.snapshot.project.revision,node,button,stage,liveMix,mixEntity});
+  function beginTrackHeaders(){railUpdates=[];}
+  function trackHeader(track,trackButton) {
+    const root=node('div',{classes:'track-strip-header'}),heading=node('div',{classes:'track-heading'});
+    heading.append(trackButton);root.append(heading);
+    const parts=controls(track,'set_track_gain','track_id',true),tools=node('div',{classes:'track-header-controls'});
+    const devices=button('Devices',()=>{selectTrack(track);selectDock('devices');},{classes:'track-devices',attrs:{title:`${label(track.id)} instrument and effects`}});
+    heading.append(parts.toggles);tools.append(parts.fader,parts.number,parts.pan,devices);root.append(tools);railUpdates.push(parts.sync);
+    return root;
+  }
   function drawMixer() {
-    mixerUpdates = [];
-    const root = byId('mix-console'), scroll=root.scrollLeft; root.replaceChildren();
-    if (!source()) return;
-    const readOnly = ui.view.revision !== ui.snapshot.project.revision;
-    const add = (entity, kind, key, color, index) => {
-      const shown = mixEntity(entity,key), toggles = [];
-      let pan;
-      const title = label(entity.id ?? 'master');
-      const strip = node('section', {classes:'channel-strip', attrs:{'aria-label':`${title} channel`}});
-      strip.style.setProperty('--track-color', color);
-      strip.classList.toggle('selected', entity.id === ui.trackId);
-      const heading = key === 'track_id'
-        ? button(title, () => selectTrack(entity), {classes:'channel-name',attrs:{title}})
-        : node('h3', {text:title, classes:'channel-name',attrs:{title}});
-      strip.append(node('span',{text:String(index).padStart(2,'0'),classes:'channel-number'}), heading);
-      strip.append(node('p',{text:key==='track_id' ? `→ ${label(entity.bus)}` : 'BUS / OUTPUT',classes:'channel-route'}));
-      const fader = node('audio-ui-fader', {attrs:{min:Math.min(FADER.min, shown.gain_db), max:Math.max(FADER.max, shown.gain_db),
-        step:FADER.step, 'default-value':shown.gain_db, 'data-entity': entity.id ?? 'master'}});
-      fader.value = shown.gain_db;
-      fader.toggleAttribute('disabled', readOnly);
-      const control = node('audio-ui-fader-control');
-      const track = node('audio-ui-fader-track'); track.append(node('audio-ui-fader-indicator'));
-      control.append(track, node('audio-ui-fader-thumb',{attrs:{'aria-label':`${title} source gain in dB`}}));
-      fader.append(control);
-      const readout = node('input', {classes:'gain-readout',attrs:{type:'number',step:.1,'aria-label':`${title} gain in dB`}});
-      readout.value=shown.gain_db; readout.disabled=readOnly;
-      const commit=value=>{const op=key?{kind,[key]:entity.id,value}:{kind,value};liveMix(op);stage(op,`Adjust ${title} gain`);};
-      readout.addEventListener('change',()=>{if(readout.checkValidity()&&Number.isFinite(readout.valueAsNumber))commit(readout.valueAsNumber);});
-      const reset=button('0 dB',()=>commit(0),{disabled:readOnly,attrs:{title:`Reset ${title} gain`}});
-      fader.addEventListener('input', e => {
-        if (readOnly) return e.preventDefault();
-        if (e.detail) { readout.value = e.detail.value.toFixed(1); liveMix(key ? {kind,[key]:entity.id,value:e.detail.value} : {kind,value:e.detail.value}); }
-      });
-      fader.addEventListener('change', e => {
-        if (!e.detail || readOnly) return;
-        const value = Math.round(e.detail.value * 10) / 10;
-        readout.value = value;
-        if (value !== shown.gain_db) stage(key ? {kind, [key]:entity.id, value} : {kind,value}, `Set ${title} gain to ${value} dB`);
-      });
-      if(key==='track_id') {
-        const channelButtons=node('div',{classes:'channel-buttons'});
-        for(const field of ['mute','solo']) {
-          const toggle=button(field==='mute'?'M':'S',()=>{
-            const op={kind:`set_track_${field}`,track_id:entity.id,value:!mixEntity(entity,key)[field]};
-            liveMix(op);stage(op,`${field} ${title}`);
-          },{disabled:readOnly,attrs:{'aria-label':`${field==='mute'?'Mute':'Solo'} ${title}`,'aria-pressed':!!shown[field],title:field==='mute'?'Mute (takes priority over Solo)':'Solo (multiple tracks can be soloed)'}});
-          toggles.push([field,toggle]);channelButtons.append(toggle);
-        }
-        strip.append(channelButtons);
-        pan=node('input',{attrs:{type:'range',min:-1,max:1,step:.01,'aria-label':`${title} pan`}});pan.value=shown.pan;pan.disabled=readOnly;
-        pan.addEventListener('input',()=>liveMix({kind:'set_track_pan',track_id:entity.id,value:pan.valueAsNumber}));
-        pan.addEventListener('change',()=>stage({kind:'set_track_pan',track_id:entity.id,value:pan.valueAsNumber},`Pan ${title}`));
-        strip.append(pan,button('Center',()=>{const op={kind:'set_track_pan',track_id:entity.id,value:0};liveMix(op);stage(op,`Center ${title}`);},{disabled:readOnly,attrs:{title:'Reset pan to center'}}));
-      }
-      mixerUpdates.push(()=>{
-        const current=mixEntity(entity,key);
-        fader.value=current.gain_db;
-        if(document.activeElement!==readout)readout.value=current.gain_db;
-        if(pan && document.activeElement!==pan)pan.value=current.pan;
-        for(const [field,toggle] of toggles)toggle.setAttribute('aria-pressed',String(!!current[field]));
-      });
-      strip.append(fader, readout, reset);
-      root.append(strip);
+    mixerUpdates=[];const root=byId('mix-console'),scroll=root.scrollLeft;root.replaceChildren();
+    if(!source())return;
+    const add=(entity,kind,key,color,index)=>{
+      const title=label(entity.id??'master'),strip=node('section',{classes:'channel-strip',attrs:{'aria-label':`${title} channel`}});
+      strip.style.setProperty('--track-color',color);strip.classList.toggle('selected',entity.id===ui.trackId);
+      const heading=key==='track_id'?button(title,()=>selectTrack(entity),{classes:'channel-name',attrs:{title}}):node('h3',{text:title,classes:'channel-name',attrs:{title}});
+      strip.append(node('span',{text:String(index).padStart(2,'0'),classes:'channel-number'}),heading,
+        node('p',{text:key==='track_id'?`→ ${label(entity.bus)}`:'BUS / OUTPUT',classes:'channel-route'}));
+      const parts=controls(entity,kind,key);
+      if(parts.pan)strip.append(parts.toggles,parts.pan,parts.center);
+      strip.append(parts.fader,parts.number,parts.reset);mixerUpdates.push(parts.sync);root.append(strip);
     };
-    source().tracks.forEach((t,i) => add(t,'set_track_gain','track_id',trackColors[t.role.toLowerCase()]??'#91a6c0',i+1));
-    source().buses.forEach((b,i) => add(b,'set_bus_gain','bus_id','#a597d1',source().tracks.length+i+1));
-    add(source().master,'set_master_gain',null,'#c7df8b',source().tracks.length+source().buses.length+1);
-    root.scrollLeft=scroll;
+    source().tracks.forEach((t,i)=>add(t,'set_track_gain','track_id',trackColors[t.role.toLowerCase()]??'#91a6c0',i+1));
+    source().buses.forEach((b,i)=>add(b,'set_bus_gain','bus_id','#a597d1',source().tracks.length+i+1));
+    add(source().master,'set_master_gain',null,'#c7df8b',source().tracks.length+source().buses.length+1);root.scrollLeft=scroll;
   }
   function drawPiano() {
     const root = byId('piano-editor'); const oldScroll=root.querySelector('audio-ui-timeline-viewport')?.scrollLeft??0; root.replaceChildren();
@@ -166,6 +141,16 @@ export function createDesktop({ ui, audio, byId, node, button, label, trackColor
     toolbar.append(node('span',{text:track.protected?'Protected track':`${label(track.id)} · ${events.length} notes`,classes:'piano-info',attrs:{title:label(track.id)}}));
     root.append(toolbar,timeline);
     roll.value=notes;
+    // Keyboard transposition is limited by MIDI, not the current viewport.
+    roll.addEventListener('keydown', e => {
+      if(!['ArrowUp','ArrowDown'].includes(e.key)||e.target.closest('input,select,textarea'))return;
+      const delta=(e.key==='ArrowUp'?1:-1)*(e.shiftKey?12:1);
+      const selected=roll.value.filter(n=>roll.selection.includes(n.id));
+      if(!selected.length)return;
+      const targets=selected.map(n=>Math.max(0,Math.min(127,n.pitch+delta)));
+      roll.setAttribute('min-pitch',Math.min(Number(roll.getAttribute('min-pitch')),Math.max(0,Math.min(...targets)-2)));
+      roll.setAttribute('max-pitch',Math.max(Number(roll.getAttribute('max-pitch')),Math.min(127,Math.max(...targets)+2)));
+    },true);
     roll.selection=(ui.selection?.length?ui.selection:[ui.eventId]).filter(id=>notes.some(n=>n.id===id));
     viewport.scrollLeft=oldScroll;
     roll.addEventListener('noteselect', e => {
@@ -229,7 +214,7 @@ export function createDesktop({ ui, audio, byId, node, button, label, trackColor
     const picker = byId('piano-section'); picker.replaceChildren();
     for (const s of source().sections) picker.add(new Option(label(s.id),s.id));
     picker.value=sectionId;
-    drawBrowser(); drawMixer(); drawGroup(); if(dock==='piano') drawPiano(); sync();
+    drawBrowser(); drawMixer(); drawGroup(); byId('dock-context').textContent=dock==='devices'?'Instrument & effects':dock==='mixer'?'Mix console':label(currentTrack()?.id); if(dock==='piano') drawPiano(); sync();
   }
   function selectSection(id) {
     sectionId=id; byId('piano-section').value=id;
@@ -283,14 +268,25 @@ export function createDesktop({ ui, audio, byId, node, button, label, trackColor
   byId('toggle-review').addEventListener('click',()=>{
     const p=byId('review-panel');p.hidden=!p.hidden;byId('toggle-review').setAttribute('aria-pressed',String(!p.hidden));
   });
-  for(const b of document.querySelectorAll('[data-dock]')) b.addEventListener('click',()=>{
-    dock=b.dataset.dock;
-    for(const tab of document.querySelectorAll('[data-dock]'))tab.setAttribute('aria-pressed',String(tab===b));
+  function closeReview() {
+    byId('review-panel').hidden=true;
+    byId('toggle-review').setAttribute('aria-pressed','false');
+    byId('toggle-review').focus();
+  }
+  byId('close-review').addEventListener('click',closeReview);
+  function selectDock(next) {
+    dock=['piano','mixer','devices'].includes(next)?next:'piano';
+    document.body.dataset.dockView=dock;
+    localStorage.setItem('adaw.studio.dock.v1',dock);
+    for(const tab of document.querySelectorAll('[data-dock]'))tab.setAttribute('aria-pressed',String(tab.dataset.dock===dock));
     byId('mix-console').hidden=dock!=='mixer';byId('piano-editor').hidden=dock!=='piano';
     byId('piano-section-label').hidden=dock!=='piano';
-    byId('dock-context').textContent=dock==='mixer'?'Adjust your mix · Audition for the finished sound':'Double-click to add · Drag to move · Audition to hear';
+    byId('dock-context').textContent=dock==='devices'?'Instrument & effects':dock==='mixer'?'Mix console':currentTrack()?label(currentTrack().id):'Select a track';
+    ui.inspector=dock==='devices'?'plugins':'edit';drawInspector();
     if(dock==='piano')drawPiano();
-  });
+    document.dispatchEvent(new CustomEvent('studio:dockchange',{detail:{dock}}));
+  }
+  for(const b of document.querySelectorAll('[data-dock]'))b.addEventListener('click',()=>selectDock(b.dataset.dock));
   byId('piano-section').addEventListener('change',e=>selectSection(e.target.value));
   byId('arrangement-timeline').addEventListener('change',e=>{if(e.target===byId('arrangement-timeline'))seek(e.detail.value);});
   byId('stop').addEventListener('click',()=>{ui.resumeOnLoad=false;audio.pause();if(ui.loadedAudio)audio.currentTime=0;});
@@ -299,7 +295,13 @@ export function createDesktop({ ui, audio, byId, node, button, label, trackColor
     if(looping)seek(section().start_tick);
   });
   document.addEventListener('keydown',e=>{
-    if(e.target.closest('input,select,textarea,[contenteditable="true"]')||byId('help-dialog').open)return;
+    if(byId('help-dialog').open)return;
+    if(e.key==='Escape'&&(!byId('review-panel').hidden||byId('playback-details').open)) {
+      if(!byId('review-panel').hidden)closeReview();
+      else {byId('playback-details').open=false;byId('playback-details').querySelector('summary').focus();}
+      e.preventDefault();e.stopImmediatePropagation();return;
+    }
+    if(e.target.closest('input,select,textarea,[contenteditable="true"]'))return;
     const roll=byId('piano-editor').querySelector('audio-ui-piano-roll');
     if(e.key==='Escape') {
       group=null;ui.selection=[];ui.eventId=null;
@@ -320,5 +322,6 @@ export function createDesktop({ ui, audio, byId, node, button, label, trackColor
       fader.toggleAttribute('disabled', ui.view?.revision !== ui.snapshot?.project.revision);
     }
   }
-  return {draw,sync,syncMixer,waveform,selectSection,selectGroup,showReview,setBusy};
+  selectDock(dock);
+  return {draw,sync,syncMixer,setTrackWaveforms,drawTrackWaveforms,waveform,selectSection,selectGroup,selectDock,beginTrackHeaders,trackHeader,showReview,setBusy};
 }

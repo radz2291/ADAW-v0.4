@@ -1,77 +1,121 @@
-/* Everyday workspace. These are view defaults; no musical values live in CSS. */
-:root { --arrangement-height: 260px; }
+/* One viewport, one arrangement, one contextual editor. No musical state here. */
+:root { --arrangement-height: 320px; }
+html { height: 100%; }
 html, body { max-width: 100%; }
-.topbar { background: #1c2025; }
-.panel { box-shadow: none; border-color: #343b44; }
-.panel-heading { background: #20252b; }
-.workspace { grid-template-columns: 176px minmax(0, 1fr) 256px; }
-.workspace.browser-hidden { grid-template-columns: minmax(0, 1fr) 256px; }
-.workspace.inspector-hidden { grid-template-columns: 176px minmax(0, 1fr); }
-.workspace.browser-hidden.inspector-hidden { grid-template-columns: minmax(0, 1fr); }
-.timeline-viewport { height: var(--arrangement-height); max-height: none; }
-.browser, .inspector { min-width: 0; overflow: hidden; }
-#browser-content { min-height: 140px; max-height: calc(var(--arrangement-height) + 8px); }
-.inspector-content { min-height: 140px; max-height: calc(var(--arrangement-height) + 52px); }
-.desktop-tools { height: auto; min-height: 36px; flex-wrap: wrap; gap: 7px 14px; }
-.desktop-tools nav { flex-wrap: wrap; }
-#pane-divider { height: 24px; display: flex; align-items: center; justify-content: center;
-  cursor: ns-resize; touch-action: none; user-select: none; color: #87929f;
-  margin: 0; outline-offset: -3px; }
-#pane-divider::before { content: ''; width: 52px; height: 3px; border-radius: 3px; background: #515c69; }
-#pane-divider:hover::before, #pane-divider.resizing::before, #pane-divider:focus-visible::before { background: var(--accent); }
-#pane-divider + .dock { margin-top: 0; }
-.dock-heading { flex-wrap: wrap; min-height: 40px; gap: 6px 12px; }
-.dock-heading nav { flex-wrap: wrap; }
-#help-dialog { width: min(640px, calc(100vw - 32px)); max-height: calc(100vh - 48px);
-  border: 1px solid #596472; border-radius: 6px; padding: 20px; background: #20252b;
-  color: #e5ebf2; box-shadow: 0 16px 80px #0009; overflow: auto; }
+body { height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+.topbar { flex: none; height: 48px; min-height: 48px; padding: 5px 14px; gap: 20px; background: #1a1e24; }
+.identity { border: 0; padding-right: 10px; flex: none; gap: 6px; }
+.project-identity { min-width: 0; }
+.project-identity h1, #project-context { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.top-actions { flex-wrap: nowrap; gap: 4px; }
+main { display: flex; flex-direction: column; flex: 1; min-height: 0; width: 100%; max-width: none; padding: 0; margin: 0; overflow: hidden; }
+.transport { flex: none; position: relative; z-index: 40; }
+.notice { flex: none; max-height: 80px; overflow: auto; }
+.workspace { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 0; align-items: stretch; flex: 0 1 auto; min-height: 170px; overflow: hidden; }
+.workspace.browser-hidden { grid-template-columns: minmax(0, 1fr); }
+.arrangement { min-width: 0; min-height: 0; border: 0; display: flex; flex-direction: column; overflow: hidden; }
+.arrangement-heading, .group-tools { flex: none; }
+#arrangement-timeline { min-height: 0; flex: 1 1 auto; }
+.timeline-viewport { height: var(--arrangement-height); max-height: 100%; }
+.browser { display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; border: 0; border-right: 1px solid var(--line); }
+#browser-search { flex: none; }
+#browser-content { min-height: 0; max-height: none; overflow: auto; flex: 1; }
+#pane-divider { height: 24px; min-height: 24px; flex: none; display: flex; align-items: center; justify-content: center; cursor: ns-resize; touch-action: none; user-select: none; color: #87929f; background: #1a1e25; border-block: 1px solid #323a44; margin: 0; outline-offset: -3px; }
+#pane-divider::before { content: ''; width: 52px; height: 3px; border-radius: 3px; background: #4d5968; }
+#pane-divider:hover::before, #pane-divider.resizing::before, #pane-divider:focus-visible::before { background: #b4c6d8; }
+.dock { flex: 1 1 240px; min-height: 190px; display: flex; flex-direction: column; margin: 0; border: 0; overflow: hidden; }
+.dock-heading { flex: none; flex-wrap: nowrap; }
+.dock-body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); overflow: hidden; }
+#mix-console, #piano-editor { height: 100%; min-width: 0; min-height: 0; max-width: 100%; overflow: auto; }
+#piano-editor { background: #1c222b; container-type: size; }
+.channel-strip { min-height: 233px; }
+#inspector-panel { display: flex; flex-direction: column; min-height: 0; min-width: 0; margin: 0; border: 0; border-left: 1px solid #46515f; overflow: hidden; }
+.inspector-content { flex: 1; min-height: 0; max-height: none; overflow: auto; }
+body[data-dock-view=piano] .dock-body:has(#inspector-panel:not([hidden])) { grid-template-columns: minmax(0, 1fr) 260px; }
+body[data-dock-view=mixer] #inspector-panel,
+body[data-dock-view=mixer] #piano-editor,
+body[data-dock-view=devices] #mix-console,
+body[data-dock-view=devices] #piano-editor,
+body[data-dock-view=piano] #mix-console { display: none; }
+body:not([data-dock-view=piano]) #toggle-inspector { display: none; }
+body[data-dock-view=devices] #inspector-panel { border-left: 0; }
+body[data-dock-view=devices] #inspector-panel > .panel-heading { display: none; }
+.review { position: fixed; z-index: 70; top: 180px; right: 12px; bottom: 12px; width: min(570px, calc(100vw - 24px)); margin: 0; border: 1px solid #566372; border-radius: 5px; background: #222a34; overflow: auto; box-shadow: 0 12px 40px #0008; }
+.review-grid { grid-template-columns: minmax(0, 1fr); }
+.review-grid > section + section { border-left: 0; border-top: 1px solid var(--line); }
+#help-dialog { width: min(640px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); border: 1px solid #596472; border-radius: 6px; padding: 20px; background: #202833; color: #e5ebf2; box-shadow: 0 16px 80px #0009; overflow: auto; }
 #help-dialog::backdrop { background: #080c10b3; }
 #help-dialog h2 { font-size: 17px; margin-bottom: 12px; }
 #help-dialog p { margin-block: 10px; color: #c0cbd6; }
-#help-dialog ul { padding-left: 22px; line-height: 1.7; }
-#help-dialog kbd { font: 11px Consolas, monospace; background: #343d47; border: 1px solid #596371;
-  border-radius: 3px; padding: 2px 5px; white-space: nowrap; }
 #help-dialog button { margin-top: 12px; }
-#help-dialog dl { display: grid; grid-template-columns: 145px 1fr; gap: 10px; font-size: 12px; }
-#help-dialog dd { margin: 0; color: #c0cbd6; }
-.transport-sources { min-width: 0; }
-.transport-sources label, .transport-sources select { min-width: 0; max-width: 100%; }
-.audio-context { min-width: 0; }
 @media (max-width: 1100px) {
-  .workspace { grid-template-columns: 150px minmax(0, 1fr) 230px; }
-  .workspace.browser-hidden { grid-template-columns: minmax(0, 1fr) 230px; }
-  .workspace.inspector-hidden { grid-template-columns: 150px minmax(0, 1fr); }
+  .topbar { gap: 10px; }
+  #project-context { max-width: 38vw; }
+  .transport-main { gap: 8px; }
+  .transport-position { gap: 8px; padding-inline: 9px; }
+  .save-feedback { gap: 7px; }
+  #timeline-context { display: none; }
+  #dock-context { max-width: 260px; }
+  body[data-dock-view=piano] .dock-body:has(#inspector-panel:not([hidden])) { grid-template-columns: minmax(0, 1fr) 240px; }
 }
 @media (max-width: 850px) {
-  .workspace, .workspace.browser-hidden, .workspace.inspector-hidden,
-  .workspace.browser-hidden.inspector-hidden { grid-template-columns: minmax(0, 1fr); }
-  .browser:not([hidden]) { display: flex; max-height: 230px; }
-  #browser-content { min-height: 60px; max-height: 145px; }
-  .browser-footer { display: none; }
-  #toggle-browser { display: inline-block; }
-  .inspector-content { min-height: 70px; max-height: 220px; }
-  .topbar { height: auto; min-height: 65px; flex-wrap: wrap; }
-  .project-identity { min-width: 0; flex-basis: 180px; }
-  .top-actions { margin-left: auto; }
+  :root { --track-width: 200px; }
+  .transport-main { flex-wrap: wrap; gap: 5px 9px; }
+  .transport-main #position { flex: 1 1 100px; }
+  .listening-control { margin-left: auto; }
+  .transport-meta { flex-wrap: wrap; gap: 3px 9px; }
+  .save-feedback { flex: 1; }
+  #dock-context { display: none; }
+  .dock-heading { gap: 7px; }
+  .workspace { grid-template-columns: 170px minmax(0, 1fr); }
+  .arrangement-title { gap: 8px; }
+  .arrangement-title h2 { display: none; }
+  .review { top: 180px; }
 }
 @media (max-width: 620px) {
-  main { padding-inline: 7px; }
-  .topbar { padding: 10px; gap: 8px; }
-  .project-identity h1, #project-context { overflow-wrap: anywhere; }
-  .workspace, .panel, .dock, .transport, .transport-main, .dock-heading,
-  .desktop-tools, .desktop-tools nav, .arrangement-actions { min-width: 0; max-width: 100%; }
-  .desktop-tools { gap: 7px; }
-  .desktop-tools nav { gap: 4px; }
-  .desktop-tools nav button { padding-inline: 6px; }
-  .panel-heading { flex-wrap: wrap; }
-  .transport-main, .transport-sources { flex-wrap: wrap; }
-  .transport-main #position { flex: 1 1 110px; min-width: 80px; }
-  .transport-sources label { flex: 1 1 115px; max-width: calc(100% - 70px); }
-  .audio-context { display: block; white-space: normal; overflow-wrap: anywhere; flex-basis: 100%; }
-  .timeline-viewport { max-width: 100%; height: var(--arrangement-height); }
-  .mix-console, #piano-editor { max-width: 100%; }
+  :root { --track-width: 170px; }
+  body { height: auto; min-height: 100dvh; overflow-y: auto; }
+  main { flex: none; overflow: visible; }
+  .topbar { height: auto; min-height: 48px; flex-wrap: wrap; gap: 7px; padding: 7px 9px; }
+  .identity { padding-right: 0; }
+  .studio-name { display: none; }
+  .project-identity { flex: 1; min-width: 160px; }
+  #project-context { max-width: 65vw; }
+  .top-actions { margin-left: auto; }
+  .transport { padding: 7px 9px; }
+  .transport-main { gap: 6px; }
+  .transport-position { margin-left: auto; border-right: 0; padding-right: 0; }
+  #musical-position { font-size: 17px; min-width: 42px; }
+  #tempo-display { font-size: 10px; }
+  .transport-main #position { flex: 1 1 130px; }
+  .listening-control { margin-left: 0; }
+  #volume { width: 60px; }
+  #audition { margin-left: auto; padding-inline: 12px; }
+  .monitor-bar { flex-wrap: wrap; gap: 6px; }
+  .save-feedback { flex-basis: 100%; }
+  .playback-details { margin-left: 0; }
+  .playback-detail-body { position: static; width: 100%; margin-top: 5px; padding: 8px; }
+  .transport-meta:has(.playback-details[open]) .playback-details { width: 100%; }
+  .transport-sources label { flex: 1 1 120px; }
+  .workspace, .workspace.browser-hidden { display: flex; flex-direction: column; flex: none; min-height: 0; overflow: visible; }
+  .browser:not([hidden]) { max-height: 220px; flex: none; border-right: 0; border-bottom: 1px solid var(--line); }
+  #browser-content { min-height: 80px; max-height: 145px; }
+  .arrangement { flex: none; }
+  .arrangement-heading { flex-wrap: wrap; gap: 4px; padding: 5px 8px; }
+  .arrangement-actions { gap: 5px; flex-wrap: wrap; }
+  .arrangement-actions #toggle-review { padding-inline: 4px; }
+  .group-tools { padding-inline: 8px; gap: 4px; }
+  .group-tools > span:first-child { flex-basis: 100%; }
+  .timeline-viewport { max-width: 100%; height: var(--arrangement-height); max-height: none; }
+  .timeline { min-width: 540px; }
+  .track-strip-header { padding: 7px 8px; }
+  .track-header-controls { gap: 3px; flex-wrap: wrap; }
+  .dock { flex: none; height: 390px; min-height: 0; }
+  .dock-heading { flex-wrap: wrap; padding: 5px 8px; gap: 4px 8px; }
+  .dock-heading nav button { padding-inline: 9px; }
   #piano-section-label { margin-left: 0; }
-  #piano-section { max-width: 150px; }
-  #help-dialog dl { grid-template-columns: 1fr; gap: 5px; }
-  #help-dialog dd { margin-bottom: 8px; }
+  #toggle-inspector { margin-left: auto; }
+  body[data-dock-view=piano] .dock-body:has(#inspector-panel:not([hidden])) { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(180px, 1fr) 170px; overflow: auto; }
+  #inspector-panel { border-left: 0; border-top: 1px solid var(--line); }
+  .review { top: 12px; bottom: 12px; }
 }

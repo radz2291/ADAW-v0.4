@@ -1,6 +1,7 @@
 import '@audio-ui/elements/timeline';
 import '@audio-ui/elements/piano-roll';
 import '@audio-ui/elements/fader';
+import '@audio-ui/elements/knob';
 import { drawDevices } from './devices.js';
 import { setupLayout } from './layout.js';
 import { createMonitor } from './monitor.js';
@@ -250,12 +251,13 @@ function drawTimeline() {
     markTime(marker, section.start_tick, section.end_tick - section.start_tick, length);
     sections.append(marker);
   }
+  desktop.beginTrackHeaders();
   for (const track of source.tracks) {
     const trackFocus = `track-${track.id}`;
     const trackButton = button(label(track.id), () => selectTrack(track, null, trackFocus), {
       attrs: { id: trackFocus, "aria-pressed": track.id === ui.trackId, title: `${label(track.id)} · ${label(track.role)} → ${label(track.bus)}` },
     });
-    const lane = addRow(trackButton);
+    const lane = addRow(desktop.trackHeader(track,trackButton));
     lane.parentElement.dataset.trackId = track.id;
     lane.parentElement.classList.toggle('selected-track', track.id === ui.trackId);
     for (const section of source.sections) {
@@ -283,6 +285,7 @@ function drawTimeline() {
     }
   }
   timeline.replaceChildren(...rows, node("div", { classes: "playhead", attrs: { id: "playhead", hidden: "", "aria-hidden": "true" } }));
+  desktop.drawTrackWaveforms();
   updateTransport();
 }
 
@@ -907,6 +910,7 @@ byId("measure").addEventListener("click", () => action(async () => {
   notice(`Measured rendition ${short(renditionId)}.`);
 }, "Analyzing rendered audio…"));
 const monitor = createMonitor({audio,
+  onWaveforms: value => desktop.setTrackWaveforms(value),
   onStatus: status => {
     byId('monitor-status').textContent = status.mode === 'monitor' ? 'Live mix preview' : 'Rendered mix';
     byId('monitor-status').title = status.mode === 'monitor' ? status.limitations : status.message || 'Exact rendered audio';

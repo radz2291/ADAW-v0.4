@@ -22,6 +22,7 @@ STATIC_FILES = {
     "/": ("index.html", "text/html; charset=utf-8"),
     "/index.html": ("index.html", "text/html; charset=utf-8"),
     "/studio.css": ("studio.css", "text/css; charset=utf-8"),
+    "/devices.css": ("devices.css", "text/css; charset=utf-8"),
     "/layout.css": ("layout.css", "text/css; charset=utf-8"),
     "/desktop.css": ("desktop.css", "text/css; charset=utf-8"),
     "/studio.js": ("dist/studio.js", "text/javascript; charset=utf-8"),

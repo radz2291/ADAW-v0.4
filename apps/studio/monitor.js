@@ -4,12 +4,35 @@ const dbGain = (db) => 10 ** (db / 20);
 const db = (value) => value > 0 ? 20 * Math.log10(value) : -Infinity;
 const stable = (value) => JSON.stringify(value, (_, v) => v && !Array.isArray(v) && typeof v === 'object'
   ? Object.fromEntries(Object.keys(v).sort().map(key => [key, v[key]])) : v);
-function soundIdentity(source) {
+export function soundIdentity(source) {
   const copy = structuredClone(source);
   for (const track of copy.tracks) for (const key of ['gain_db', 'pan', 'mute', 'solo']) delete track[key];
   for (const bus of copy.buses) delete bus.gain_db;
   delete copy.master.gain_db;
   return stable(copy);
+}
+
+// Measured sample-track overview in musical ticks, so tempo changes do not
+// stretch the picture onto a misleading linear-seconds arrangement grid.
+function trackEnvelope(buffer, source) {
+  const count=640, peaks=new Float32Array(count); // Display resolution policy.
+  const changes=source.time_map??[{tick:0,bpm:source.tempo}];
+  const secondsAt=tick=>{
+    let seconds=0;
+    for(let i=0;i<changes.length;i++) {
+      const end=Math.min(tick,changes[i+1]?.tick??source.length_ticks);
+      if(end>changes[i].tick)seconds+=(end-changes[i].tick)*60/source.ppq/changes[i].bpm;
+      if(end===tick)break;
+    }
+    return seconds;
+  };
+  const samples=Array.from({length:buffer.numberOfChannels},(_,i)=>buffer.getChannelData(i));
+  for(let bin=0;bin<count;bin++) {
+    const start=Math.max(0,Math.round(secondsAt(bin/count*source.length_ticks)*buffer.sampleRate));
+    const end=Math.min(buffer.length,Math.round(secondsAt((bin+1)/count*source.length_ticks)*buffer.sampleRate));
+    for(const channel of samples)for(let i=start;i<end;i++)peaks[bin]=Math.max(peaks[bin],Math.abs(channel[i]));
+  }
+  return Array.from(peaks);
 }
 
 // Native graph sums every bus into master, including the recursively fed sends.
@@ -25,7 +48,7 @@ function busWeights(source) {
   return weights;
 }
 
-export function createMonitor({audio, onMeters = () => {}, onStatus = () => {}}) {
+export function createMonitor({audio, onMeters = () => {}, onStatus = () => {}, onWaveforms = () => {}}) {
   let context, media, output, rendered, stemOutput, analysers, frame;
   let manifest = null, source = null, buffers = new Map(), voices = [], request = 0;
   let mode = 'render', ready = false, compatible = false, destroyed = false;
@@ -135,6 +158,9 @@ export function createMonitor({audio, onMeters = () => {}, onStatus = () => {}})
         if (ticket !== request || destroyed) return false;
         stopVoices(); buffers = decoded; manifest = next; ready = true;
         source ??= next.source; compatible = soundIdentity(source) === soundIdentity(next.source);
+        const tracks={};
+        for(const track of next.source.tracks)if(track.kind==='samples')tracks[track.id]=trackEnvelope(decoded.get(track.id),next.source);
+        onWaveforms({key:soundIdentity(next.source),revision:next.revision,tracks});
         applyLevels(); startVoices(); state(compatible ? 'Live monitoring ready' : 'Notes or devices changed. Audition to update monitoring.');
         return true;
       } catch (error) { if (ticket === request) state(error.message); throw error; }
