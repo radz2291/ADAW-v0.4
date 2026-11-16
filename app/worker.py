@@ -240,6 +240,9 @@ def main():
             e = backend.daw.RenderEngine(request["sample_rate"], request["block_size"])
             p = e.make_faust_processor("validation")
             p.set_dsp_string(request["source"])
+            if "voices" in request:
+                p.num_voices = request["voices"]
+                p.release_length = request["release_seconds"]
             try:
                 if not p.compile():
                     raise RuntimeError("Faust compilation returned false")

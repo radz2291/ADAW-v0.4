@@ -1,6 +1,7 @@
 """Authoritative service for imports, proposals, revisions and renditions."""
 from contextlib import closing
 import io
+import importlib.metadata
 import json
 import os
 from pathlib import Path
@@ -17,6 +18,11 @@ from app.quality import analyze_delivery
 class ProjectService(Service):
     def __init__(self, root):
         super().__init__(root)
+        distribution = importlib.metadata.distribution("dawdreamer")
+        self._synth_engine_identity = {"version": distribution.version,
+            "native": {str(path): file_hash(distribution.locate_file(path)) for path in distribution.files
+                       if str(path).endswith((".pyd", ".so", ".dylib"))},
+            "adapter": file_hash(Path(__file__).with_name("worker.py"))}
         with closing(self.connect()) as db, db:
             db.executescript('''
                 CREATE TABLE IF NOT EXISTS g1_imports (hash TEXT PRIMARY KEY, kind TEXT NOT NULL, provenance TEXT NOT NULL);
@@ -26,6 +32,7 @@ class ProjectService(Service):
                 CREATE TABLE IF NOT EXISTS g1_proposals (id TEXT PRIMARY KEY, payload BLOB NOT NULL, source BLOB NOT NULL, applied TEXT);
                 CREATE TABLE IF NOT EXISTS g1_renditions (id TEXT PRIMARY KEY, revision TEXT NOT NULL, report BLOB NOT NULL);
                 CREATE TABLE IF NOT EXISTS g1_exports (id TEXT PRIMARY KEY, rendition TEXT NOT NULL, report BLOB NOT NULL);
+                CREATE TABLE IF NOT EXISTS g3_synth_validation (key TEXT PRIMARY KEY, validation BLOB NOT NULL);
                 CREATE TABLE IF NOT EXISTS g2_undos (target TEXT PRIMARY KEY, applied TEXT NOT NULL);
             ''')
 
@@ -102,11 +109,10 @@ class ProjectService(Service):
                     require(info.samplerate == source["sample_rate"] and info.channels in (1, 2), "Sample rate/channels must match source; no implicit resampling")
                 elif t["kind"] == "faust_synth":
                     references.append((inst["module_sha256"], "faust"))
-                    validation = self._module_validation(db, inst["module_sha256"])
-                    if validation is not None:
-                        catalog = {item["name"]: item for item in validation["catalog"]}
-                        for binding, value in inst["parameters"].items():
-                            self._validate_faust_parameter(catalog, binding, value)
+                    validation = self._synth_validation(inst, source, db)
+                    catalog = {item["name"]: item for item in validation["catalog"]}
+                    for binding, value in inst["parameters"].items():
+                        self._validate_faust_parameter(catalog, binding, value)
                 else:
                     check_plugin(inst)
             for entity in [*source["tracks"], *source["buses"], source["master"]]:
@@ -157,6 +163,69 @@ class ProjectService(Service):
         parameter = catalog[binding]
         number(value, parameter["min"], parameter["max"])
 
+    def _synth_validation(self, instance, source, db=None):
+        """Verified catalog from the same native synth configuration as rendering.
+
+        Native jobs can write job records, so callers must warm this derived cache
+        before taking a source-write transaction. A concurrent context change
+        fails safely instead of attempting nested writes under the source lock.
+        """
+        data = self.read_content(instance["module_sha256"])
+        configuration = {"module_sha256": instance["module_sha256"], "voices": instance["voices"],
+                         "release_seconds": instance["release_seconds"], "sample_rate": source["sample_rate"],
+                         "block_size": source["block_size"], "engine": self._synth_engine_identity}
+        key = digest(canonical(configuration))
+        if db is None:
+            with closing(self.connect()) as reader:
+                row = reader.execute("SELECT validation FROM g3_synth_validation WHERE key=?", (key,)).fetchone()
+        else:
+            row = db.execute("SELECT validation FROM g3_synth_validation WHERE key=?", (key,)).fetchone()
+        if row:
+            return json.loads(row[0])
+        if db is not None and db.in_transaction:
+            raise AdawError("STALE_REVISION", "Instrument configuration changed during validation; refresh and retry")
+        validation = self.run_worker({"operation": "module_validate", "source": data.decode("utf-8"),
+            "sample_rate": source["sample_rate"], "block_size": source["block_size"],
+            "voices": instance["voices"], "release_seconds": instance["release_seconds"]}, 30)["data"]
+        require(validation["source_sha256"] == instance["module_sha256"], "Synth catalog source mismatch")
+        require((validation["inputs"], validation["outputs"]) == (0, 2), "Synth needs no audio inputs and stereo output")
+        with closing(self.connect()) as writer, writer:
+            writer.execute("INSERT OR IGNORE INTO g3_synth_validation VALUES (?,?)", (key, canonical(validation)))
+            stored = writer.execute("SELECT validation FROM g3_synth_validation WHERE key=?", (key,)).fetchone()
+        return json.loads(stored[0])
+
+    def _prepare_synth_catalogs(self, source):
+        validate(source)
+        for track in source["tracks"]:
+            if track["kind"] == "faust_synth":
+                self._synth_validation(track["instrument"], source)
+
+    def _prepare_apply_catalogs(self, proposal_id):
+        with closing(self.connect()) as db:
+            payload, snapshot, applied = self._proposal(db, proposal_id)
+            if applied:
+                return
+            command = json.loads(payload)
+            head = self.head(db)
+            current = json.loads(self._revision(db, head)[1])
+            base = json.loads(self._revision(db, command["base_revision"])[1])
+            merged = merge_source(base, current, json.loads(snapshot),
+                                  base_revision=command["base_revision"], current_revision=head)
+        self._prepare_synth_catalogs(merged)
+
+    def _prepare_undo_catalogs(self, revision):
+        with closing(self.connect()) as db:
+            if db.execute("SELECT 1 FROM g2_undos WHERE target=?", (revision,)).fetchone():
+                return
+            parent, target = self._revision(db, revision)
+            require(parent is not None, "Initial revision cannot be undone")
+            head = self.head(db)
+            current = json.loads(self._revision(db, head)[1])
+            before = json.loads(self._revision(db, parent)[1])
+            merged = merge_source(json.loads(target), current, before,
+                                  base_revision=revision, current_revision=head)
+        self._prepare_synth_catalogs(merged)
+
     def _set_bus_parameter(self, insert, binding, value):
         if "registry_id" in insert:
             self._set_vst_parameter(insert, binding, value)
@@ -180,11 +249,18 @@ class ProjectService(Service):
         _, source = self.source(revision)
         rows = []
 
-        def add_faust(instance, **location):
+        def add_faust(instance, synth=False, **location):
             row = {**location, "kind": "faust", "module_sha256": instance["module_sha256"], "parameters": []}
             rows.append(row)
-            with closing(self.connect()) as db:
-                validation = self._module_validation(db, instance["module_sha256"])
+            try:
+                if synth:
+                    validation = self._synth_validation(instance, source)
+                else:
+                    with closing(self.connect()) as db:
+                        validation = self._module_validation(db, instance["module_sha256"])
+            except AdawError as error:
+                row["error"] = {"code": error.code, "message": str(error), "details": error.details}
+                return
             if validation is None:
                 row["error"] = {"code": "MODULE_CAPABILITY_UNVERIFIED",
                                 "message": "Reimport the module to record its control catalog", "details": {}}
@@ -218,7 +294,7 @@ class ProjectService(Service):
             if track["kind"] == "vst":
                 add(track["instrument"], track_id=track["id"])
             elif track["kind"] == "faust_synth":
-                add_faust(track["instrument"], track_id=track["id"])
+                add_faust(track["instrument"], synth=True, track_id=track["id"])
         for bus in source["buses"]:
             for index, insert in enumerate(bus["inserts"]):
                 if "registry_id" in insert:
@@ -381,7 +457,10 @@ class ProjectService(Service):
                 if track["kind"] == "vst":
                     self._set_vst_parameter(track["instrument"], op["binding"], op["value"])
                 else:
-                    self._set_bus_parameter(track["instrument"], op["binding"], op["value"])
+                    validation = self._synth_validation(track["instrument"], source)
+                    catalog = {item["name"]: item for item in validation["catalog"]}
+                    self._validate_faust_parameter(catalog, op["binding"], op["value"])
+                    track["instrument"]["parameters"][op["binding"]] = op["value"]
             else:
                 raise AdawError("VALIDATION_ERROR", "Unsupported typed operation")
         self.validate_dependencies(source)
@@ -493,6 +572,7 @@ class ProjectService(Service):
         return revision
 
     def apply(self, proposal_id):
+        self._prepare_apply_catalogs(proposal_id)
         with closing(self.connect()) as db, db:
             db.execute("BEGIN IMMEDIATE")
             payload, snapshot, applied = self._proposal(db, proposal_id)
@@ -522,6 +602,7 @@ class ProjectService(Service):
     def undo(self, revision):
         """Apply the inverse of one committed revision onto the current head."""
         require(isinstance(revision, str) and revision, "Expected revision ID")
+        self._prepare_undo_catalogs(revision)
         with closing(self.connect()) as db, db:
             db.execute("BEGIN IMMEDIATE")
             previous = db.execute("SELECT applied FROM g2_undos WHERE target=?", (revision,)).fetchone()

@@ -76,3 +76,7 @@ in optional history/details rather than requiring administrative knowledge.
 Avoid repeated components and competing controls for the same action. Reuse the
 established control adapters; keep one primary home for mixing and audition.
 Precision editing and optional evidence should complement the main workflow.
+
+Read [the direct editing decision](docs/decisions/ADR-0006-everyday-studio.md) for
+current gesture, monitoring and native parameter semantics; it supersedes the
+temporary Stage/Apply interaction in ADR-0005.

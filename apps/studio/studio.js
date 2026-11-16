@@ -250,7 +250,7 @@ function drawTimeline() {
   for (const track of source.tracks) {
     const trackFocus = `track-${track.id}`;
     const trackButton = button(label(track.id), () => selectTrack(track, null, trackFocus), {
-      attrs: { id: trackFocus, "aria-pressed": track.id === ui.trackId, title: `${label(track.role)} · ${label(track.bus)}` },
+      attrs: { id: trackFocus, "aria-pressed": track.id === ui.trackId, title: `${label(track.id)} · ${label(track.role)} → ${label(track.bus)}` },
     });
     const lane = addRow(trackButton);
     lane.parentElement.dataset.trackId = track.id;
@@ -300,14 +300,15 @@ function editEvent(target, track, readOnly) {
     target.append(paragraph("Select a track to inspect its events."));
     return;
   }
-  target.append(paragraph(`${label(track.id)} · ${track.events.length} events`));
+  target.append(paragraph(`${label(track.id)} · ${track.events.length} ${track.kind === "samples" ? "hits" : "notes"}`));
   if (!track.events.length) return;
   const eventPicker = node("select", { attrs: { id: "event-select" } });
   eventPicker.add(new Option("Choose an event", ""));
-  for (const event of track.events) eventPicker.add(new Option(`${event.start_tick} ticks · MIDI ${event.note} · ${event.id}`, event.id));
+  const pitchName = note => `${['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'][note%12]}${Math.floor(note/12)-1}`;
+  for (const event of track.events) eventPicker.add(new Option(`Beat ${1+event.start_tick/ui.view.source.ppq}${track.kind==='samples'?'':` · ${pitchName(event.note)}`}`, event.id));
   eventPicker.value = ui.eventId ?? "";
   eventPicker.addEventListener("change", () => selectTrack(track, eventPicker.value || null, "event-select"));
-  target.append(controlLabel("Event", eventPicker));
+  target.append(controlLabel(track.kind === "samples" ? "Hit" : "Note", eventPicker));
   const event = selectedEvent();
   if (!event) return;
   const unavailable = readOnly || track.protected;
@@ -315,15 +316,17 @@ function editEvent(target, track, readOnly) {
   const form = node("form", { classes: "stack" });
   const fields = node("div", { classes: "fields" });
   const entries = [
-    ["start_tick", "Start (ticks)", 0, ui.view.source.length_ticks - 1],
-    ["duration_ticks", "Length (ticks)", 1, ui.view.source.length_ticks],
+    ["start_tick", "Start (beat)", 1, 1+ui.view.source.length_ticks/ui.view.source.ppq],
+    ["duration_ticks", "Length (beats)", 1/ui.view.source.ppq, ui.view.source.length_ticks/ui.view.source.ppq],
     ["note", "MIDI note", 0, 127],
     ["velocity", "Velocity", 1, 127],
   ];
   const inputs = new Map();
   for (const [key, fieldLabel, min, max] of entries) {
     if (key === "note" && track.kind === "samples") continue;
-    const input = numberInput(`edit-${key}`, event[key], { min, max, step: 1 });
+    const musicalTime=key==='start_tick'||key==='duration_ticks';
+    const shown=musicalTime?event[key]/ui.view.source.ppq+(key==='start_tick'?1:0):event[key];
+    const input = numberInput(`edit-${key}`, shown, { min, max, step: musicalTime?'any':1 });
     input.disabled = unavailable;
     fields.append(controlLabel(fieldLabel, input));
     inputs.set(key, input);
@@ -336,7 +339,8 @@ function editEvent(target, track, readOnly) {
     if (unavailable) return;
     const changes = {};
     for (const [key, input] of inputs) {
-      if (input.valueAsNumber !== event[key]) changes[key] = input.valueAsNumber;
+      const value=key==='start_tick'?Math.round((input.valueAsNumber-1)*ui.view.source.ppq):key==='duration_ticks'?Math.round(input.valueAsNumber*ui.view.source.ppq):input.valueAsNumber;
+      if (value !== event[key]) changes[key] = value;
     }
     if (!Object.keys(changes).length) return notice("Change an event field before saving.");
     stage({ kind: "edit_event", track_id: track.id, event_id: event.id, changes }, `Edit ${event.id} on ${track.id}`);
@@ -407,10 +411,56 @@ async function refresh({ viewHead = false } = {}) {
   drawProject();
   const chosen = byId(`rendition-${ui.slot}`).value;
   if (chosen !== ui.loadedAudio) await loadRendition();
+  monitor.updateSource(mixSource());
 }
 
 let editQueue = Promise.resolve(), lastFailedEdit = null;
 const ownRevisions = new Map();
+
+// Transient mix intent only. The committed service snapshot stays authoritative.
+const mixIntents = new Map(), failedEdits = new Map();
+function mixKey(operation) {
+  const kinds = {set_track_gain:'gain_db',set_track_pan:'pan',set_track_mute:'mute',
+    set_track_solo:'solo',set_bus_gain:'gain_db',set_master_gain:'gain_db'};
+  const field = kinds[operation.kind];
+  if (!field) return null;
+  const scope = operation.track_id ? 'track' : operation.bus_id ? 'bus' : 'master';
+  return `${scope}:${operation.track_id ?? operation.bus_id ?? ''}:${field}`;
+}
+function mixEntity(entity, key) {
+  const result = {...entity};
+  if (ui.view?.revision !== ui.snapshot?.project.revision) return result;
+  const scope = key === 'track_id' ? 'track' : key === 'bus_id' ? 'bus' : 'master';
+  for (const field of ['gain_db','pan','mute','solo']) {
+    const intent = mixIntents.get(`${scope}:${key ? entity.id : ''}:${field}`);
+    if (intent) result[field] = intent.operation.value;
+  }
+  return result;
+}
+function mixSource() {
+  const source = ui.view.source;
+  return {...source, tracks:source.tracks.map(track=>mixEntity(track,'track_id')),
+    buses:source.buses.map(bus=>mixEntity(bus,'bus_id')), master:mixEntity(source.master,null)};
+}
+function markMix(operations, owner, retry = false) {
+  for (const operation of operations) {
+    const key = mixKey(operation);
+    if (key && (!retry || !mixIntents.has(key))) mixIntents.set(key,{operation:{...operation},owner});
+  }
+}
+function settleMix(owner) {
+  // Never let an earlier request erase a newer gesture on the same control.
+  for (const [key,intent] of mixIntents) if (intent.owner === owner) mixIntents.delete(key);
+}
+function syncMix() {
+  monitor.updateSource(mixSource());
+  desktop.syncMixer();
+}
+function syncRetry() {
+  lastFailedEdit = [...failedEdits.values()].at(-1) ?? null;
+  byId('retry-edit').hidden = !lastFailedEdit;
+}
+
 let undoStack = [], redoStack = [], historyKey = null;
 function historyControls() {
   byId('undo').disabled = !undoStack.length || !!ui.editPending;
@@ -435,17 +485,32 @@ function stage(operation, reason) {
   const base = ui.view.revision;
   const operations = structuredClone(Array.isArray(operation) ? operation : [operation]);
   const commandId = `studio-${crypto.randomUUID()}`;
+  let submittedRevision;
+  markMix(operations, commandId);
+  if (operations.some(mixKey)) syncMix();
   const work = async () => {
-    let revision = base;
-    while (ownRevisions.has(revision)) revision = ownRevisions.get(revision);
-    lastFailedEdit = () => enqueue(work);
-    const result = await api('/edit', {command_id:commandId,base_revision:revision,reason,operations});
-    if(revision!==result.revision)ownRevisions.set(revision,result.revision);
-    if (result.changed !== false && !undoStack.includes(result.revision)) undoStack.push(result.revision);
-    redoStack = []; lastFailedEdit = null; byId('retry-edit').hidden = true;
-    await refresh({viewHead:true});
-    monitor.updateSource(ui.view.source);
-    notice('');
+    try {
+      let revision = base;
+      while (ownRevisions.has(revision)) revision = ownRevisions.get(revision);
+      // Retrying an uncertain response must retain the exact idempotent payload.
+      submittedRevision ??= revision;
+      const result = await api('/edit', {command_id:commandId,base_revision:submittedRevision,reason,operations});
+      if(submittedRevision!==result.revision)ownRevisions.set(submittedRevision,result.revision);
+      if (result.changed !== false && !undoStack.includes(result.revision)) undoStack.push(result.revision);
+      redoStack = [];
+      await refresh({viewHead:true});
+      settleMix(commandId); syncMix();
+      failedEdits.delete(commandId); syncRetry();
+      notice('');
+    } catch (error) {
+      settleMix(commandId); syncMix();
+      failedEdits.set(commandId, () => {
+        markMix(operations,commandId,true); syncMix();
+        return enqueue(work).catch(()=>{});
+      });
+      syncRetry();
+      throw error;
+    }
   };
   return enqueue(work).catch(() => {});
 }
@@ -455,16 +520,12 @@ function historyStep(redo = false) {
   return enqueue(async () => {
     const result = await api(redo ? '/redo' : '/undo', {revision:stack.at(-1)});
     stack.pop(); if(result.changed !== false)(redo ? undoStack : redoStack).push(result.revision);
-    await refresh({viewHead:true}); monitor.updateSource(ui.view.source); notice('');
+    await refresh({viewHead:true}); monitor.updateSource(mixSource()); notice('');
   }).catch(() => {});
 }
 function liveMix(operation) {
-  const view = structuredClone(ui.view);
-  const target = operation.track_id ? view.source.tracks.find(t=>t.id===operation.track_id)
-    : operation.bus_id ? view.source.buses.find(t=>t.id===operation.bus_id) : view.source.master;
-  const key = operation.kind.endsWith('_gain') ? 'gain_db' : operation.kind.split('_').at(-1);
-  target[key] = operation.value;
-  monitor.updateSource(view.source); monitor.setMode('monitor');
+  markMix([operation], null);
+  monitor.updateSource(mixSource()); monitor.setMode('monitor');
 }
 let auditionSequence = 0;
 async function audition() {
@@ -676,7 +737,7 @@ async function loadRendition({ preserve = false } = {}) {
   if (request !== ui.audioRequest) return;
   ui.rendition = rendition;
   monitor.setMode('render');
-  monitor.updateSource(ui.view.source);
+  monitor.updateSource(mixSource());
   api(`/renditions/${idPath(id)}/monitor`).then(manifest => {
     if (request === ui.audioRequest) return monitor.prepare(manifest);
   }).catch(error => { byId('monitor-status').textContent = 'Render playback'; byId('monitor-status').title = error.message; });
@@ -782,7 +843,7 @@ for (const tab of document.querySelectorAll("[data-view]")) {
     drawInspector();
   });
 }
-byId("refresh").addEventListener("click", () => action(() => refresh({ viewHead: true }), "Refreshing project…"));
+byId("refresh").addEventListener("click", () => action(async () => { await refresh({ viewHead: true }); notice(""); }, "Refreshing…"));
 byId("back-head").addEventListener("click", () => {
   ui.view = ui.snapshot.project;
   drawProject();
@@ -849,7 +910,7 @@ document.addEventListener('keydown',e=>{
 },true);
 setupLayout();
 const desktop = createDesktop({ ui, audio, byId, node, button, label, trackColors, stage, notice,
-  selectTrack, currentTrack, drawInspector, tickAtTime, timeChanges, liveMix });
+  selectTrack, currentTrack, drawInspector, tickAtTime, timeChanges, liveMix, mixEntity });
 action(async () => {
   await refresh({ viewHead: true });
   notice("");

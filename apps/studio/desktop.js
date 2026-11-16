@@ -4,7 +4,7 @@ import WaveSurfer from 'wavesurfer.js';
 const FADER = { min: -60, max: 12, step: .1 };
 
 export function createDesktop({ ui, audio, byId, node, button, label, trackColors, stage, notice,
-  selectTrack, currentTrack, drawInspector, tickAtTime, timeChanges, liveMix }) {
+  selectTrack, currentTrack, drawInspector, tickAtTime, timeChanges, liveMix, mixEntity }) {
   let dock = 'mixer', sectionId = null, looping = false, wave = null, snap=.25, drawMode=false, group=null;
   const source = () => ui.view?.source;
   const section = () => source()?.sections.find(s => s.id === sectionId) ?? source()?.sections[0];
@@ -20,7 +20,7 @@ export function createDesktop({ ui, audio, byId, node, button, label, trackColor
     return seconds;
   };
   const seek = tick => {
-    if (!matching()) return notice('This audio belongs to another revision. Render the displayed source to navigate its sections.');
+    if (!matching()) return notice('Audition your latest edits before jumping to a section.');
     if (Number.isFinite(audio.duration)) audio.currentTime = Math.min(audio.duration, secondsAt(tick));
   };
   function showReview() {
@@ -36,22 +36,27 @@ export function createDesktop({ ui, audio, byId, node, button, label, trackColor
       for (const item of items.filter(i => label(i.id).toLowerCase().includes(query))) root.append(make(item));
     };
     group('TRACKS', source().tracks, t => {
-      const b = button(label(t.id), () => selectTrack(t), { classes: 'browser-item', attrs: { 'aria-pressed': ui.trackId === t.id } });
+      const b = button(label(t.id), () => selectTrack(t), { classes: 'browser-item', attrs: { 'aria-pressed': ui.trackId === t.id, title:label(t.id) } });
       b.style.setProperty('--track-color', trackColors[t.role.toLowerCase()] ?? '#91a6c0');
       b.append(node('span', {text: t.kind === 'samples' ? 'AUDIO' : 'MIDI', classes:'browser-kind'}));
       return b;
     });
     group('SONG SECTIONS', source().sections, s => button(label(s.id), () => selectSection(s.id), {
-      classes:'browser-section', attrs:{'aria-pressed': section()?.id === s.id, title: s.mood}
+      classes:'browser-section', attrs:{'aria-pressed': section()?.id === s.id, title: `${label(s.id)} · ${s.mood}`}
     }));
     root.append(node('h3', {text:'DEVICES', classes:'browser-heading'}));
     root.append(button('Instruments & effects', () => {ui.inspector = 'plugins'; drawInspector();}, {classes:'browser-section'}));
   }
+  let mixerUpdates = [];
+  function syncMixer() { for (const update of mixerUpdates) update(); }
   function drawMixer() {
+    mixerUpdates = [];
     const root = byId('mix-console'), scroll=root.scrollLeft; root.replaceChildren();
     if (!source()) return;
     const readOnly = ui.view.revision !== ui.snapshot.project.revision;
     const add = (entity, kind, key, color, index) => {
+      const shown = mixEntity(entity,key), toggles = [];
+      let pan;
       const title = label(entity.id ?? 'master');
       const strip = node('section', {classes:'channel-strip', attrs:{'aria-label':`${title} channel`}});
       strip.style.setProperty('--track-color', color);
@@ -61,16 +66,16 @@ export function createDesktop({ ui, audio, byId, node, button, label, trackColor
         : node('h3', {text:title, classes:'channel-name',attrs:{title}});
       strip.append(node('span',{text:String(index).padStart(2,'0'),classes:'channel-number'}), heading);
       strip.append(node('p',{text:key==='track_id' ? `→ ${label(entity.bus)}` : 'BUS / OUTPUT',classes:'channel-route'}));
-      const fader = node('audio-ui-fader', {attrs:{min:Math.min(FADER.min, entity.gain_db), max:Math.max(FADER.max, entity.gain_db),
-        step:FADER.step, 'default-value':entity.gain_db, 'data-entity': entity.id ?? 'master'}});
-      fader.value = entity.gain_db;
+      const fader = node('audio-ui-fader', {attrs:{min:Math.min(FADER.min, shown.gain_db), max:Math.max(FADER.max, shown.gain_db),
+        step:FADER.step, 'default-value':shown.gain_db, 'data-entity': entity.id ?? 'master'}});
+      fader.value = shown.gain_db;
       fader.toggleAttribute('disabled', readOnly);
       const control = node('audio-ui-fader-control');
       const track = node('audio-ui-fader-track'); track.append(node('audio-ui-fader-indicator'));
       control.append(track, node('audio-ui-fader-thumb',{attrs:{'aria-label':`${title} source gain in dB`}}));
       fader.append(control);
       const readout = node('input', {classes:'gain-readout',attrs:{type:'number',step:.1,'aria-label':`${title} gain in dB`}});
-      readout.value=entity.gain_db; readout.disabled=readOnly;
+      readout.value=shown.gain_db; readout.disabled=readOnly;
       const commit=value=>{const op=key?{kind,[key]:entity.id,value}:{kind,value};liveMix(op);stage(op,`Adjust ${title} gain`);};
       readout.addEventListener('change',()=>{if(readout.checkValidity()&&Number.isFinite(readout.valueAsNumber))commit(readout.valueAsNumber);});
       const reset=button('0 dB',()=>commit(0),{disabled:readOnly,attrs:{title:`Reset ${title} gain`}});
@@ -82,19 +87,30 @@ export function createDesktop({ ui, audio, byId, node, button, label, trackColor
         if (!e.detail || readOnly) return;
         const value = Math.round(e.detail.value * 10) / 10;
         readout.value = value;
-        if (value !== entity.gain_db) stage(key ? {kind, [key]:entity.id, value} : {kind,value}, `Set ${title} gain to ${value} dB`);
+        if (value !== shown.gain_db) stage(key ? {kind, [key]:entity.id, value} : {kind,value}, `Set ${title} gain to ${value} dB`);
       });
       if(key==='track_id') {
         const channelButtons=node('div',{classes:'channel-buttons'});
-        for(const field of ['mute','solo'])channelButtons.append(button(field==='mute'?'M':'S',()=>{
-          const op={kind:`set_track_${field}`,track_id:entity.id,value:!entity[field]};liveMix(op);stage(op,`${field} ${title}`);
-        },{disabled:readOnly,attrs:{'aria-label':`${field==='mute'?'Mute':'Solo'} ${title}`,'aria-pressed':!!entity[field],title:field==='mute'?'Mute (takes priority over Solo)':'Solo (multiple tracks can be soloed)'}}));
+        for(const field of ['mute','solo']) {
+          const toggle=button(field==='mute'?'M':'S',()=>{
+            const op={kind:`set_track_${field}`,track_id:entity.id,value:!mixEntity(entity,key)[field]};
+            liveMix(op);stage(op,`${field} ${title}`);
+          },{disabled:readOnly,attrs:{'aria-label':`${field==='mute'?'Mute':'Solo'} ${title}`,'aria-pressed':!!shown[field],title:field==='mute'?'Mute (takes priority over Solo)':'Solo (multiple tracks can be soloed)'}});
+          toggles.push([field,toggle]);channelButtons.append(toggle);
+        }
         strip.append(channelButtons);
-        const pan=node('input',{attrs:{type:'range',min:-1,max:1,step:.01,'aria-label':`${title} pan`}});pan.value=entity.pan;pan.disabled=readOnly;
+        pan=node('input',{attrs:{type:'range',min:-1,max:1,step:.01,'aria-label':`${title} pan`}});pan.value=shown.pan;pan.disabled=readOnly;
         pan.addEventListener('input',()=>liveMix({kind:'set_track_pan',track_id:entity.id,value:pan.valueAsNumber}));
         pan.addEventListener('change',()=>stage({kind:'set_track_pan',track_id:entity.id,value:pan.valueAsNumber},`Pan ${title}`));
         strip.append(pan,button('Center',()=>{const op={kind:'set_track_pan',track_id:entity.id,value:0};liveMix(op);stage(op,`Center ${title}`);},{disabled:readOnly,attrs:{title:'Reset pan to center'}}));
       }
+      mixerUpdates.push(()=>{
+        const current=mixEntity(entity,key);
+        fader.value=current.gain_db;
+        if(document.activeElement!==readout)readout.value=current.gain_db;
+        if(pan && document.activeElement!==pan)pan.value=current.pan;
+        for(const [field,toggle] of toggles)toggle.setAttribute('aria-pressed',String(!!current[field]));
+      });
       strip.append(fader, readout, reset);
       root.append(strip);
     };
@@ -300,5 +316,5 @@ export function createDesktop({ ui, audio, byId, node, button, label, trackColor
       fader.toggleAttribute('disabled', ui.view?.revision !== ui.snapshot?.project.revision);
     }
   }
-  return {draw,sync,waveform,selectSection,selectGroup,showReview,setBusy};
+  return {draw,sync,syncMixer,waveform,selectSection,selectGroup,showReview,setBusy};
 }

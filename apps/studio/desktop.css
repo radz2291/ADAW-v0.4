@@ -23,7 +23,8 @@ input[type=text] {
   border-radius: 3px;
 }
 button {
-  min-height: 27px;
+min-height: 26px;
+  min-width: 26px;
 }
 h1 {
   font-size: 16px;
@@ -137,6 +138,7 @@ main {
 }
 .browser-item,
 .browser-section {
+  min-height: 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -193,7 +195,7 @@ audio-ui-timeline-track.ruler-row {
   min-height: 24px;
 }
 audio-ui-timeline-track.section-row {
-  min-height: 26px;
+  min-height: 32px;
 }
 .track-label {
   display: flex;
@@ -202,6 +204,7 @@ audio-ui-timeline-track.section-row {
   z-index: 25;
 }
 .track-label button {
+  min-height: 26px;
   font-size: 11px;
   padding: 4px;
 }
@@ -237,6 +240,7 @@ audio-ui-timeline-track.section-row {
   white-space: nowrap;
 }
 .event-block {
+  min-width: 2px;
   z-index: 2;
   pointer-events: auto;
   min-height: 0;
@@ -341,42 +345,49 @@ audio-ui-timeline-track.section-row {
   max-width: 150px;
 }
 .mix-console {
-  display: flex;
+display: flex;
   overflow: auto;
-  height: 241px;
+  height: 306px;
   padding: 0 3px;
   background: #191d22;
   scrollbar-color: #4a515c #1c2025;
 }
 .channel-strip {
-  flex: 1 0 86px;
+flex: 1 0 86px;
   max-width: 125px;
   min-width: 0;
-  display: flex;
+  display: grid;
+  justify-items: center;
   align-items: center;
-  flex-direction: column;
+  align-content: start;
+  gap: 2px;
+  grid-template-columns: minmax(0, 1fr);
+  /* 257px rows + 14px gaps + 13px padding + 3px border = 287px.
+     The 306px console retains space for its horizontal scrollbar. */
+  grid-template-rows: 28px 15px 28px 26px 26px 80px 28px 26px;
   position: relative;
   border-right: 1px solid #343b44;
   border-top: 3px solid var(--track-color);
   padding: 8px 5px 5px;
-  background: linear-gradient(#292e36, #21262d);
+  background: #252b32;
 }
 .channel-strip:last-child {
-  margin-left: auto;
-  background: #32392e;
+margin-left: auto;
+  background: #2b332b;
 }
 .channel-strip.selected {
-  background: linear-gradient(#39434c, #282e36);
+background: #303b43;
 }
 .channel-number {
-  font-size: 9px;
+font-size: 7px;
   color: #7f8b9b;
   align-self: flex-start;
   position: absolute;
-  top: 5px;
-  left: 5px;
+  top: 2px;
+  left: 3px;
 }
 .channel-name {
+grid-row: 1;
   font-size: 11px;
   font-weight: 600;
   text-align: center;
@@ -384,30 +395,38 @@ audio-ui-timeline-track.section-row {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-top: 7px;
-  min-height: 25px;
+  margin-top: 0;
+  min-height: 28px;
   background: transparent;
   border: 0;
-  padding: 4px 0;
+  padding: 3px 0;
 }
 .channel-route {
+grid-row: 2;
   font-size: 9px;
   color: #8f9ba9;
   text-align: center;
   line-height: 1.5;
 }
 .gain-readout {
+grid-row: 7;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  padding: 3px;
+  text-align: center;
   font-family: Consolas, monospace;
-  font-size: 12px;
-  margin: 5px 0;
-  color: #d3dce7;
+  font-size: 11px;
+  color: #e0e7ee;
 }
 audio-ui-fader {
+grid-row: 6;
   position: relative;
   display: block;
-  height: 114px;
+  height: 76px;
   width: 48px;
-  margin-top: 7px;
+  margin: 0;
 }
 audio-ui-fader-control {
   position: relative;
@@ -438,7 +457,7 @@ audio-ui-fader-thumb {
   z-index: 2;
   display: block;
   width: 28px;
-  height: 12px;
+  height: 24px;
   border: 1px solid #a4b0bd;
   border-radius: 2px;
   background:
@@ -456,7 +475,7 @@ audio-ui-fader[data-disabled] {
   opacity: .45;
 }
 #piano-editor {
-  height: 241px;
+  height: 306px;
   overflow: auto;
   background: #171c22;
 }
@@ -702,26 +721,33 @@ audio-ui-piano-roll-note-handle:hover {
   background: #ffffff70;
 }
 
-/* Everyday music controls, using the established audio/UI primitives. */
-.note-tools, .group-tools { display:flex; align-items:center; flex-wrap:wrap; gap:5px; padding:5px 9px; font-size:11px; }
-.note-tools .piano-info { padding:0 6px; }
-.group-tools:has(input) { border-block:1px solid var(--line); }
-.group-tools input { width:65px; min-width:0; padding:3px; }
-.group-tools>span:first-child { margin-right:auto; color:var(--muted); }
-.monitor-bar { display:flex; align-items:center; gap:8px; margin-top:6px; font-size:11px; color:var(--muted); }
-#master-meter { display:flex; gap:6px; align-items:center; margin-left:auto; }
-#master-meter label { display:flex; align-items:center; gap:4px; }
-#master-meter meter { width:75px; height:13px; }
-#master-meter.clipping { color:#ff7d68; }
-#meter-clip { min-width:27px; }
-#save-state, #audition-state { color:var(--muted); font-size:11px; }
-.channel-buttons { display:flex; gap:4px; justify-content:center; }
-.channel-buttons button { min-width:28px; }
-.channel-strip { min-height:340px; width:100px; }
-.channel-strip>input[type=range] { width:76px; }
-.channel-strip>.gain-readout { width:75px; max-width:100%; text-align:center; font-size:11px; }
-.channel-strip>button { font-size:10px; min-height:26px; }
-audio-ui-fader-thumb { min-height:24px; }
-.mix-console { height:366px; }
-button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
-@media(max-width:620px) { .monitor-bar {flex-wrap:wrap;} #master-meter {margin-left:0;} .note-tools,.group-tools{max-width:100%;} }
+/* Component controls. Pane preferences and dialog layout live in layout.css. */
+select, input:not([type=hidden]) { min-height: 26px; }
+.channel-buttons { grid-row: 3; display: flex; gap: 4px; justify-content: center; }
+.channel-buttons button { min-width: 28px; }
+.channel-buttons button[aria-pressed=true] { color: #f4e3ae; background: #594b2a; border-color: #bfa45d; }
+.channel-strip > input[type=range] { grid-row: 4; width: 100%; min-width: 0; margin: 0; }
+.channel-strip > button { font-size: 10px; }
+.channel-strip > button:not(.channel-name) { grid-row: 5; padding: 3px 6px; }
+.channel-strip > button:last-child { grid-row: 8; }
+.note-tools, .group-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; font-size: 11px; }
+.note-tools { padding: 5px 8px; border-bottom: 1px solid var(--line); background: #242a31; }
+.note-tools button, .note-tools select { font-size: 11px; }
+.note-tools .piano-info { height: auto; padding: 2px 5px; }
+.group-tools { padding: 5px 9px; }
+.group-tools:has(input) { border-block: 1px solid var(--line); }
+.group-tools input { width: 65px; min-width: 0; padding: 3px; }
+.group-tools > span:first-child { margin-right: auto; color: var(--muted); }
+.monitor-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin-top: 6px; font-size: 10px; color: #a6b1be; }
+.monitor-bar button { font-size: 10px; }
+#monitor-status { min-width: 0; overflow-wrap: anywhere; }
+#master-meter { margin-left: auto; display: flex; gap: 8px; align-items: center; min-width: 0; }
+#master-meter label { display: flex; gap: 4px; align-items: center; font: 10px Consolas, monospace; }
+#master-meter meter { width: 66px; height: 13px; }
+#meter-clip { min-width: 24px; color: #ffad9d; }
+#master-meter.clipping { color: #ff7d68; outline: 1px solid #e17865; outline-offset: 3px; }
+#save-state, #audition-state { color: var(--muted); font-size: 11px; }
+button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 620px) {
+  .note-tools, .group-tools { max-width: 100%; }
+}

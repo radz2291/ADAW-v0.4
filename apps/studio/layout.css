@@ -1,9 +1,6 @@
 /* Everyday workspace. These are view defaults; no musical values live in CSS. */
 :root { --arrangement-height: 260px; }
 html, body { max-width: 100%; }
-button, select, input:not([type=hidden]) { min-height: 26px; }
-button { min-width: 26px; }
-.event-block { min-width: 2px; min-height: 0; }
 .topbar { background: #1c2025; }
 .panel { box-shadow: none; border-color: #343b44; }
 .panel-heading { background: #20252b; }
@@ -15,28 +12,8 @@ button { min-width: 26px; }
 .browser, .inspector { min-width: 0; overflow: hidden; }
 #browser-content { min-height: 140px; max-height: calc(var(--arrangement-height) + 8px); }
 .inspector-content { min-height: 140px; max-height: calc(var(--arrangement-height) + 52px); }
-.browser-item, .browser-section, .channel-name { min-height: 28px; }
 .desktop-tools { height: auto; min-height: 36px; flex-wrap: wrap; gap: 7px 14px; }
 .desktop-tools nav { flex-wrap: wrap; }
-.desktop-tools nav button { font-size: 11px; }
-.channel-strip { background: #252b32; }
-.channel-strip.selected { background: #303b43; }
-.channel-strip:last-child { background: #2b332b; }
-.mix-console { height: 306px; }
-.channel-strip { display: grid; justify-items: center; align-items: center; gap: 2px;
-  grid-template-columns: minmax(0, 1fr); grid-template-rows: 25px 15px 28px 26px 26px 88px 28px 26px; }
-.channel-strip .channel-name { grid-row: 1; margin-top: 0; padding: 3px 0; }
-.channel-strip .channel-route { grid-row: 2; }
-.channel-strip .channel-buttons { grid-row: 3; display: flex; gap: 4px; }
-.channel-strip > input[type=range] { grid-row: 4; width: 100%; min-width: 0; margin: 0; }
-.channel-strip > button:not(.channel-name) { grid-row: 5; font-size: 10px; padding: 3px 6px; }
-.channel-strip > audio-ui-fader { grid-row: 6; height: 84px; margin: 0; }
-.channel-strip > .gain-readout { grid-row: 7; width: 100%; min-width: 0; margin: 0; text-align: center; padding: 3px; }
-.channel-strip > button:last-child { grid-row: 8; }
-.channel-number { left: 3px; top: 2px; font-size: 7px; }
-.channel-buttons button[aria-pressed=true] { color: #f4e3ae; background: #594b2a; border-color: #bfa45d; }
-.gain-readout { color: #e0e7ee; }
-.track-label button { min-height: 26px; }
 #pane-divider { height: 24px; display: flex; align-items: center; justify-content: center;
   cursor: ns-resize; touch-action: none; user-select: none; color: #87929f;
   margin: 0; outline-offset: -3px; }
@@ -60,20 +37,6 @@ button { min-width: 26px; }
 .transport-sources { min-width: 0; }
 .transport-sources label, .transport-sources select { min-width: 0; max-width: 100%; }
 .audio-context { min-width: 0; }
-#master-meters, .master-meters { min-width: 0; }
-.monitor-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; font-size: 10px; color: #a6b1be; }
-.monitor-bar button { font-size: 10px; }
-#monitor-status { min-width: 0; overflow-wrap: anywhere; }
-#master-meter { margin-left: auto; display: flex; gap: 8px; align-items: center; min-width: 0; }
-#master-meter label { display: flex; gap: 4px; align-items: center; font: 10px Consolas, monospace; }
-#master-meter meter { width: 66px; height: 13px; }
-#meter-clip { min-width: 24px; color: #ffad9d; }
-#master-meter.clipping { outline: 1px solid #e17865; outline-offset: 3px; }
-.note-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; padding: 5px 8px;
-  border-bottom: 1px solid var(--line); background: #242a31; font-size: 11px; }
-.note-tools button, .note-tools select { font-size: 11px; }
-.note-tools .piano-info { height: auto; padding: 2px 5px; }
-#piano-editor { height: 306px; }
 @media (max-width: 1100px) {
   .workspace { grid-template-columns: 150px minmax(0, 1fr) 230px; }
   .workspace.browser-hidden { grid-template-columns: minmax(0, 1fr) 230px; }
