@@ -1,6 +1,9 @@
 import '@audio-ui/elements/timeline';
 import '@audio-ui/elements/piano-roll';
 import '@audio-ui/elements/fader';
+import { drawDevices } from './devices.js';
+import { setupLayout } from './layout.js';
+import { createMonitor } from './monitor.js';
 import { createDesktop } from './desktop.js';
 const byId = (id) => document.getElementById(id);
 const audio = byId("audio");
@@ -9,6 +12,8 @@ const ui = {
   view: null,
   trackId: null,
   eventId: null,
+  selection: [],
+  editPending: 0,
   inspector: "edit",
   proposal: null,
   busy: false,
@@ -97,7 +102,6 @@ async function action(work, pending = "") {
 }
 
 function updateBusy() {
-  byId("render-head").disabled = !ui.snapshot || ui.busy;
   byId("refresh").disabled = ui.busy;
   byId("measure").disabled = !ui.rendition || ui.busy;
   for (const item of document.querySelectorAll("[data-project-action]")) {
@@ -133,6 +137,7 @@ function selectedEvent() {
 function selectTrack(track, eventId = null, focusId = null) {
   ui.trackId = track.id;
   ui.eventId = eventId;
+  ui.selection = eventId ? [eventId] : [];
   if (eventId) ui.inspector = "edit";
   drawTimeline();
   drawInspector();
@@ -253,7 +258,7 @@ function drawTimeline() {
     for (const section of source.sections) {
       const events = track.events.filter(e => e.start_tick >= section.start_tick && e.start_tick < section.end_tick);
       if (!events.length) continue;
-      const clip = button(label(section.id), () => { selectTrack(track); desktop.selectSection(section.id); }, {classes: 'section-clip', attrs: {title: `${label(track.id)} · ${label(section.id)} · ${events.length} events`}});
+      const clip = button(label(section.id), () => { selectTrack(track); desktop.selectGroup(track, section, events); }, {classes: 'section-clip', attrs: {title: `${label(track.id)} · ${label(section.id)} · ${events.length} events`}});
       markTime(clip, section.start_tick, section.end_tick-section.start_tick, length);
       lane.append(clip);
     }
@@ -290,20 +295,6 @@ function controlLabel(text, control) {
   return wrapper;
 }
 
-function controlForm(name, input, operation, reason, unavailable) {
-  const form = node("form", { classes: "control-row" });
-  form.append(node("label", { text: name, attrs: { for: input.id } }), input);
-  input.disabled = unavailable;
-  const submit = projectAction("Stage", () => {}, unavailable);
-  submit.type = "submit";
-  form.append(submit);
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-    if (!unavailable && input.reportValidity()) stage(operation(input.valueAsNumber), reason);
-  });
-  return form;
-}
-
 function editEvent(target, track, readOnly) {
   if (!track) {
     target.append(paragraph("Select a track to inspect its events."));
@@ -337,7 +328,7 @@ function editEvent(target, track, readOnly) {
     fields.append(controlLabel(fieldLabel, input));
     inputs.set(key, input);
   }
-  const submit = projectAction("Stage event edit", () => {}, unavailable, "primary");
+  const submit = projectAction("Save note", () => {}, unavailable, "primary");
   submit.type = "submit";
   form.append(fields, submit);
   form.addEventListener("submit", (submission) => {
@@ -347,65 +338,14 @@ function editEvent(target, track, readOnly) {
     for (const [key, input] of inputs) {
       if (input.valueAsNumber !== event[key]) changes[key] = input.valueAsNumber;
     }
-    if (!Object.keys(changes).length) return notice("Change an event field before staging.");
+    if (!Object.keys(changes).length) return notice("Change an event field before saving.");
     stage({ kind: "edit_event", track_id: track.id, event_id: event.id, changes }, `Edit ${event.id} on ${track.id}`);
   });
   target.append(form);
 }
 
-function mixer(target, source, readOnly) {
-  const addGain = (title, id, gain, kind, key) => {
-    const input = numberInput(`gain-${kind}-${id}`, gain, { step: "any", "aria-label": `${title} gain in dB` });
-    const operation = (value) => key ? { kind, [key]: id, value } : { kind, value };
-    target.append(controlForm(`${title} · dB`, input, operation, `Adjust ${title} gain`, readOnly));
-  };
-  target.append(node("h3", { text: "Tracks", classes: "entity-title" }));
-  for (const track of source.tracks) addGain(label(track.id), track.id, track.gain_db, "set_track_gain", "track_id");
-  const busHeading = node("h3", { text: "Buses and master", classes: "control-block entity-title" });
-  target.append(busHeading);
-  for (const bus of source.buses) addGain(label(bus.id), bus.id, bus.gain_db, "set_bus_gain", "bus_id");
-  addGain("Master", "master", source.master.gain_db, "set_master_gain");
-}
-
 function plugins(target, readOnly) {
-  const entries = ui.snapshot.plugins ?? [];
-  if (!entries.length) return target.append(paragraph("This project has no cataloged plugin controls."));
-  for (const entry of entries) {
-    const group = node("section", { classes: "control-block stack" });
-    const isInstrument = Boolean(entry.track_id);
-    const title = isInstrument ? label(entry.track_id) : `${label(entry.bus_id)} · insert ${entry.insert_index + 1}`;
-    group.append(node("h3", { text: title }));
-    if (entry.error) {
-      group.append(paragraph(entry.error.message ?? "Plugin catalog unavailable."));
-      target.append(group);
-      continue;
-    }
-    const selector = node("select");
-    const controls = entry.parameters ?? [];
-    for (const parameter of controls) {
-      selector.add(new Option(`${parameter.name} · #${parameter.index}`, parameter.index));
-    }
-    const bindingForm = node("div", { classes: "stack" });
-    const showParameter = () => {
-      bindingForm.replaceChildren();
-      const parameter = controls.find((item) => String(item.index) === selector.value);
-      if (!parameter) return;
-      const id = `binding-${entry.track_id ?? entry.bus_id}-${entry.insert_index ?? "instrument"}`;
-      const input = numberInput(id, parameter.value, { min: 0, max: 1, step: "any", placeholder: "0–1" });
-      const disabled = readOnly || parameter.editable === false;
-      const operation = (value) => isInstrument
-        ? { kind: "set_instrument_parameter", track_id: entry.track_id, binding: String(parameter.index), value }
-        : { kind: "set_bus_insert_parameter", bus_id: entry.bus_id, insert_index: entry.insert_index, binding: String(parameter.index), value };
-      bindingForm.append(
-        paragraph(finite(parameter.value) ? "Stored normalized value" : "Value comes from the saved plugin state"),
-        controlForm("Normalized", input, operation, `Set ${title} · ${parameter.name}`, disabled),
-      );
-    };
-    group.append(controlLabel("Parameter", selector), bindingForm);
-    selector.addEventListener("change", showParameter);
-    showParameter();
-    target.append(group);
-  }
+  drawDevices({target,ui,track:currentTrack(),readOnly,node,button,label,stage});
 }
 
 function drawInspector() {
@@ -413,13 +353,12 @@ function drawInspector() {
   target.replaceChildren();
   if (!ui.view) return;
   const readOnly = ui.view.revision !== ui.snapshot.project.revision;
-  byId("inspector-context").textContent = readOnly ? "Preview · read-only" : "Project head";
+  byId("inspector-context").textContent = readOnly ? "Earlier version · read-only" : "";
   for (const tab of document.querySelectorAll("[data-view]")) tab.setAttribute("aria-pressed", tab.dataset.view === ui.inspector);
   if (ui.inspector === "edit") editEvent(target, currentTrack(), readOnly);
-  if (ui.inspector === "mix") mixer(target, ui.view.source, readOnly);
   if (ui.inspector === "plugins") {
     if (readOnly) target.append(paragraph("View the project head to inspect current plugin bindings."));
-    else plugins(target, false);
+    plugins(target, readOnly);
   }
 }
 
@@ -427,12 +366,18 @@ function drawProject() {
   const { project } = ui.snapshot;
   const source = ui.view.source;
   const headView = ui.view.revision === project.revision;
+  const active=document.activeElement;
+  const focusNote=active?.getAttribute('note-id');
+  const focusId=active?.id;
+  const timelineScroll=byId('timeline-viewport').scrollLeft;
+  const timelineTop=byId('timeline-viewport').scrollTop;
   byId("project-title").textContent = source.title;
   const tempo = source.time_map?.length > 1 ? "Tempo map" : `${source.tempo} BPM`;
-  byId("project-context").textContent = `${tempo} · ${source.sample_rate / 1000} kHz · Head ${short(project.revision)}`;
+  byId("project-context").textContent = `${tempo} · ${source.tracks.length} tracks`;
   byId("timeline-context").textContent = headView
     ? `${source.sections.length} sections · ${source.tracks.length} tracks`
     : `Viewing ${ui.view.revision.startsWith("proposal:") ? ui.view.revision : short(ui.view.revision)}`;
+  byId("project-context").title = `Source ${project.revision}`;
   byId("back-head").hidden = headView;
   if (!currentTrack()) ui.trackId = source.tracks[0]?.id;
   if (!selectedEvent()) ui.eventId = null;
@@ -442,6 +387,11 @@ function drawProject() {
   drawRevisions();
   drawRenditionSelectors();
   desktop.draw();
+  historyControls();
+  byId('timeline-viewport').scrollLeft=timelineScroll;
+  byId('timeline-viewport').scrollTop=timelineTop;
+  if(focusNote)(document.querySelector(`audio-ui-piano-roll-note[note-id="${CSS.escape(focusNote)}"]`) ?? document.querySelector("audio-ui-piano-roll-grid"))?.focus({preventScroll:true});
+  else if(focusId)byId(focusId)?.focus({preventScroll:true});
   updateBusy();
 }
 
@@ -449,27 +399,95 @@ async function refresh({ viewHead = false } = {}) {
   const next = await api("/state");
   const wasHead = !ui.view || ui.view.revision === ui.snapshot?.project.revision;
   ui.snapshot = next;
+  if (!historyKey) {
+    historyKey = `adaw-history:${location.origin}:${next.project.source.title}`;
+    try { ({undoStack = [], redoStack = []} = JSON.parse(localStorage.getItem(historyKey) || '{}')); } catch {}
+  }
   if (viewHead || wasHead) ui.view = next.project;
   drawProject();
   const chosen = byId(`rendition-${ui.slot}`).value;
   if (chosen !== ui.loadedAudio) await loadRendition();
 }
 
+let editQueue = Promise.resolve(), lastFailedEdit = null;
+const ownRevisions = new Map();
+let undoStack = [], redoStack = [], historyKey = null;
+function historyControls() {
+  byId('undo').disabled = !undoStack.length || !!ui.editPending;
+  byId('redo').disabled = !redoStack.length || !!ui.editPending;
+  if (historyKey) localStorage.setItem(historyKey, JSON.stringify({undoStack,redoStack}));
+}
+function enqueue(work) {
+  ui.editPending++;
+  byId('save-state').textContent = 'Saving…';
+  const result = editQueue.then(work);
+  editQueue = result.catch(error => {
+    notice(['STALE_REVISION','CONFLICT','REVISION_CONFLICT'].includes(error.code) ? 'This part changed elsewhere. Refresh to review it before editing again.' : `Couldn’t save. ${error.message}`, true, {code:error.code,...error.details});
+    byId('retry-edit').hidden = !lastFailedEdit;
+  }).finally(() => {
+    ui.editPending--; historyControls();
+    byId('save-state').textContent = ui.editPending ? 'Saving…' : lastFailedEdit ? 'Not saved · Retry' : 'Saved';
+  });
+  historyControls();
+  return result;
+}
 function stage(operation, reason) {
-  const baseRevision = ui.view.revision;
-  return action(async () => {
-    const command = {
-      command_id: `studio-${crypto.randomUUID()}`,
-      base_revision: baseRevision,
-      reason,
-      operations: Array.isArray(operation) ? operation : [operation],
-    };
-    await api("/proposals", command);
-    await inspectProposal(command.command_id);
+  const base = ui.view.revision;
+  const operations = structuredClone(Array.isArray(operation) ? operation : [operation]);
+  const commandId = `studio-${crypto.randomUUID()}`;
+  const work = async () => {
+    let revision = base;
+    while (ownRevisions.has(revision)) revision = ownRevisions.get(revision);
+    lastFailedEdit = () => enqueue(work);
+    const result = await api('/edit', {command_id:commandId,base_revision:revision,reason,operations});
+    if(revision!==result.revision)ownRevisions.set(revision,result.revision);
+    if (result.changed !== false && !undoStack.includes(result.revision)) undoStack.push(result.revision);
+    redoStack = []; lastFailedEdit = null; byId('retry-edit').hidden = true;
+    await refresh({viewHead:true});
+    monitor.updateSource(ui.view.source);
+    notice('');
+  };
+  return enqueue(work).catch(() => {});
+}
+function historyStep(redo = false) {
+  const stack = redo ? redoStack : undoStack;
+  if (!stack.length) return;
+  return enqueue(async () => {
+    const result = await api(redo ? '/redo' : '/undo', {revision:stack.at(-1)});
+    stack.pop(); if(result.changed !== false)(redo ? undoStack : redoStack).push(result.revision);
+    await refresh({viewHead:true}); monitor.updateSource(ui.view.source); notice('');
+  }).catch(() => {});
+}
+function liveMix(operation) {
+  const view = structuredClone(ui.view);
+  const target = operation.track_id ? view.source.tracks.find(t=>t.id===operation.track_id)
+    : operation.bus_id ? view.source.buses.find(t=>t.id===operation.bus_id) : view.source.master;
+  const key = operation.kind.endsWith('_gain') ? 'gain_db' : operation.kind.split('_').at(-1);
+  target[key] = operation.value;
+  monitor.updateSource(view.source); monitor.setMode('monitor');
+}
+let auditionSequence = 0;
+async function audition() {
+  const request = ++auditionSequence;
+  await editQueue;
+  const revision = ui.snapshot.project.revision;
+  byId('audition-state').textContent = 'Preparing…';
+  byId('retry-preview').hidden = true;
+  try {
+    const rendition = await api('/render', {revision});
     await refresh();
-    desktop.showReview();
-    notice("Edit staged. Apply it below, then Render head to hear your change. The current audio remains playable.");
-  }, "Staging project edit…");
+    if (request !== auditionSequence || ui.snapshot.project.revision !== revision) {
+      byId('audition-state').textContent = 'New edits · audition again'; return;
+    }
+    byId('rendition-b').value = rendition.id; ui.slot = 'b';
+    await loadRendition({preserve:true});
+    byId('audition-state').textContent = 'Ready';
+  } catch(error) {
+    if (request !== auditionSequence) return;
+    byId('audition-state').textContent = 'Couldn’t prepare audio';
+    byId('retry-preview').hidden = false;
+    notice(`Audition failed. Your previous audio is still available. ${error.message}`,true,error.details);
+  }
 }
 
 async function inspectProposal(id, showSource = false) {
@@ -554,7 +572,7 @@ function drawRenditionSelectors() {
     select.replaceChildren(new Option("Choose a render", ""));
     for (const item of renditions) {
       const revision = item.revision.startsWith("proposal:") ? "Proposal" : `Rev ${short(item.revision)}`;
-      select.add(new Option(`${revision} · ${short(item.id)}`, item.id));
+      select.add(new Option(`Take ${renditions.length-renditions.indexOf(item)}${item.revision === project.revision ? " · current" : ""}`, item.id));
     }
     select.value = renditions.some((item) => item.id === previous) ? previous : fallback ?? "";
   };
@@ -657,7 +675,13 @@ async function loadRendition({ preserve = false } = {}) {
   const rendition = await api(`/renditions/${idPath(id)}`);
   if (request !== ui.audioRequest) return;
   ui.rendition = rendition;
-  byId("audio-context").textContent = `${rendition.revision.startsWith("proposal:") ? "Proposal preview" : `Revision ${short(rendition.revision)}`} · ${short(id)}`;
+  monitor.setMode('render');
+  monitor.updateSource(ui.view.source);
+  api(`/renditions/${idPath(id)}/monitor`).then(manifest => {
+    if (request === ui.audioRequest) return monitor.prepare(manifest);
+  }).catch(error => { byId('monitor-status').textContent = 'Render playback'; byId('monitor-status').title = error.message; });
+  byId("audio-context").textContent = `${rendition.revision.startsWith("proposal:") ? "Proposed mix" : "Rendered mix"}`;
+  byId("audio-context").title = `${rendition.revision} · ${id}`;
   drawQuality();
   updateTransport();
   if (Array.isArray(rendition.waveform)) drawWaveform(rendition.waveform);
@@ -759,7 +783,6 @@ for (const tab of document.querySelectorAll("[data-view]")) {
   });
 }
 byId("refresh").addEventListener("click", () => action(() => refresh({ viewHead: true }), "Refreshing project…"));
-byId("render-head").addEventListener("click", () => render({ revision: ui.snapshot.project.revision }));
 byId("back-head").addEventListener("click", () => {
   ui.view = ui.snapshot.project;
   drawProject();
@@ -767,7 +790,7 @@ byId("back-head").addEventListener("click", () => {
 byId("zoom").addEventListener("change", drawTimeline);
 window.addEventListener("resize", updateTransport);
 byId("play").addEventListener("click", () => {
-  if (audio.paused) audio.play().catch((error) => notice(error.message, true));
+  if (audio.paused) { monitor.resume(); audio.play().catch((error) => notice(error.message, true)); }
   else audio.pause();
 });
 byId("position").addEventListener("input", (event) => { audio.currentTime = Number(event.target.value); });
@@ -796,8 +819,37 @@ byId("measure").addEventListener("click", () => action(async () => {
   drawQuality();
   notice(`Measured rendition ${short(renditionId)}.`);
 }, "Analyzing rendered audio…"));
+const monitor = createMonitor({audio,
+  onStatus: status => {
+    byId('monitor-status').textContent = status.mode === 'monitor' ? 'Live mix preview' : 'Rendered mix';
+    byId('monitor-status').title = status.mode === 'monitor' ? status.limitations : status.message || 'Exact rendered audio';
+    byId('monitor-mode').disabled = !status.ready || !status.compatible;
+    byId('monitor-mode').setAttribute('aria-pressed', String(status.mode==='monitor'));
+  },
+  onMeters: m => {
+    for (const [channel,value] of [['left',m.left],['right',m.right]]) {
+      const meter=byId(`meter-${channel}`); meter.value=Number.isFinite(value)?value:-60;
+      meter.title=`${channel} ${Number.isFinite(value)?value.toFixed(1):'−∞'} dBFS`;
+    }
+    byId('master-meter').classList.toggle('clipping',m.clip);
+    byId('meter-clip').textContent=m.clip?'CLIP':'';
+  }
+});
+byId('monitor-mode').addEventListener('click',()=>monitor.setMode(monitor.status.mode==='monitor'?'render':'monitor'));
+byId('audition').addEventListener('click',audition);
+byId('retry-preview').addEventListener('click',audition);
+byId('retry-edit').addEventListener('click',()=>lastFailedEdit?.());
+byId('undo').addEventListener('click',()=>historyStep());
+byId('redo').addEventListener('click',()=>historyStep(true));
+document.addEventListener('keydown',e=>{
+  if(e.target.closest('input,select,textarea,[contenteditable="true"]'))return;
+  if((e.ctrlKey||e.metaKey)&&['z','y'].includes(e.key.toLowerCase())) {
+    e.preventDefault(); e.stopPropagation(); historyStep(e.shiftKey||e.key.toLowerCase()==='y');
+  }
+},true);
+setupLayout();
 const desktop = createDesktop({ ui, audio, byId, node, button, label, trackColors, stage, notice,
-  selectTrack, currentTrack, drawInspector, tickAtTime, timeChanges });
+  selectTrack, currentTrack, drawInspector, tickAtTime, timeChanges, liveMix });
 action(async () => {
   await refresh({ viewHead: true });
   notice("");

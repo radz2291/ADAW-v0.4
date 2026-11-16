@@ -25,15 +25,29 @@ The fork can reuse an explicitly supplied existing Python environment via the
 launcher's `-Python` argument. Project paths remain explicit and independent.
 
 Use Space for play/pause and Home for stop/start outside input controls. Click a
-section to seek matching audio; Loop auditions that section. Select a MIDI track
-and Piano roll to move or resize existing notes with pointer/keyboard and edit
-velocity. Fader and note gestures create proposals: Apply, then Render head to
-hear the edited source. The inspector also offers exact numeric editing. History
-& review exposes proposals, selective undo, audio evidence and owner decisions.
+section to seek matching audio; Loop auditions that section. Piano roll supports
+pointer creation, note movement/resizing, velocity, multi-selection, copy/paste
+and deletion. Changes save through validated service operations immediately.
+Undo/Redo works through the shared revision service. Audition prepares the latest
+source while the previous audio remains playable. Pending agent proposals remain
+separate in History & review.
+
+Track gain/pan/mute/solo and bus/master gain persist. Multiple solos play together;
+mute wins. Live mix uses verified native pre-level track stems for immediate
+monitoring. It approximates downstream bus/master effects and final fade; use
+Audition for the canonical finished sound. Stereo output meters measure actual
+WebAudio samples; listening volume does not change source gain. Exact rendition
+identity remains available in transport tooltips and History.
 
 Protected tracks and historical source are read-only in the note editor. There
-is no live input/recording, live instrument audition, mute/solo or invented meter.
-The piano keys are a silent pitch reference. Browser loops are not sample accurate.
+is no live input/recording or live instrument synthesis. The piano keys are a
+silent pitch reference. Browser loops are not sample accurate. Sample groups
+support end trim; leading sample trim and split are explicitly unsupported.
+Browser/inspector visibility and pane height persist locally; Help has Reset layout.
+
+The frozen everyday rubric and independent round reports live under
+`docs/evaluation/` and `evidence/evaluation/`. Never change the rubric without an
+explicit owner request. Older evidence describes its historical build.
 
 Verification commands and results are retained under `evidence/ui/desktop/`.
 

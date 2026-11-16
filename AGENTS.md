@@ -62,3 +62,17 @@ Read [the UI adoption decision](docs/decisions/ADR-0005-desktop-studio.md) and
 [Studio development instructions](apps/studio/README.md) before UI work.
 The isolated development fork is branch `adaw/desktop-studio`, based on `3897f30`;
 it does not replace or merge the prior integration branch automatically.
+
+## Frozen everyday interaction acceptance
+
+The owner froze [EVERYDAY-INTERACTION-v1](docs/evaluation/EVERYDAY-INTERACTION-v1.md)
+before implementation. Never change its tasks, scoring, scope, mandatory checks,
+thresholds, or SHA-256 lock unless the owner explicitly asks. Improvements must be
+independently evaluated against those same criteria; keep every failed round.
+The target is at least 90/100 with all mandatory checks, not DAW feature parity.
+The main workspace serves musicians: keep it quiet, familiar and meaningful.
+Show musical actions and clear feedback; put revisions, hashes and diagnostics
+in optional history/details rather than requiring administrative knowledge.
+Avoid repeated components and competing controls for the same action. Reuse the
+established control adapters; keep one primary home for mixing and audition.
+Precision editing and optional evidence should complement the main workflow.

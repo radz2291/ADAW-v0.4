@@ -701,3 +701,27 @@ audio-ui-piano-roll-note-handle {
 audio-ui-piano-roll-note-handle:hover {
   background: #ffffff70;
 }
+
+/* Everyday music controls, using the established audio/UI primitives. */
+.note-tools, .group-tools { display:flex; align-items:center; flex-wrap:wrap; gap:5px; padding:5px 9px; font-size:11px; }
+.note-tools .piano-info { padding:0 6px; }
+.group-tools:has(input) { border-block:1px solid var(--line); }
+.group-tools input { width:65px; min-width:0; padding:3px; }
+.group-tools>span:first-child { margin-right:auto; color:var(--muted); }
+.monitor-bar { display:flex; align-items:center; gap:8px; margin-top:6px; font-size:11px; color:var(--muted); }
+#master-meter { display:flex; gap:6px; align-items:center; margin-left:auto; }
+#master-meter label { display:flex; align-items:center; gap:4px; }
+#master-meter meter { width:75px; height:13px; }
+#master-meter.clipping { color:#ff7d68; }
+#meter-clip { min-width:27px; }
+#save-state, #audition-state { color:var(--muted); font-size:11px; }
+.channel-buttons { display:flex; gap:4px; justify-content:center; }
+.channel-buttons button { min-width:28px; }
+.channel-strip { min-height:340px; width:100px; }
+.channel-strip>input[type=range] { width:76px; }
+.channel-strip>.gain-readout { width:75px; max-width:100%; text-align:center; font-size:11px; }
+.channel-strip>button { font-size:10px; min-height:26px; }
+audio-ui-fader-thumb { min-height:24px; }
+.mix-console { height:366px; }
+button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+@media(max-width:620px) { .monitor-bar {flex-wrap:wrap;} #master-meter {margin-left:0;} .note-tools,.group-tools{max-width:100%;} }

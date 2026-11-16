@@ -336,3 +336,12 @@ def test_archive_rejects_altered_member_and_manifest(tmp_path):
             "member": "Package checksum mismatch", "manifest": "Package inventory differs from manifest",
         }[what]
         assert not rejected.exists()
+
+
+def test_everyday_rubric_is_frozen():
+    from hashlib import sha256
+    from pathlib import Path
+    folder = Path(__file__).resolve().parents[1] / "docs" / "evaluation"
+    expected = "904217d07d250e4fa1677b522372313fbf449c9a15177f022a229457f0d78253"
+    assert sha256((folder / "EVERYDAY-INTERACTION-v1.md").read_bytes()).hexdigest() == expected
+    assert expected in (folder / "EVERYDAY-INTERACTION-v1.sha256").read_text()

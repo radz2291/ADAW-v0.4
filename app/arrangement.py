@@ -138,12 +138,14 @@ def validate(source):
     require(isinstance(source["tracks"], list) and source["tracks"], "Missing tracks")
     track_ids, event_ids = set(), set()
     for t in source["tracks"]:
-        fields(t, ("id", "role", "kind", "bus", "gain_db", "pan", "protected", "instrument", "events", "inserts"))
+        fields(t, ("id", "role", "kind", "bus", "gain_db", "pan", "protected", "instrument", "events", "inserts"), ("mute", "solo"))
         identifier(t["id"])
         require(t["id"] not in track_ids and t["id"] not in bus_ids, "Duplicate track/bus ID")
         track_ids.add(t["id"])
         require(t["bus"] in bus_ids and isinstance(t["role"], str), "Invalid track routing/role")
         require(type(t["protected"]) is bool, "Invalid protection flag")
+        for flag in ("mute", "solo"):
+            require(type(t.get(flag, False)) is bool, "Invalid track " + flag + " flag")
         number(t["gain_db"])
         number(t["pan"], -1, 1)
         validate_inserts(t["inserts"], allow_key=False)
@@ -238,7 +240,7 @@ def compile_graph(source, read_content):
     def add(name, kind, inputs, config):
         nodes.append(dict(id=name, kind=kind, inputs=inputs, channels=2, config=config))
         return name
-    def processing(name, upstream, gain_db, pan, inserts, available_keys=None):
+    def processing(name, upstream, gain_db, pan, inserts, available_keys=None, audible=True, monitor=False):
         last = upstream
         for i, insert in enumerate(inserts):
             if "registry_id" in insert:
@@ -255,8 +257,12 @@ def compile_graph(source, read_content):
                 if "key_bus" in insert:
                     inputs.append(available_keys[insert["key_bus"]])
                 last = add(f"{name}_fx{i}", "faust", inputs, config)
-        gain = 10 ** (gain_db / 20)
+        if monitor:
+            last = add(name + "_monitor", "faust", [last], {"source": "process = _,_;", "parameters": {}})
+            stems.append(last)
+        gain = 10 ** (gain_db / 20) if audible else 0
         return add(name + "_level", "faust", [last], {"source": f"process = *( {gain*min(1,1-pan):.17g} ), *( {gain*min(1,1+pan):.17g} );", "parameters": {}})
+    any_solo = any(t.get("solo", False) for t in source["tracks"])
     for t in source["tracks"]:
         inst = t["instrument"]
         midi = [{"note": e["note"], "velocity": e["velocity"], "start_frame": frame(e["start_tick"]),
@@ -272,7 +278,9 @@ def compile_graph(source, read_content):
             config = {"registry_id": inst["registry_id"], "state_sha256": inst["state_sha256"],
                       "parameters": inst["parameters"], "midi": midi, "automation": {}}
         dry = add("track_"+t["id"], t["kind"], [], config)
-        ends[t["id"]] = processing("track_"+t["id"], dry, t["gain_db"], t["pan"], t["inserts"])
+        audible = not t.get("mute", False) and (not any_solo or t.get("solo", False))
+        ends[t["id"]] = processing("track_"+t["id"], dry, t["gain_db"], t["pan"], t["inserts"],
+                                   audible=audible, monitor=True)
         stems.append(ends[t["id"]])
     buses = {}
     for b in source["buses"]:

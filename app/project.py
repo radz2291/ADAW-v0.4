@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 import uuid
 
-from app.arrangement import validate, compile_graph, sha
+from app.arrangement import validate, compile_graph, sha, integer
 from app.contracts import canonical, catalog_hash, digest, fields, file_hash, number, require
 from app.errors import AdawError
 from app.revisions import merge_source
@@ -102,6 +102,11 @@ class ProjectService(Service):
                     require(info.samplerate == source["sample_rate"] and info.channels in (1, 2), "Sample rate/channels must match source; no implicit resampling")
                 elif t["kind"] == "faust_synth":
                     references.append((inst["module_sha256"], "faust"))
+                    validation = self._module_validation(db, inst["module_sha256"])
+                    if validation is not None:
+                        catalog = {item["name"]: item for item in validation["catalog"]}
+                        for binding, value in inst["parameters"].items():
+                            self._validate_faust_parameter(catalog, binding, value)
                 else:
                     check_plugin(inst)
             for entity in [*source["tracks"], *source["buses"], source["master"]]:
@@ -175,6 +180,21 @@ class ProjectService(Service):
         _, source = self.source(revision)
         rows = []
 
+        def add_faust(instance, **location):
+            row = {**location, "kind": "faust", "module_sha256": instance["module_sha256"], "parameters": []}
+            rows.append(row)
+            with closing(self.connect()) as db:
+                validation = self._module_validation(db, instance["module_sha256"])
+            if validation is None:
+                row["error"] = {"code": "MODULE_CAPABILITY_UNVERIFIED",
+                                "message": "Reimport the module to record its control catalog", "details": {}}
+                return
+            for parameter in validation["catalog"]:
+                binding = parameter["name"]
+                row["parameters"].append({**parameter, "binding": binding,
+                    "value": instance["parameters"].get(binding, parameter["value"]),
+                    "value_source": "override" if binding in instance["parameters"] else "module_default"})
+
         def add(instance, **location):
             row = {**location, "registry_id": instance["registry_id"],
                    "catalog_sha256": instance["catalog_sha256"], "parameters": []}
@@ -197,10 +217,14 @@ class ProjectService(Service):
         for track in source["tracks"]:
             if track["kind"] == "vst":
                 add(track["instrument"], track_id=track["id"])
+            elif track["kind"] == "faust_synth":
+                add_faust(track["instrument"], track_id=track["id"])
         for bus in source["buses"]:
             for index, insert in enumerate(bus["inserts"]):
                 if "registry_id" in insert:
                     add(insert, bus_id=bus["id"], insert_index=index)
+                else:
+                    add_faust(insert, bus_id=bus["id"], insert_index=index)
         return rows
 
     def create(self, source):
@@ -319,6 +343,16 @@ class ProjectService(Service):
                 fields(op, ("kind", "track_id", "value"))
                 number(op["value"])
                 track["gain_db"] = op["value"]
+            elif op["kind"] in ("set_track_pan", "set_track_mute", "set_track_solo"):
+                fields(op, ("kind", "track_id", "value"))
+                key = op["kind"].removeprefix("set_track_")
+                if key == "pan":
+                    number(op["value"], -1, 1)
+                else:
+                    require(type(op["value"]) is bool, "Expected boolean track flag")
+                track[key] = op["value"]
+            elif op["kind"] in ("add_events", "delete_events", "duplicate_events", "transform_events"):
+                self._edit_events(track, op)
             elif op["kind"] == "move_event":
                 fields(op, ("kind", "track_id", "event_id", "start_tick"))
                 if track["protected"]:
@@ -347,8 +381,7 @@ class ProjectService(Service):
                 if track["kind"] == "vst":
                     self._set_vst_parameter(track["instrument"], op["binding"], op["value"])
                 else:
-                    number(op["value"])
-                    track["instrument"]["parameters"][op["binding"]] = op["value"]
+                    self._set_bus_parameter(track["instrument"], op["binding"], op["value"])
             else:
                 raise AdawError("VALIDATION_ERROR", "Unsupported typed operation")
         self.validate_dependencies(source)
@@ -362,6 +395,81 @@ class ProjectService(Service):
             else:
                 db.execute("INSERT INTO g1_proposals VALUES (?,?,?,NULL)", (command["command_id"], payload, canonical(source)))
         return {"proposal_id": command["command_id"], "source_sha256": digest(canonical(source)), "operations": command["operations"], "head_changed": False}
+
+    def edit(self, command):
+        """Validate and commit one manual gesture through the proposal contract."""
+        proposal = self.propose(command)
+        return self.apply(proposal["proposal_id"])
+
+    @staticmethod
+    def _edit_events(track, op):
+        if track["protected"]:
+            raise AdawError("ARTISTIC_BOUNDARY", "Protected track events cannot be changed by this operation")
+        common = ("kind", "track_id")
+        kind = op["kind"]
+        if kind == "add_events":
+            fields(op, (*common, "events"))
+            require(isinstance(op["events"], list), "Expected event list")
+            track["events"].extend(op["events"])
+            return
+        required = (*common, "event_ids")
+        if kind == "delete_events":
+            fields(op, required)
+        elif kind == "duplicate_events":
+            fields(op, (*required, "new_ids", "offset_ticks"))
+        else:
+            action = op.get("action")
+            require(action in ("move", "trim", "split"), "Unknown event transform")
+            extra = {"move": ("offset_ticks",), "trim": ("start_tick", "end_tick"),
+                     "split": ("tick", "new_ids")}[action]
+            fields(op, (*required, "action", *extra))
+        ids = op["event_ids"]
+        require(isinstance(ids, list) and all(isinstance(item, str) for item in ids), "Expected event IDs")
+        require(len(ids) == len(set(ids)), "Repeated event ID")
+        selected = [event for event in track["events"] if event["id"] in ids]
+        require(len(selected) == len(ids), "Unknown event")
+        if kind == "delete_events":
+            track["events"] = [event for event in track["events"] if event["id"] not in ids]
+            return
+        action = "duplicate" if kind == "duplicate_events" else op["action"]
+        if action in ("move", "duplicate"):
+            require(type(op["offset_ticks"]) is int, "Expected integer tick offset")
+        if action == "duplicate":
+            require(isinstance(op["new_ids"], dict) and set(op["new_ids"]) == set(ids),
+                    "Provide one new ID for every duplicated event")
+            track["events"].extend({**event, "id": op["new_ids"][event["id"]],
+                                    "start_tick": event["start_tick"] + op["offset_ticks"]} for event in selected)
+        elif action == "move":
+            for event in selected:
+                event["start_tick"] += op["offset_ticks"]
+        elif action == "split":
+            integer(op["tick"])
+            crossing = [event for event in selected
+                        if event["start_tick"] < op["tick"] < event["start_tick"] + event["duration_ticks"]]
+            require(isinstance(op["new_ids"], dict) and set(op["new_ids"]) == {event["id"] for event in crossing},
+                    "Provide new IDs for exactly the notes crossing the split")
+            require(track["kind"] != "samples" or not crossing,
+                    "Sample split requires source offsets; split MIDI notes instead")
+            for event in crossing:
+                end = event["start_tick"] + event["duration_ticks"]
+                track["events"].append({**event, "id": op["new_ids"][event["id"]],
+                                        "start_tick": op["tick"], "duration_ticks": end - op["tick"]})
+                event["duration_ticks"] = op["tick"] - event["start_tick"]
+        else:
+            integer(op["start_tick"])
+            integer(op["end_tick"], 1)
+            require(op["start_tick"] < op["end_tick"], "Empty trim range")
+            removed = set()
+            for event in selected:
+                start = max(event["start_tick"], op["start_tick"])
+                end = min(event["start_tick"] + event["duration_ticks"], op["end_tick"])
+                if start >= end:
+                    removed.add(event["id"])
+                    continue
+                require(track["kind"] != "samples" or start == event["start_tick"],
+                        "Sample leading trim requires source offsets; trim MIDI notes instead")
+                event.update(start_tick=start, duration_ticks=end - start)
+            track["events"] = [event for event in track["events"] if event["id"] not in removed]
 
     def _set_vst_parameter(self, instance, binding, value):
         catalog = self._verified_catalog(instance)
@@ -418,8 +526,10 @@ class ProjectService(Service):
             db.execute("BEGIN IMMEDIATE")
             previous = db.execute("SELECT applied FROM g2_undos WHERE target=?", (revision,)).fetchone()
             if previous:
+                previous_parent, previous_source = self._revision(db, previous[0])
+                changed = previous[0] == self._revision_id(previous_parent, json.loads(previous_source), {"undo": revision})
                 return {"revision": previous[0], "undone_revision": revision, "idempotent": True,
-                        "listening": "NOT_EVALUATED"}
+                        "changed": changed, "listening": "NOT_EVALUATED"}
             parent, source = self._revision(db, revision)
             require(parent is not None, "Initial revision cannot be undone")
             head = self.head(db)
@@ -433,7 +543,17 @@ class ProjectService(Service):
                 applied = self._commit(db, head, merged, {"undo": revision}, f"Undo {revision}")
             db.execute("INSERT INTO g2_undos VALUES (?,?)", (revision, applied))
             return {"revision": applied, "undone_revision": revision, "idempotent": False,
-                    "listening": "NOT_EVALUATED"}
+                    "changed": applied != head, "listening": "NOT_EVALUATED"}
+
+    def redo(self, revision):
+        """Invert the actual undo revision, retaining later unrelated changes."""
+        require(isinstance(revision, str) and revision, "Expected undo revision ID")
+        with closing(self.connect()) as db:
+            parent, source = self._revision(db, revision)
+            targets = db.execute("SELECT target FROM g2_undos WHERE applied=?", (revision,)).fetchall()
+            require(any(revision == self._revision_id(parent, json.loads(source), {"undo": target[0]})
+                        for target in targets), "Redo requires an actual undo revision")
+        return {**self.undo(revision), "redone_revision": revision}
 
     def render_project(self, timeout, revision=None, proposal_id=None):
         require(revision is None or proposal_id is None, "Choose revision or proposal")

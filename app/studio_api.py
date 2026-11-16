@@ -13,6 +13,7 @@ from app.contracts import canonical, fields
 from app.errors import AdawError
 from app.project import ProjectService
 from app.reviews import ReviewStore
+from app.studio_audio import monitor_manifest, monitor_stem_sha
 
 MAX_COMMAND_BYTES = 8 * 1024 * 1024
 RENDER_TIMEOUT_SECONDS = 180
@@ -21,6 +22,7 @@ STATIC_FILES = {
     "/": ("index.html", "text/html; charset=utf-8"),
     "/index.html": ("index.html", "text/html; charset=utf-8"),
     "/studio.css": ("studio.css", "text/css; charset=utf-8"),
+    "/layout.css": ("layout.css", "text/css; charset=utf-8"),
     "/desktop.css": ("desktop.css", "text/css; charset=utf-8"),
     "/studio.js": ("dist/studio.js", "text/javascript; charset=utf-8"),
     "/styles.css": ("styles.css", "text/css; charset=utf-8"),
@@ -100,6 +102,9 @@ def make_server(root, port=0, studio_dir=None):
             self.send_body(416, b"", "audio/wav", [("Content-Range", f"bytes */{size}")])
 
         def get_data(self, route):
+            monitor = re.fullmatch(r"/api/v1/renditions/([A-Za-z0-9_-]+)/monitor", route)
+            if monitor:
+                return monitor_manifest(service, monitor.group(1))
             if route == "/api/v1/session":
                 return {"token": token}
             if route == "/api/v1/state":
@@ -118,6 +123,11 @@ def make_server(root, port=0, studio_dir=None):
             raise AdawError("NOT_FOUND", "Unknown Studio endpoint")
 
         def post_data(self, route, body):
+            if route == "/api/v1/edit":
+                return service.edit(body)
+            if route == "/api/v1/redo":
+                fields(body, ("revision",))
+                return service.redo(body["revision"])
             if route == "/api/v1/proposals":
                 return service.propose(body)
             if route == "/api/v1/apply":
@@ -144,6 +154,10 @@ def make_server(root, port=0, studio_dir=None):
                 if write:
                     data = self.post_data(route, self.command_body())
                 else:
+                    stem = re.fullmatch(r"/api/v1/renditions/([A-Za-z0-9_-]+)/stems/([A-Za-z0-9_:-]+)/audio", route)
+                    if stem:
+                        self.audio(monitor_stem_sha(service, *stem.groups()))
+                        return
                     if assets and route in STATIC_FILES:
                         filename, media_type = STATIC_FILES[route]
                         self.send_body(200, (assets / filename).read_bytes(), media_type)

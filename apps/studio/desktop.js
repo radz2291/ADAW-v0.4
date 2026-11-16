@@ -4,8 +4,8 @@ import WaveSurfer from 'wavesurfer.js';
 const FADER = { min: -60, max: 12, step: .1 };
 
 export function createDesktop({ ui, audio, byId, node, button, label, trackColors, stage, notice,
-  selectTrack, currentTrack, drawInspector, tickAtTime, timeChanges }) {
-  let dock = 'mixer', sectionId = null, looping = false, wave = null;
+  selectTrack, currentTrack, drawInspector, tickAtTime, timeChanges, liveMix }) {
+  let dock = 'mixer', sectionId = null, looping = false, wave = null, snap=.25, drawMode=false, group=null;
   const source = () => ui.view?.source;
   const section = () => source()?.sections.find(s => s.id === sectionId) ?? source()?.sections[0];
   const matching = () => ui.rendition?.revision === ui.view?.revision;
@@ -48,7 +48,7 @@ export function createDesktop({ ui, audio, byId, node, button, label, trackColor
     root.append(button('Instruments & effects', () => {ui.inspector = 'plugins'; drawInspector();}, {classes:'browser-section'}));
   }
   function drawMixer() {
-    const root = byId('mix-console'); root.replaceChildren();
+    const root = byId('mix-console'), scroll=root.scrollLeft; root.replaceChildren();
     if (!source()) return;
     const readOnly = ui.view.revision !== ui.snapshot.project.revision;
     const add = (entity, kind, key, color, index) => {
@@ -57,53 +57,68 @@ export function createDesktop({ ui, audio, byId, node, button, label, trackColor
       strip.style.setProperty('--track-color', color);
       strip.classList.toggle('selected', entity.id === ui.trackId);
       const heading = key === 'track_id'
-        ? button(title, () => selectTrack(entity), {classes:'channel-name'})
-        : node('h3', {text:title, classes:'channel-name'});
+        ? button(title, () => selectTrack(entity), {classes:'channel-name',attrs:{title}})
+        : node('h3', {text:title, classes:'channel-name',attrs:{title}});
       strip.append(node('span',{text:String(index).padStart(2,'0'),classes:'channel-number'}), heading);
       strip.append(node('p',{text:key==='track_id' ? `→ ${label(entity.bus)}` : 'BUS / OUTPUT',classes:'channel-route'}));
       const fader = node('audio-ui-fader', {attrs:{min:Math.min(FADER.min, entity.gain_db), max:Math.max(FADER.max, entity.gain_db),
         step:FADER.step, 'default-value':entity.gain_db, 'data-entity': entity.id ?? 'master'}});
       fader.value = entity.gain_db;
-      fader.toggleAttribute('disabled', readOnly || ui.busy);
+      fader.toggleAttribute('disabled', readOnly);
       const control = node('audio-ui-fader-control');
       const track = node('audio-ui-fader-track'); track.append(node('audio-ui-fader-indicator'));
       control.append(track, node('audio-ui-fader-thumb',{attrs:{'aria-label':`${title} source gain in dB`}}));
       fader.append(control);
-      const readout = node('output', {text:`${entity.gain_db.toFixed(1)} dB`, classes:'gain-readout'});
+      const readout = node('input', {classes:'gain-readout',attrs:{type:'number',step:.1,'aria-label':`${title} gain in dB`}});
+      readout.value=entity.gain_db; readout.disabled=readOnly;
+      const commit=value=>{const op=key?{kind,[key]:entity.id,value}:{kind,value};liveMix(op);stage(op,`Adjust ${title} gain`);};
+      readout.addEventListener('change',()=>{if(readout.checkValidity()&&Number.isFinite(readout.valueAsNumber))commit(readout.valueAsNumber);});
+      const reset=button('0 dB',()=>commit(0),{disabled:readOnly,attrs:{title:`Reset ${title} gain`}});
       fader.addEventListener('input', e => {
-        if (ui.busy || readOnly) return e.preventDefault();
-        if (e.detail) readout.textContent = `${e.detail.value.toFixed(1)} dB`;
+        if (readOnly) return e.preventDefault();
+        if (e.detail) { readout.value = e.detail.value.toFixed(1); liveMix(key ? {kind,[key]:entity.id,value:e.detail.value} : {kind,value:e.detail.value}); }
       });
       fader.addEventListener('change', e => {
-        if (!e.detail || ui.busy || readOnly) return;
+        if (!e.detail || readOnly) return;
         const value = Math.round(e.detail.value * 10) / 10;
-        // The committed source remains visible while the proposal is reviewed.
-        fader.value = entity.gain_db;
-        readout.textContent = `${entity.gain_db.toFixed(1)} dB`;
+        readout.value = value;
         if (value !== entity.gain_db) stage(key ? {kind, [key]:entity.id, value} : {kind,value}, `Set ${title} gain to ${value} dB`);
       });
-      strip.append(fader, readout, node('span',{text:`${entity.inserts?.length ?? 0} inserts`,classes:'channel-route'}));
+      if(key==='track_id') {
+        const channelButtons=node('div',{classes:'channel-buttons'});
+        for(const field of ['mute','solo'])channelButtons.append(button(field==='mute'?'M':'S',()=>{
+          const op={kind:`set_track_${field}`,track_id:entity.id,value:!entity[field]};liveMix(op);stage(op,`${field} ${title}`);
+        },{disabled:readOnly,attrs:{'aria-label':`${field==='mute'?'Mute':'Solo'} ${title}`,'aria-pressed':!!entity[field],title:field==='mute'?'Mute (takes priority over Solo)':'Solo (multiple tracks can be soloed)'}}));
+        strip.append(channelButtons);
+        const pan=node('input',{attrs:{type:'range',min:-1,max:1,step:.01,'aria-label':`${title} pan`}});pan.value=entity.pan;pan.disabled=readOnly;
+        pan.addEventListener('input',()=>liveMix({kind:'set_track_pan',track_id:entity.id,value:pan.valueAsNumber}));
+        pan.addEventListener('change',()=>stage({kind:'set_track_pan',track_id:entity.id,value:pan.valueAsNumber},`Pan ${title}`));
+        strip.append(pan,button('Center',()=>{const op={kind:'set_track_pan',track_id:entity.id,value:0};liveMix(op);stage(op,`Center ${title}`);},{disabled:readOnly,attrs:{title:'Reset pan to center'}}));
+      }
+      strip.append(fader, readout, reset);
       root.append(strip);
     };
     source().tracks.forEach((t,i) => add(t,'set_track_gain','track_id',trackColors[t.role.toLowerCase()]??'#91a6c0',i+1));
     source().buses.forEach((b,i) => add(b,'set_bus_gain','bus_id','#a597d1',source().tracks.length+i+1));
     add(source().master,'set_master_gain',null,'#c7df8b',source().tracks.length+source().buses.length+1);
+    root.scrollLeft=scroll;
   }
   function drawPiano() {
-    const root = byId('piano-editor'); root.replaceChildren();
+    const root = byId('piano-editor'); const oldScroll=root.querySelector('audio-ui-timeline-viewport')?.scrollLeft??0; root.replaceChildren();
     const track = currentTrack(), range = section();
     if (!track || !range) return;
     if (track.kind === 'samples') {
-      root.append(node('div',{text:'Audio / sample track. Select a MIDI instrument to edit notes. Sample timing and velocity are available in the Events inspector.',classes:'editor-empty'})); return;
+      root.append(node('div',{text:'Audio / sample track. Select a MIDI instrument to edit notes. Sample timing and velocity are available in the Notes inspector.',classes:'editor-empty'})); return;
     }
     const ppq = source().ppq;
-    const events = track.events.filter(e => e.start_tick >= range.start_tick && e.start_tick < range.end_tick);
+    let events = track.events.filter(e => e.start_tick >= range.start_tick && e.start_tick < range.end_tick);
     const notes = events.map(e => ({id:e.id,pitch:e.note,start:(e.start_tick-range.start_tick)/ppq,length:e.duration_ticks/ppq,velocity:e.velocity/127}));
     const pitches = events.map(e=>e.note);
     const low = Math.max(0, (pitches.length ? Math.min(...pitches) : 60)-2);
     const high = Math.min(127,Math.max(low+12,(pitches.length ? Math.max(...pitches) : 72)+2));
-    const timeline = node('audio-ui-timeline',{attrs:{id:'note-timeline',duration:(range.end_tick-range.start_tick)/ppq,'snap-step':.25,'min-zoom':8,'max-zoom':240}});
-    const roll = node('audio-ui-piano-roll',{attrs:{'min-pitch':low,'max-pitch':high,mode:'select'}});
+    const timeline = node('audio-ui-timeline',{attrs:{id:'note-timeline',duration:(range.end_tick-range.start_tick)/ppq,'snap-step':snap,'min-zoom':8,'max-zoom':240}});
+    const roll = node('audio-ui-piano-roll',{attrs:{'min-pitch':low,'max-pitch':high,mode:drawMode?'draw':'select'}});
+    roll.createNoteId=()=>`note-${crypto.randomUUID()}`;
     roll.toggleAttribute('disabled', track.protected || ui.view.revision !== ui.snapshot.project.revision);
     const keys = node('audio-ui-piano-roll-keys');
     const piano = node('audio-ui-piano', {attrs:{'aria-label':'Pitch reference (silent)'}}); piano.append(node('audio-ui-piano-keys')); keys.append(piano);
@@ -123,40 +138,82 @@ export function createDesktop({ ui, audio, byId, node, button, label, trackColor
     viewport.append(grid);
     const velocityLane = node('audio-ui-piano-roll-velocity-lane'); velocityLane.append(node('audio-ui-piano-roll-velocities'));
     viewport.append(velocityLane); roll.append(keys,viewport); timeline.append(roll);
-    root.append(node('div',{text:`${label(track.id)} / ${label(range.id)} · ${events.length} notes · 1/16 grid · Drag / arrows to move · Shift + arrows to resize${track.protected ? ' · Protected' : ''}`,classes:'piano-info'}),timeline);
-    roll.value = notes;
-    if (ui.eventId && notes.some(n=>n.id===ui.eventId)) roll.selection=[ui.eventId];
+    const toolbar=node('div',{classes:'note-tools'});
+    const unavailable=track.protected||ui.view.revision!==ui.snapshot.project.revision;
+    toolbar.append(button(drawMode?'Draw notes ✓':'Draw notes',()=>{drawMode=!drawMode;drawPiano();},{disabled:unavailable,attrs:{'aria-pressed':drawMode,title:'Click empty space to add notes; double-click also adds in Select mode'}}));
+    const snapPicker=node('select',{attrs:{'aria-label':'Note snap'}});
+    for(const [text,value] of [['1/4',1],['1/8',.5],['1/16',.25],['1/32',.125],['Off',0]])snapPicker.add(new Option(text,String(value)));
+    snapPicker.value=String(snap);snapPicker.addEventListener('change',()=>{snap=Number(snapPicker.value);timeline.setAttribute('snap-step',snap);});
+    toolbar.append(node('span',{text:'Snap'}),snapPicker);
+    const shortcut=(key,ctrl=false)=>{grid.focus();grid.dispatchEvent(new KeyboardEvent('keydown',{key,ctrlKey:ctrl,bubbles:true,cancelable:true}));};
+    for(const [text,key,ctrl] of [['Delete','Delete',false],['Duplicate','d',true],['Copy','c',true],['Paste','v',true]])toolbar.append(button(text,()=>shortcut(key,ctrl),{disabled:unavailable}));
+    toolbar.append(node('span',{text:track.protected?'Protected track':`${label(track.id)} · ${events.length} notes`,classes:'piano-info',attrs:{title:label(track.id)}}));
+    root.append(toolbar,timeline);
+    roll.value=notes;
+    roll.selection=(ui.selection?.length?ui.selection:[ui.eventId]).filter(id=>notes.some(n=>n.id===id));
+    viewport.scrollLeft=oldScroll;
     roll.addEventListener('noteselect', e => {
-      ui.eventId = e.detail.selection[0] ?? null; drawInspector();
-    });
-    roll.addEventListener('input', e => {
-      if (!e.detail) return;
-      const unsupported = e.detail.value.length !== notes.length || e.detail.value.some(n => !events.some(v=>v.id===n.id));
-      if (ui.busy || unsupported) {
-        e.preventDefault();
-        if (unsupported) notice('This editor supports moving, resizing and changing velocity of existing notes. Adding or deleting notes is not available yet.');
-      }
+      ui.selection=[...e.detail.selection];ui.eventId=ui.selection[0]??null;drawInspector();
     });
     roll.addEventListener('change', e => {
-      if (!e.detail || ui.busy || track.protected || ui.view.revision !== ui.snapshot.project.revision) return;
-      const operations = [];
-      for (const n of e.detail.value) {
-        const old = events.find(v=>v.id===n.id); if (!old) continue;
-        const values = {start_tick:range.start_tick+Math.round(n.start*ppq),duration_ticks:Math.max(1,Math.round(n.length*ppq)),note:Math.round(n.pitch),velocity:Math.max(1,Math.round((n.velocity??1)*127))};
-        const changes = Object.fromEntries(Object.entries(values).filter(([k,v])=>old[k]!==v));
-        if (Object.keys(changes).length) operations.push({kind:'edit_event',track_id:track.id,event_id:n.id,changes});
+      if(!e.detail||unavailable)return;
+      const operations=[],additions=[];
+      for(const n of e.detail.value) {
+        const values={start_tick:range.start_tick+Math.round(n.start*ppq),duration_ticks:Math.max(1,Math.round(n.length*ppq)),note:Math.round(n.pitch),velocity:Math.max(1,Math.min(127,Math.round((n.velocity??1)*127)))};
+        const old=events.find(v=>v.id===n.id);
+        if(!old)additions.push({id:String(n.id),...values});
+        else {const changes=Object.fromEntries(Object.entries(values).filter(([k,v])=>old[k]!==v));if(Object.keys(changes).length)operations.push({kind:'edit_event',track_id:track.id,event_id:n.id,changes});}
       }
-      roll.value = notes;
-      if (operations.length) stage(operations,`Edit ${operations.length} notes on ${track.id}`);
+      const deleted=events.filter(v=>!e.detail.value.some(n=>n.id===v.id)).map(v=>v.id);
+      if(additions.length)operations.push({kind:'add_events',track_id:track.id,events:additions});
+      if(deleted.length)operations.push({kind:'delete_events',track_id:track.id,event_ids:deleted});
+      ui.selection=[...roll.selection];ui.eventId=ui.selection[0]??null;
+      if(operations.length) {
+        events=e.detail.value.map(n=>({id:n.id,start_tick:range.start_tick+Math.round(n.start*ppq),duration_ticks:Math.max(1,Math.round(n.length*ppq)),note:Math.round(n.pitch),velocity:Math.max(1,Math.min(127,Math.round((n.velocity??1)*127)))}));
+        stage(operations,`Edit notes on ${label(track.id)}`);
+      }
     });
   }
+  function selectGroup(track, range, events) {
+    group={trackId:track.id,ids:events.map(e=>e.id),start:range.start_tick,end:range.end_tick};
+    selectSection(range.id);drawGroup();
+  }
+  function drawGroup() {
+    const root=byId('group-tools');root.replaceChildren();
+    const track=source()?.tracks.find(t=>t.id===group?.trackId);
+    if(!track){root.append(node('span',{text:'Select a section clip to arrange it.'}));return;}
+    const ids=group.ids.filter(id=>track.events.some(e=>e.id===id));
+    const locked=track.protected||ui.view.revision!==ui.snapshot.project.revision;
+    root.append(node('span',{text:`${label(track.id)} · ${ids.length} events${locked?' · Locked':''}`,attrs:{title:label(track.id)}}));
+    const numeric=(name,value)=>{const input=node('input',{attrs:{type:'number',step:1,'aria-label':name,title:name}});input.value=value;input.disabled=locked;const wrap=node('label',{text:name.replace('Group ','').replace(' (beats)','').replace('Split at beat','Split at'),classes:'group-field'});wrap.append(input);root.append(wrap);return input;};
+    const start=numeric('Group start (beats)',group.start/source().ppq+1),end=numeric('Group end (beats)',group.end/source().ppq+1);
+    const common={track_id:track.id,event_ids:ids};
+    const run=(op,reason)=>stage(op,reason).then(()=>drawGroup());
+    root.append(button('Move',()=>{
+      const offset=Math.round((start.valueAsNumber-1)*source().ppq)-group.start;
+      run({kind:'transform_events',...common,action:'move',offset_ticks:offset},'Move section group');
+      group.start+=offset;group.end+=offset;
+    },{disabled:locked}),button('Duplicate',()=>{
+      const new_ids=Object.fromEntries(ids.map(id=>[id,`event-${crypto.randomUUID()}`]));
+      run({kind:'duplicate_events',...common,new_ids,offset_ticks:Math.round((start.valueAsNumber-1)*source().ppq)-group.start||group.end-group.start},'Duplicate section group');
+    },{disabled:locked}));
+    const split=numeric('Split at beat',(group.start+group.end)/2/source().ppq+1);
+    root.append(button('Split',()=>{
+      const tick=Math.round((split.valueAsNumber-1)*source().ppq);
+      const new_ids=Object.fromEntries(track.events.filter(e=>ids.includes(e.id)&&e.start_tick<tick&&e.start_tick+e.duration_ticks>tick).map(e=>[e.id,`event-${crypto.randomUUID()}`]));
+      run({kind:'transform_events',...common,action:'split',tick,new_ids},'Split notes at beat');
+      group.ids.push(...Object.values(new_ids));
+    },{disabled:locked}),button('Trim',()=>run({kind:'transform_events',...common,action:'trim',start_tick:Math.round((start.valueAsNumber-1)*source().ppq),end_tick:Math.round((end.valueAsNumber-1)*source().ppq)},'Trim section group'),{disabled:locked}));
+    if(track.kind==='samples')root.append(node('span',{text:'Sample groups: end trim only; split/front trim unavailable.',classes:'small'}));
+  }
+
   function draw() {
     if (!source()) return;
     if (!source().sections.some(s=>s.id===sectionId)) sectionId=source().sections[0]?.id;
     const picker = byId('piano-section'); picker.replaceChildren();
     for (const s of source().sections) picker.add(new Option(label(s.id),s.id));
     picker.value=sectionId;
-    drawBrowser(); drawMixer(); if(dock==='piano') drawPiano(); sync();
+    drawBrowser(); drawMixer(); drawGroup(); if(dock==='piano') drawPiano(); sync();
   }
   function selectSection(id) {
     sectionId=id; byId('piano-section').value=id;
@@ -167,9 +224,10 @@ export function createDesktop({ ui, audio, byId, node, button, label, trackColor
     if (!source()) return;
     const matches = matching();
     const state = byId('playback-state');
-    state.textContent = !ui.rendition ? 'Choose a render' : matches ? 'Audio matches displayed source' : 'Audio differs from displayed source · render to update';
+    state.textContent = !ui.rendition ? 'Ready to audition' : matches ? 'Latest mix' : 'Edits to hear · Audition';
     state.classList.toggle('stale',!!ui.rendition&&!matches);
     byId('loop').disabled=!matches||!Number.isFinite(audio.duration);
+    byId('loop').title=`Loop ${label(section()?.id)} (${((section()?.end_tick-section()?.start_tick)/source().ppq).toFixed(0)} beats)`;
     if (!matches) {
       byId('musical-position').textContent='—'; byId('tempo-display').textContent='— BPM';
       return;
@@ -202,11 +260,6 @@ export function createDesktop({ ui, audio, byId, node, button, label, trackColor
       barWidth:2,barGap:1,normalize:false,interact:true,hideScrollbar:true});
   }
   byId('browser-search').addEventListener('input',drawBrowser);
-  byId('toggle-browser').addEventListener('click',()=>{
-    const p=byId('browser-panel');p.hidden=!p.hidden;
-    document.querySelector('.workspace').classList.toggle('browser-hidden',p.hidden);
-    byId('toggle-browser').setAttribute('aria-pressed',String(!p.hidden));
-  });
   byId('toggle-review').addEventListener('click',()=>{
     const p=byId('review-panel');p.hidden=!p.hidden;byId('toggle-review').setAttribute('aria-pressed',String(!p.hidden));
   });
@@ -215,7 +268,7 @@ export function createDesktop({ ui, audio, byId, node, button, label, trackColor
     for(const tab of document.querySelectorAll('[data-dock]'))tab.setAttribute('aria-pressed',String(tab===b));
     byId('mix-console').hidden=dock!=='mixer';byId('piano-editor').hidden=dock!=='piano';
     byId('piano-section-label').hidden=dock!=='piano';
-    byId('dock-context').textContent=dock==='mixer'?'Source gains · stage changes, apply, then render':'Notes · stage edits, apply, then render';
+    byId('dock-context').textContent=dock==='mixer'?'Adjust your mix · Audition for the finished sound':'Double-click to add · Drag to move · Audition to hear';
     if(dock==='piano')drawPiano();
   });
   byId('piano-section').addEventListener('change',e=>selectSection(e.target.value));
@@ -226,14 +279,26 @@ export function createDesktop({ ui, audio, byId, node, button, label, trackColor
     if(looping)seek(section().start_tick);
   });
   document.addEventListener('keydown',e=>{
+    if(e.target.closest('input,select,textarea,[contenteditable="true"]')||byId('help-dialog').open)return;
+    const roll=byId('piano-editor').querySelector('audio-ui-piano-roll');
+    if(e.key==='Escape') {
+      group=null;ui.selection=[];ui.eventId=null;
+      if(roll){roll.selection=[];roll.querySelector('audio-ui-piano-roll-grid')?.focus({preventScroll:true});}
+      drawGroup();drawInspector();e.preventDefault();e.stopImmediatePropagation();
+    }
+    if(['Delete','Backspace'].includes(e.key)&&roll&&!roll.selection.length) {
+      e.preventDefault();e.stopImmediatePropagation();
+    }
+  },true);
+  document.addEventListener('keydown',e=>{
     if(e.target.closest('input,select,textarea,button,[contenteditable="true"],audio-ui-piano-roll'))return;
     if(e.code==='Space'){e.preventDefault();if(!byId('play').disabled)byId('play').click();}
     if(e.code==='Home'){e.preventDefault();byId('stop').click();}
   });
   function setBusy() {
     for (const fader of document.querySelectorAll('audio-ui-fader')) {
-      fader.toggleAttribute('disabled', ui.busy || ui.view?.revision !== ui.snapshot?.project.revision);
+      fader.toggleAttribute('disabled', ui.view?.revision !== ui.snapshot?.project.revision);
     }
   }
-  return {draw,sync,waveform,selectSection,showReview,setBusy};
+  return {draw,sync,waveform,selectSection,selectGroup,showReview,setBusy};
 }

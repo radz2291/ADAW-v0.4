@@ -64,7 +64,19 @@ def merge_source(base, current, proposed, *, base_revision, current_revision):
         if all(isinstance(value, list) for value in (old, head, candidate)):
             if path[-1] in _ENTITY_LISTS:
                 ids = [[item["id"] for item in items] for items in (old, head, candidate)]
-                order = merge(path + ("order",), *ids)
+                # Event identities carry timing; independent additions/removals
+                # are not competing rearrangements of the surviving notes.
+                # Keep current order and append new candidate IDs, but retain
+                # conservative conflicts for explicit reordering or other lists.
+                old_ids = set(ids[0])
+                preserves_order = all(
+                    [item for item in sequence if item in old_ids]
+                    == [item for item in ids[0] if item in sequence]
+                    for sequence in ids[1:])
+                if path[-1] == "events" and preserves_order:
+                    order = list(dict.fromkeys([*ids[1], *ids[2]]))
+                else:
+                    order = merge(path + ("order",), *ids)
                 maps = [{item["id"]: item for item in items} for items in (old, head, candidate)]
                 merged = {}
                 for item_id in dict.fromkeys([*ids[0], *ids[1], *ids[2]]):

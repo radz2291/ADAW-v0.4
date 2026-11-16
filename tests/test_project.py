@@ -243,7 +243,7 @@ def test_compiler_maps_absolute_ticks_and_source_hash(project):
     assert graph["frames"] == 88000
     event = graph["nodes"][0]["config"]["events"][0]
     assert event["duration_frames"] == tick_sample(240,144,960,48000)
-    assert stems == ["track_kick_level"]
+    assert stems == ["track_kick_monitor", "track_kick_level"]
     assert digest(canonical(graph)) == digest(canonical(compile_graph(copy.deepcopy(source),service.read_content)[0]))
 
 

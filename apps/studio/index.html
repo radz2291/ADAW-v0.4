@@ -7,6 +7,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/studio.css">
   <link rel="stylesheet" href="/desktop.css">
+  <link rel="stylesheet" href="/layout.css">
   <script type="module" src="/studio.js"></script>
 </head>
 <body>
@@ -18,21 +19,19 @@
     </div>
     <div class="top-actions">
       <button type="button" id="refresh">Refresh</button>
-      <button type="button" class="primary" id="render-head" disabled>Render head</button>
     </div>
   </header>
   <main>
     <p id="notice" class="notice" role="status" aria-live="polite" hidden></p>
     <div class="desktop-tools">
-      <nav aria-label="Workspace panels"><button id="toggle-browser" aria-pressed="true">Browser</button><button id="toggle-review" aria-pressed="false">History &amp; review</button></nav>
-      <span id="playback-state" role="status">Loading audio…</span><span class="shortcut-hint">Space · play / pause &nbsp; Home · start</span>
+      <nav aria-label="Workspace panels"><button id="toggle-browser" aria-pressed="true">Browser</button><button id="toggle-inspector" aria-pressed="true">Inspector</button><button id="toggle-review" aria-pressed="false">History &amp; review</button></nav>
+      <button id="undo" disabled title="Undo · Ctrl+Z">Undo</button><button id="redo" disabled title="Redo · Ctrl+Shift+Z">Redo</button><button id="audition" class="primary" title="Hear your latest edits">Audition</button><span id="audition-state" role="status"></span><span id="save-state" role="status"></span><button id="retry-edit" hidden>Retry save</button><button id="retry-preview" hidden>Retry audition</button><button id="help" aria-label="Shortcuts and layout help" title="Shortcuts and layout help">?</button><span id="playback-state" role="status">Loading audio…</span>
     </div>
     <div class="workspace">
       <aside class="browser panel" id="browser-panel" aria-label="Project browser">
         <div class="panel-heading"><h2>Project browser</h2><span class="eyebrow">LOCAL</span></div>
         <label class="sr-only" for="browser-search">Find track or section</label><input id="browser-search" type="search" placeholder="Find track or section…">
         <div id="browser-content"></div>
-        <div class="browser-footer">DawDreamer engine<br><span>Source edits • rendered playback</span></div>
       </aside>
       <section class="arrangement panel" aria-labelledby="arrangement-heading">
         <div class="panel-heading">
@@ -43,6 +42,7 @@
             <button type="button" id="back-head" hidden>View head</button>
           </div>
         </div>
+        <div id="group-tools" class="group-tools"><span>Select a section clip to arrange it.</span></div>
         <audio-ui-timeline id="arrangement-timeline" duration="1" min-zoom="0.0001" max-zoom="2">
           <audio-ui-timeline-viewport class="timeline-viewport" id="timeline-viewport" tabindex="0" aria-label="Scrollable arrangement timeline">
             <div class="timeline" id="timeline"></div>
@@ -56,7 +56,7 @@
             <label class="sr-only" for="position">Playback position</label>
             <input id="position" type="range" min="0" max="0" step=".01" value="0" disabled>
             <span class="time" id="time">0:00 / 0:00</span>
-            <label for="volume" class="volume-label">Monitor</label>
+            <label for="volume" class="volume-label" title="Listening level only; does not change the mix">Listening</label>
             <input id="volume" aria-label="Monitor volume" type="range" min="0" max="1" step=".01" value=".8">
           </div>
           <div class="transport-sources">
@@ -68,21 +68,22 @@
             <label><span class="sr-only">Rendition B</span><select id="rendition-b"></select></label>
             <span id="audio-context" class="audio-context"></span>
           </div>
+          <div class="monitor-bar"><button id="monitor-mode" disabled aria-pressed="false" title="Preview fader changes using track audio. Audition for the finished mix.">Live mix</button><span id="monitor-status">Rendered mix</span><div id="master-meter" aria-label="Stereo output meters"><label>L <meter id="meter-left" min="-60" max="0" value="-60"></meter></label><label>R <meter id="meter-right" min="-60" max="0" value="-60"></meter></label><span id="meter-clip"></span></div></div>
           <audio id="audio" preload="metadata"></audio>
         </div>
       </section>
-      <aside class="inspector panel" aria-labelledby="inspector-heading">
+      <aside id="inspector-panel" class="inspector panel" aria-labelledby="inspector-heading">
         <div class="panel-heading"><h2 id="inspector-heading">Inspector</h2><p id="inspector-context"></p></div>
         <nav class="tabs" aria-label="Inspector views">
-          <button type="button" data-view="edit" aria-pressed="true">Events</button>
-          <button type="button" data-view="mix" aria-pressed="false">Mixer</button>
-          <button type="button" data-view="plugins" aria-pressed="false">Plugins</button>
+          <button type="button" data-view="edit" aria-pressed="true">Notes</button>
+          <button type="button" data-view="plugins" aria-pressed="false">Devices</button>
         </nav>
         <div id="inspector-content" class="inspector-content"></div>
       </aside>
     </div>
+    <div id="pane-divider" role="separator" tabindex="0" aria-label="Resize arrangement and editor" aria-orientation="horizontal"></div>
     <section class="dock panel" aria-label="Editor dock">
-      <div class="dock-heading"><nav aria-label="Editor views"><button data-dock="mixer" aria-pressed="true">Mix console</button><button data-dock="piano" aria-pressed="false">Piano roll</button></nav><span id="dock-context">Source gains · stage changes, apply, then render</span><label id="piano-section-label" hidden>Section <select id="piano-section"></select></label></div>
+      <div class="dock-heading"><nav aria-label="Editor views"><button data-dock="mixer" aria-pressed="true">Mix console</button><button data-dock="piano" aria-pressed="false">Piano roll</button></nav><span id="dock-context">Adjust your mix · Audition for the finished sound</span><label id="piano-section-label" hidden>Section <select id="piano-section"></select></label></div>
       <div id="mix-console" class="mix-console"></div><div id="piano-editor" hidden></div>
     </section>
     <section id="review-panel" hidden class="review panel" aria-labelledby="review-heading">
@@ -102,6 +103,7 @@
         </section>
       </div>
     </section>
+    <dialog id="help-dialog"><h2>Make music</h2><p>Choose a track, then edit its notes or mix. Changes save automatically. Audition plays the latest arrangement.</p><p>Space: play / pause · Home: return to start<br>Ctrl+Z: undo · Ctrl+Shift+Z: redo<br>Piano roll: double-click to add; drag to move; drag a note’s right edge to resize.<br>Arrows: move notes · Shift+arrows: resize · Delete: remove<br>Ctrl+A: select all · Ctrl+D: duplicate · Ctrl+C / X / V: copy / cut / paste<br>Escape: clear selection or close this help</p><p>Multiple Solo buttons play together. Mute always wins. Live mix previews fader changes; Audition includes the finished effects.</p><button id="reset-layout">Reset layout</button><button id="close-help">Close</button></dialog>
   </main>
 </body>
 </html>
