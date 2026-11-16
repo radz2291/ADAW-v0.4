@@ -80,3 +80,9 @@ Precision editing and optional evidence should complement the main workflow.
 Read [the direct editing decision](docs/decisions/ADR-0006-everyday-studio.md) for
 current gesture, monitoring and native parameter semantics; it supersedes the
 temporary Stage/Apply interaction in ADR-0005.
+
+The owner identified BandLab Studio as the visual/workflow finish reference:
+compact top transport, track controls beside a dominant arrangement, substantial
+clips, and one contextual lower editor/instrument/effects area. Favor this coherent
+musician-facing hierarchy over simultaneous dashboard panels. Keep ADAW branding,
+validated behavior and the established libraries; the frozen rubric is unchanged.

@@ -1,0 +1,64 @@
+{
+  "identity": {
+    "root": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\.local\\evaluation\\preflight-service-01\\project",
+    "rendition": "rendition-96cfdc9966324999bd8c8f6e2fc1281e",
+    "revision": "rev-397d00ff05607ec2c45a1953e61ceb9cfc7dd87c2fa102630aa46abf76c60316"
+  },
+  "checks": [
+    {
+      "name": "protected event/clip batches atomic",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "three undo redo plus unrelated and conflict",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "manual and pending proposals separate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "stable create duplicate delete and empty selection",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "native gain pan solo mute semantics",
+      "status": "PASS",
+      "detail": {
+        "gain_ratio": 0.5011872473430448,
+        "silence_peak": 0.0
+      }
+    }
+  ],
+  "audio": [
+    {
+      "revision": "rev-32b80ca962fec3fbcc18cc11bd7ca87958c5a1527eef40fb1f88e8366ddbeca6",
+      "sha256": "ecfc9a25e0de0888682cdb991d1cd4d918f5682108b00c542919d77ceb516a57",
+      "seconds": 1.5646889000199735,
+      "rate": 48000
+    },
+    {
+      "revision": "rev-cc742de52a8c1adecf8cb88b014e9b757a27437e17662e7e3509d3651d77a88c",
+      "sha256": "179b71a93c4bfad5cb84e0f41677e02455a697af68afe2c712e93fad562d4d36",
+      "seconds": 1.5155044000130147,
+      "rate": 48000
+    },
+    {
+      "revision": "rev-283f7d947d02493c93f53c028ae6db6cca55ee7484bf7d13365acbbe71393f09",
+      "sha256": "cf45eb77bd1b2e80a7a8fd38be4337f2f6a559fb132a00a2a944c781df0b4537",
+      "seconds": 1.5227974000154063,
+      "rate": 48000
+    },
+    {
+      "revision": "rev-26ba2143f4eb3334778aa4f653347669eba143e8288ce97c8baaca60f28c5dcb",
+      "sha256": "8096bcc8a0faf6993bcca4cea7470224f7473649bad01fe2f26bbcacdb553d3e",
+      "seconds": 1.4706160000059754,
+      "rate": 48000
+    }
+  ],
+  "final_revision": "rev-26ba2143f4eb3334778aa4f653347669eba143e8288ce97c8baaca60f28c5dcb"
+}

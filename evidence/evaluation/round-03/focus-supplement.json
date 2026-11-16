@@ -1,0 +1,13 @@
+{
+  "transport": {
+    "id": "play",
+    "text": "Play",
+    "outline": "solid",
+    "width": "2px"
+  },
+  "mixer": {
+    "name": "evaluation-midi gain in dB",
+    "outline": "solid",
+    "width": "2px"
+  }
+}

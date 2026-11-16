@@ -1,0 +1,556 @@
+{
+  "date": "2026-11-16T04:07:16.310Z",
+  "checks": [
+    {
+      "name": "F2A note edit to playable 2-bar three warm trials",
+      "status": "PASS",
+      "detail": [
+        {
+          "elapsed_ms": 1531.938,
+          "revision": "rev-fd4c511987789ef876047a45505924a3991c8a34647027ee1669bbfccd555d7f",
+          "src": "/api/v1/renditions/rendition-cefa2bf76918446593e43378ce0d0f74/audio"
+        },
+        {
+          "elapsed_ms": 1633.0694000000003,
+          "revision": "rev-2215dfd964b7a3254d0d82651a4e282ed0666b00edcd01fc64d5b6b939c0c531",
+          "src": "/api/v1/renditions/rendition-44b65ac30f244641a6d12411e80d9d88/audio"
+        },
+        {
+          "elapsed_ms": 1612.1359999999995,
+          "revision": "rev-f8d0dbef7a55c8be9784814d7685f999276dbd8cb0d5e0b1907f292f6a66d600",
+          "src": "/api/v1/renditions/rendition-d64ecda4d0574646976873a1c6a23bce/audio"
+        }
+      ]
+    },
+    {
+      "name": "F2B prior playback progress exact identity and superseded response",
+      "status": "PASS",
+      "detail": {
+        "newer": "rev-e969cc4e147347cd4f0bf28aec18b2c49f618492bae3e3123e6dd5bb232dda98",
+        "newerSrc": "/api/v1/renditions/rendition-c597f20224c640779aad37afdeec7f75/audio",
+        "oldSrc": "/api/v1/renditions/rendition-d64ecda4d0574646976873a1c6a23bce/audio"
+      }
+    },
+    {
+      "name": "S4A render network failure keeps last audio and retry",
+      "status": "PASS",
+      "detail": {
+        "previous": "/api/v1/renditions/rendition-c597f20224c640779aad37afdeec7f75/audio",
+        "current": "/api/v1/renditions/rendition-49bda5b3eb5548cfaea2e3ba4d3c32f7/audio"
+      }
+    },
+    {
+      "name": "F5B rapid note edits retain last requested pitch",
+      "status": "PASS",
+      "detail": {
+        "start": 66,
+        "result": 69
+      }
+    }
+  ],
+  "errors": [],
+  "initial": {
+    "last_playable_rendition": "rendition-40deaaff78d44179bd70953ac5ce3228",
+    "listening": "NOT_EVALUATED",
+    "revision": "rev-2ffa8d37bf8b7ec1f5c11adcb1d64e4ec37ef398d5af67ecb981fe0c62b31cb2",
+    "source": {
+      "block_size": 256,
+      "brief": "Disposable evaluation only",
+      "buses": [
+        {
+          "gain_db": 0,
+          "id": "music",
+          "inserts": []
+        },
+        {
+          "gain_db": 0,
+          "id": "other",
+          "inserts": []
+        }
+      ],
+      "fade_frames": 240,
+      "length_ticks": 7680,
+      "master": {
+        "gain_db": 0,
+        "inserts": []
+      },
+      "ppq": 960,
+      "profile": {
+        "channels": 2,
+        "dither_seed": 1,
+        "id": "evaluation",
+        "max_dc": 0.001,
+        "max_estimated_true_peak_dbfs": -1,
+        "max_lufs": -10,
+        "max_sample_peak_dbfs": -1,
+        "min_lufs": -40,
+        "purpose": "test only",
+        "sample_rate": 48000,
+        "status": "temporary_engineering_profile",
+        "subtype": "PCM_24",
+        "true_peak_margin_db": 0.25
+      },
+      "sample_rate": 48000,
+      "schema": "adaw.arrangement@2",
+      "sections": [
+        {
+          "end_tick": 3840,
+          "id": "intro",
+          "mood": "test",
+          "start_tick": 0,
+          "swing": 0.5
+        },
+        {
+          "end_tick": 7680,
+          "id": "bridge",
+          "mood": "test",
+          "start_tick": 3840,
+          "swing": 0.5
+        }
+      ],
+      "tail_frames": 24000,
+      "tempo": 120,
+      "time_map": [
+        {
+          "bpm": 120,
+          "denominator": 4,
+          "numerator": 4,
+          "tick": 0
+        },
+        {
+          "bpm": 104,
+          "denominator": 4,
+          "numerator": 4,
+          "tick": 3840
+        }
+      ],
+      "title": "Independent interaction fixture",
+      "tracks": [
+        {
+          "bus": "music",
+          "events": [
+            {
+              "duration_ticks": 480,
+              "id": "eval-0",
+              "note": 60,
+              "start_tick": 0,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "eval-1",
+              "note": 61,
+              "start_tick": 960,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "eval-2",
+              "note": 62,
+              "start_tick": 1920,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "eval-3",
+              "note": 63,
+              "start_tick": 2880,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "eval-4",
+              "note": 64,
+              "start_tick": 3840,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "eval-5",
+              "note": 65,
+              "start_tick": 4800,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "eval-6",
+              "note": 66,
+              "start_tick": 5760,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "eval-7",
+              "note": 67,
+              "start_tick": 6720,
+              "velocity": 90
+            }
+          ],
+          "gain_db": -12,
+          "id": "evaluation-midi",
+          "inserts": [],
+          "instrument": {
+            "module_sha256": "7858fc7dbf50f58280f8311c4e78e2a3d1b4787ea5ca763d46d89a00910667da",
+            "parameters": {},
+            "release_seconds": 0.2,
+            "voices": 8
+          },
+          "kind": "faust_synth",
+          "pan": 0,
+          "protected": false,
+          "role": "lead"
+        },
+        {
+          "bus": "other",
+          "events": [
+            {
+              "duration_ticks": 960,
+              "id": "sample-1",
+              "note": 60,
+              "start_tick": 0,
+              "velocity": 90
+            }
+          ],
+          "gain_db": -12,
+          "id": "evaluation-sample",
+          "inserts": [],
+          "instrument": {
+            "asset_sha256": "90b31a874b335fb5fc3c313a5b4a514acc90a49d4502960828a84c6d4f96628e",
+            "fade_frames": 24
+          },
+          "kind": "samples",
+          "pan": 0,
+          "protected": false,
+          "role": "sample"
+        },
+        {
+          "bus": "other",
+          "events": [
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-0",
+              "note": 60,
+              "start_tick": 0,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-1",
+              "note": 61,
+              "start_tick": 960,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-2",
+              "note": 62,
+              "start_tick": 1920,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-3",
+              "note": 63,
+              "start_tick": 2880,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-4",
+              "note": 64,
+              "start_tick": 3840,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-5",
+              "note": 65,
+              "start_tick": 4800,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-6",
+              "note": 66,
+              "start_tick": 5760,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-7",
+              "note": 67,
+              "start_tick": 6720,
+              "velocity": 90
+            }
+          ],
+          "gain_db": -12,
+          "id": "evaluation-protected",
+          "inserts": [],
+          "instrument": {
+            "module_sha256": "7858fc7dbf50f58280f8311c4e78e2a3d1b4787ea5ca763d46d89a00910667da",
+            "parameters": {},
+            "release_seconds": 0.2,
+            "voices": 8
+          },
+          "kind": "faust_synth",
+          "pan": 0,
+          "protected": true,
+          "role": "lead"
+        }
+      ]
+    },
+    "source_sha256": "2ffa8d37bf8b7ec1f5c11adcb1d64e4ec37ef398d5af67ecb981fe0c62b31cb2"
+  },
+  "final": {
+    "last_playable_rendition": "rendition-49bda5b3eb5548cfaea2e3ba4d3c32f7",
+    "listening": "NOT_EVALUATED",
+    "revision": "rev-d6d037c0eee9a4adc3d5f24e0504806a01e3329b37806fabba94847c80edc0fd",
+    "source": {
+      "block_size": 256,
+      "brief": "Disposable evaluation only",
+      "buses": [
+        {
+          "gain_db": 0,
+          "id": "music",
+          "inserts": []
+        },
+        {
+          "gain_db": 0,
+          "id": "other",
+          "inserts": []
+        }
+      ],
+      "fade_frames": 240,
+      "length_ticks": 7680,
+      "master": {
+        "gain_db": 0,
+        "inserts": []
+      },
+      "ppq": 960,
+      "profile": {
+        "channels": 2,
+        "dither_seed": 1,
+        "id": "evaluation",
+        "max_dc": 0.001,
+        "max_estimated_true_peak_dbfs": -1,
+        "max_lufs": -10,
+        "max_sample_peak_dbfs": -1,
+        "min_lufs": -40,
+        "purpose": "test only",
+        "sample_rate": 48000,
+        "status": "temporary_engineering_profile",
+        "subtype": "PCM_24",
+        "true_peak_margin_db": 0.25
+      },
+      "sample_rate": 48000,
+      "schema": "adaw.arrangement@2",
+      "sections": [
+        {
+          "end_tick": 3840,
+          "id": "intro",
+          "mood": "test",
+          "start_tick": 0,
+          "swing": 0.5
+        },
+        {
+          "end_tick": 7680,
+          "id": "bridge",
+          "mood": "test",
+          "start_tick": 3840,
+          "swing": 0.5
+        }
+      ],
+      "tail_frames": 24000,
+      "tempo": 120,
+      "time_map": [
+        {
+          "bpm": 120,
+          "denominator": 4,
+          "numerator": 4,
+          "tick": 0
+        },
+        {
+          "bpm": 104,
+          "denominator": 4,
+          "numerator": 4,
+          "tick": 3840
+        }
+      ],
+      "title": "Independent interaction fixture",
+      "tracks": [
+        {
+          "bus": "music",
+          "events": [
+            {
+              "duration_ticks": 480,
+              "id": "eval-0",
+              "note": 69,
+              "start_tick": 0,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "eval-1",
+              "note": 61,
+              "start_tick": 960,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "eval-2",
+              "note": 62,
+              "start_tick": 1920,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "eval-3",
+              "note": 63,
+              "start_tick": 2880,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "eval-4",
+              "note": 64,
+              "start_tick": 3840,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "eval-5",
+              "note": 65,
+              "start_tick": 4800,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "eval-6",
+              "note": 66,
+              "start_tick": 5760,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "eval-7",
+              "note": 67,
+              "start_tick": 6720,
+              "velocity": 90
+            }
+          ],
+          "gain_db": -12,
+          "id": "evaluation-midi",
+          "inserts": [],
+          "instrument": {
+            "module_sha256": "7858fc7dbf50f58280f8311c4e78e2a3d1b4787ea5ca763d46d89a00910667da",
+            "parameters": {},
+            "release_seconds": 0.2,
+            "voices": 8
+          },
+          "kind": "faust_synth",
+          "pan": 0,
+          "protected": false,
+          "role": "lead"
+        },
+        {
+          "bus": "other",
+          "events": [
+            {
+              "duration_ticks": 960,
+              "id": "sample-1",
+              "note": 60,
+              "start_tick": 0,
+              "velocity": 90
+            }
+          ],
+          "gain_db": -12,
+          "id": "evaluation-sample",
+          "inserts": [],
+          "instrument": {
+            "asset_sha256": "90b31a874b335fb5fc3c313a5b4a514acc90a49d4502960828a84c6d4f96628e",
+            "fade_frames": 24
+          },
+          "kind": "samples",
+          "pan": 0,
+          "protected": false,
+          "role": "sample"
+        },
+        {
+          "bus": "other",
+          "events": [
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-0",
+              "note": 60,
+              "start_tick": 0,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-1",
+              "note": 61,
+              "start_tick": 960,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-2",
+              "note": 62,
+              "start_tick": 1920,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-3",
+              "note": 63,
+              "start_tick": 2880,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-4",
+              "note": 64,
+              "start_tick": 3840,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-5",
+              "note": 65,
+              "start_tick": 4800,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-6",
+              "note": 66,
+              "start_tick": 5760,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-7",
+              "note": 67,
+              "start_tick": 6720,
+              "velocity": 90
+            }
+          ],
+          "gain_db": -12,
+          "id": "evaluation-protected",
+          "inserts": [],
+          "instrument": {
+            "module_sha256": "7858fc7dbf50f58280f8311c4e78e2a3d1b4787ea5ca763d46d89a00910667da",
+            "parameters": {},
+            "release_seconds": 0.2,
+            "voices": 8
+          },
+          "kind": "faust_synth",
+          "pan": 0,
+          "protected": true,
+          "role": "lead"
+        }
+      ]
+    },
+    "source_sha256": "132a6d2dfc73431d1ac7989376e0ed21c59709b24f4e9c5de9f02a4d4da76f99"
+  }
+}

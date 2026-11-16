@@ -1,0 +1,424 @@
+{
+  "checks": [
+    {
+      "name": "E3A pointer move resize keyboard pitch timing velocity render",
+      "status": "PASS",
+      "detail": {
+        "before": {
+          "duration_ticks": 480,
+          "id": "eval-0",
+          "note": 60,
+          "start_tick": 0,
+          "velocity": 90
+        },
+        "after": {
+          "duration_ticks": 720,
+          "id": "eval-0",
+          "note": 61,
+          "start_tick": 480,
+          "velocity": 77
+        }
+      }
+    },
+    {
+      "name": "E3B multiselect duplicate unique IDs relative note attributes",
+      "status": "PASS",
+      "detail": {
+        "selection": [
+          "eval-0",
+          "eval-1"
+        ],
+        "added": [
+          {
+            "duration_ticks": 720,
+            "id": "note-89744bea-4679-431b-91a1-786a72ef754d",
+            "note": 61,
+            "start_tick": 1440,
+            "velocity": 77
+          },
+          {
+            "duration_ticks": 480,
+            "id": "note-b5a3653e-da3e-43a9-8dbb-5c89ed7e11b7",
+            "note": 61,
+            "start_tick": 1920,
+            "velocity": 90
+          }
+        ]
+      }
+    },
+    {
+      "name": "E5A visible group move duplicate source refresh",
+      "status": "PASS",
+      "detail": {
+        "ids": [
+          "eval-0",
+          "eval-1",
+          "eval-2",
+          "eval-3",
+          "note-89744bea-4679-431b-91a1-786a72ef754d",
+          "note-b5a3653e-da3e-43a9-8dbb-5c89ed7e11b7"
+        ],
+        "added": [
+          {
+            "duration_ticks": 720,
+            "id": "event-c0e8dd17-192f-4aa7-bdde-12efb4e762d0",
+            "note": 61,
+            "start_tick": 5280,
+            "velocity": 77
+          },
+          {
+            "duration_ticks": 480,
+            "id": "event-36ac5fe1-d65a-4b92-9959-f1f688a4820f",
+            "note": 61,
+            "start_tick": 5760,
+            "velocity": 90
+          },
+          {
+            "duration_ticks": 480,
+            "id": "event-9f7a2d20-9cd2-4a4e-98d0-8c558f2008bf",
+            "note": 62,
+            "start_tick": 6720,
+            "velocity": 90
+          },
+          {
+            "duration_ticks": 480,
+            "id": "event-39d61b24-1cf7-4272-b037-992de6df31c8",
+            "note": 63,
+            "start_tick": 7680,
+            "velocity": 90
+          },
+          {
+            "duration_ticks": 720,
+            "id": "event-6437d9dc-539e-473c-80aa-814a9102f96a",
+            "note": 61,
+            "start_tick": 6240,
+            "velocity": 77
+          },
+          {
+            "duration_ticks": 480,
+            "id": "event-1afa8345-11db-46a5-8818-41a30be62086",
+            "note": 61,
+            "start_tick": 6720,
+            "velocity": 90
+          }
+        ]
+      }
+    },
+    {
+      "name": "E5B split trim native bounds and explicit sample limitation",
+      "status": "PASS",
+      "detail": {
+        "split_tick": 1560,
+        "trim_end": 1920
+      }
+    },
+    {
+      "name": "M4 numeric out of travel pointer keyboard reset pan and listening level separate",
+      "status": "PASS",
+      "detail": "Numeric expanded -72dB; keyboard .1dB; reset0dB; pan.01/center; listening level did not change source"
+    }
+  ],
+  "errors": [],
+  "final": {
+    "last_playable_rendition": "rendition-14a190ca582b483299a5174a3e04a975",
+    "listening": "NOT_EVALUATED",
+    "revision": "rev-162c1e43aec9be1f5f0fd805f9148389b83d58c12925ed026a632a21550f9b97",
+    "source": {
+      "block_size": 256,
+      "brief": "Disposable evaluation only",
+      "buses": [
+        {
+          "gain_db": 0,
+          "id": "music",
+          "inserts": []
+        },
+        {
+          "gain_db": 0,
+          "id": "other",
+          "inserts": []
+        }
+      ],
+      "fade_frames": 240,
+      "length_ticks": 10560,
+      "master": {
+        "gain_db": 0,
+        "inserts": []
+      },
+      "ppq": 960,
+      "profile": {
+        "channels": 2,
+        "dither_seed": 1,
+        "id": "evaluation",
+        "max_dc": 0.001,
+        "max_estimated_true_peak_dbfs": -1,
+        "max_lufs": -10,
+        "max_sample_peak_dbfs": -1,
+        "min_lufs": -40,
+        "purpose": "test only",
+        "sample_rate": 48000,
+        "status": "temporary_engineering_profile",
+        "subtype": "PCM_24",
+        "true_peak_margin_db": 0.25
+      },
+      "sample_rate": 48000,
+      "schema": "adaw.arrangement@2",
+      "sections": [
+        {
+          "end_tick": 3840,
+          "id": "intro",
+          "mood": "test",
+          "start_tick": 0,
+          "swing": 0.5
+        },
+        {
+          "end_tick": 7680,
+          "id": "bridge",
+          "mood": "test",
+          "start_tick": 3840,
+          "swing": 0.5
+        },
+        {
+          "end_tick": 10560,
+          "id": "turn",
+          "mood": "test",
+          "start_tick": 7680,
+          "swing": 0.5
+        }
+      ],
+      "tail_frames": 24000,
+      "tempo": 120,
+      "time_map": [
+        {
+          "bpm": 120,
+          "denominator": 4,
+          "numerator": 4,
+          "tick": 0
+        },
+        {
+          "bpm": 104,
+          "denominator": 4,
+          "numerator": 4,
+          "tick": 3840
+        },
+        {
+          "bpm": 104,
+          "denominator": 4,
+          "numerator": 3,
+          "tick": 7680
+        }
+      ],
+      "title": "Independent interaction fixture",
+      "tracks": [
+        {
+          "bus": "music",
+          "events": [
+            {
+              "duration_ticks": 120,
+              "id": "eval-0",
+              "note": 61,
+              "start_tick": 1440,
+              "velocity": 77
+            },
+            {
+              "duration_ticks": 480,
+              "id": "eval-3",
+              "note": 63,
+              "start_tick": 3840,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "eval-4",
+              "note": 64,
+              "start_tick": 3840,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "eval-5",
+              "note": 65,
+              "start_tick": 4800,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "eval-6",
+              "note": 66,
+              "start_tick": 5760,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "eval-7",
+              "note": 67,
+              "start_tick": 6720,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 720,
+              "id": "event-c0e8dd17-192f-4aa7-bdde-12efb4e762d0",
+              "note": 61,
+              "start_tick": 5280,
+              "velocity": 77
+            },
+            {
+              "duration_ticks": 480,
+              "id": "event-36ac5fe1-d65a-4b92-9959-f1f688a4820f",
+              "note": 61,
+              "start_tick": 5760,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "event-9f7a2d20-9cd2-4a4e-98d0-8c558f2008bf",
+              "note": 62,
+              "start_tick": 6720,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "event-39d61b24-1cf7-4272-b037-992de6df31c8",
+              "note": 63,
+              "start_tick": 7680,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 720,
+              "id": "event-6437d9dc-539e-473c-80aa-814a9102f96a",
+              "note": 61,
+              "start_tick": 6240,
+              "velocity": 77
+            },
+            {
+              "duration_ticks": 480,
+              "id": "event-1afa8345-11db-46a5-8818-41a30be62086",
+              "note": 61,
+              "start_tick": 6720,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 360,
+              "id": "event-8c4cbebf-1be3-4f1b-a00a-a44358b94590",
+              "note": 61,
+              "start_tick": 1560,
+              "velocity": 77
+            }
+          ],
+          "gain_db": 0,
+          "id": "evaluation-midi",
+          "inserts": [],
+          "instrument": {
+            "module_sha256": "7858fc7dbf50f58280f8311c4e78e2a3d1b4787ea5ca763d46d89a00910667da",
+            "parameters": {},
+            "release_seconds": 0.2,
+            "voices": 8
+          },
+          "kind": "faust_synth",
+          "mute": false,
+          "pan": 0,
+          "protected": false,
+          "role": "lead",
+          "solo": false
+        },
+        {
+          "bus": "other",
+          "events": [
+            {
+              "duration_ticks": 960,
+              "id": "sample-1",
+              "note": 60,
+              "start_tick": 0,
+              "velocity": 90
+            }
+          ],
+          "gain_db": -12,
+          "id": "evaluation-sample",
+          "inserts": [],
+          "instrument": {
+            "asset_sha256": "90b31a874b335fb5fc3c313a5b4a514acc90a49d4502960828a84c6d4f96628e",
+            "fade_frames": 24
+          },
+          "kind": "samples",
+          "pan": 0,
+          "protected": false,
+          "role": "sample"
+        },
+        {
+          "bus": "other",
+          "events": [
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-0",
+              "note": 60,
+              "start_tick": 0,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-1",
+              "note": 61,
+              "start_tick": 960,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-2",
+              "note": 62,
+              "start_tick": 1920,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-3",
+              "note": 63,
+              "start_tick": 2880,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-4",
+              "note": 64,
+              "start_tick": 3840,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-5",
+              "note": 65,
+              "start_tick": 4800,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-6",
+              "note": 66,
+              "start_tick": 5760,
+              "velocity": 90
+            },
+            {
+              "duration_ticks": 480,
+              "id": "protected-eval-7",
+              "note": 67,
+              "start_tick": 6720,
+              "velocity": 90
+            }
+          ],
+          "gain_db": -12,
+          "id": "evaluation-protected",
+          "inserts": [],
+          "instrument": {
+            "module_sha256": "7858fc7dbf50f58280f8311c4e78e2a3d1b4787ea5ca763d46d89a00910667da",
+            "parameters": {},
+            "release_seconds": 0.2,
+            "voices": 8
+          },
+          "kind": "faust_synth",
+          "pan": 0,
+          "protected": true,
+          "role": "lead"
+        }
+      ]
+    },
+    "source_sha256": "84bcdae192af72937e98ee1c7b008efadd15c0efbd6cbae0847677d3c721ee27"
+  }
+}

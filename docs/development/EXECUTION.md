@@ -23,3 +23,21 @@ evidence and original specification passed byte verification. A Windows
 recovery test observed delayed lock release after process exit. The test now
 checks eventual reconciliation within five seconds and keeps the original
 failure log.
+
+
+## Everyday Studio functional checkpoint — 16 November 2026
+
+The frozen rubric was committed before implementation (`b8edc8c`). Independent
+round 03 assessed `88fe8026a8d78dea83a2037cd02477b0a9a171f9` at **98/100**, all
+mandatory checks passing. See the [full independent report](../../evidence/evaluation/round-03/REPORT.md)
+for every subcheck, exact tree/rubric/audio hashes, commands and timings. All prior
+rounds and their corrections remain alongside it. Backend: 62 passed, one optional
+Dexed skip; the direct browser workflow also passed all 20 checks.
+
+The remaining lost points concern the octave shortcut's visible pitch-range
+clamp. This is a tested workflow score, not full DAW feature parity or owner
+musical approval. The original Glass Current source and exported WAV are intact.
+
+The owner subsequently showed BandLab's effects and MIDI workspace as the expected
+visual finish. A further presentation pass follows this checkpoint, preserving
+the same frozen rubric and the audio/ui + WaveSurfer foundation.

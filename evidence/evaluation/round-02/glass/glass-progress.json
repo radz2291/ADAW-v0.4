@@ -1,0 +1,102 @@
+{
+  "checks": [
+    {
+      "name": "F3A Space Home ruler waveform section text isolation",
+      "status": "PASS"
+    },
+    {
+      "name": "F3B tempo meter sample boundaries fullsong",
+      "status": "PASS",
+      "detail": [
+        {
+          "time": 0,
+          "displayed": "120 BPM · 4/4",
+          "position": "1.1"
+        },
+        {
+          "time": 0.000020833333333333333,
+          "displayed": "120 BPM · 4/4",
+          "position": "1.1"
+        },
+        {
+          "time": 95.99997916666666,
+          "displayed": "120 BPM · 4/4",
+          "position": "48.4"
+        },
+        {
+          "time": 96,
+          "displayed": "104 BPM · 4/4",
+          "position": "49.1"
+        },
+        {
+          "time": 96.00002083333334,
+          "displayed": "104 BPM · 4/4",
+          "position": "49.1"
+        },
+        {
+          "time": 114.46152083333332,
+          "displayed": "104 BPM · 4/4",
+          "position": "56.4"
+        },
+        {
+          "time": 114.46154166666666,
+          "displayed": "104 BPM · 3/4",
+          "position": "57.1"
+        },
+        {
+          "time": 114.4615625,
+          "displayed": "104 BPM · 3/4",
+          "position": "57.1"
+        },
+        {
+          "time": 128.30766666666665,
+          "displayed": "104 BPM · 3/4",
+          "position": "64.3"
+        },
+        {
+          "time": 128.3076875,
+          "displayed": "120 BPM · 4/4",
+          "position": "65.1"
+        },
+        {
+          "time": 128.30770833333332,
+          "displayed": "120 BPM · 4/4",
+          "position": "65.1"
+        }
+      ]
+    },
+    {
+      "name": "F4A visible loop wraps stop restarts no source mutation",
+      "status": "PASS"
+    },
+    {
+      "name": "F4B identified AB preserves position and stale identity",
+      "status": "FAIL",
+      "detail": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'rev-d5125b81c64cde95cecae7c48b071781152d743ae6a2f6f53782599096cb21e5 · rendition-eeec01ce897d4c81a1b0be5a6c6b4ce3'\n- 'rev-d5125b81c64cde95cecae7c48b071781152d743ae6a2f6f53782599096cb21e5 · rendition-3e19a0acc88f4b8da0f74d5b43e985c9'\n\n    at C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\glass-probe.cjs:8:733\n    at runNextTicks (node:internal/process/task_queues:65:5)\n    at process.processImmediate (node:internal/timers:541:9)\n    at async check (C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\glass-probe.cjs:3:81)\n    at async C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\glass-probe.cjs:8:1"
+    },
+    {
+      "name": "U5A complete song search zoom playback no errors",
+      "status": "PASS",
+      "detail": 162.307688
+    },
+    {
+      "name": "U2A 1440 and1280 identifiable names selection and active editor",
+      "status": "PASS"
+    },
+    {
+      "name": "U5B 390 no overflow reachable playback review local-only",
+      "status": "PASS"
+    },
+    {
+      "name": "S3B exact export hash actual playback unchanged source",
+      "status": "PASS",
+      "detail": {
+        "hash": "ac56815f8cfbf86a8153e8231d110f7a8ebb679d685e367ac8e2638a574e362b",
+        "revision": "rev-d5125b81c64cde95cecae7c48b071781152d743ae6a2f6f53782599096cb21e5"
+      }
+    }
+  ],
+  "errors": [],
+  "remote": [],
+  "revision": "rev-d5125b81c64cde95cecae7c48b071781152d743ae6a2f6f53782599096cb21e5"
+}

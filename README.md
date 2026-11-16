@@ -9,7 +9,10 @@ Musical feedback and rendition approvals are tracked separately.
 
 The `adaw/desktop-studio` development fork adds a library-backed desktop workspace
 on top of `adaw/g2-g5`: an audio/ui arrangement, piano roll and mix console, and
-WaveSurfer rendition navigation. See [Studio setup and controls](apps/studio/README.md).
+WaveSurfer rendition navigation. Direct edits, undo/redo, native audition and live
+mix preview use the shared validated service. See
+[Studio setup and controls](apps/studio/README.md) and the immutable
+[everyday interaction rubric](docs/evaluation/EVERYDAY-INTERACTION-v1.md).
 The service retains portable archives, comparison tools and offline timing/routing.
 
 ```powershell
@@ -22,7 +25,7 @@ import remain available in the CLI. [Owner handoff](docs/development/OWNER-RETUR
 
 See the [G1 decision](docs/decisions/G1-DECISION.md),
 [implemented contract](docs/decisions/ADR-0002-g1-production-contract.md) and
-[production evidence](evidence/gates/g1/REPORT.md). The current candidate is
+[production evidence](evidence/gates/g1/REPORT.md). The historical G1 candidate is
 `.local/delivery/g1-v2/Night-Circuit-G1-review.wav`: modern electronic 808 trap,
 six sections with changing swing/mood, stereo 48 kHz/24-bit, 75 seconds.
 
@@ -118,9 +121,9 @@ Worker diagnostics are captured in each job's stdout/stderr log files.
 
 `render` creates an uncommitted candidate. Only `--commit-fixture` with the correct
 `--base-revision` updates source head and last playable artifact atomically. These
-are G0 engineering commits, not owner musical approval. Proposal merging, musical
-approval is not implemented. G1 uses separate proposal/revision/rendition commands
-above and implements delivery export with independent byte verification.
+are G0 engineering commits, not owner musical approval. Musical projects use the
+separate proposal/revision/rendition commands and shared review service, including
+conflict-aware merging and delivery export with independent byte verification.
 
 `plugin-allow --path <exact-file-or-bundle> --provenance <approval>` authorizes one
 binary fingerprint. `plugin-probe --id <registry-id> --sample-rate 48000 --block-size 256`
@@ -147,8 +150,9 @@ are not kept. Historical reports describe the repository at the time of their ru
 
 Workers retain the same Windows user's filesystem/network rights. Direct-process
 crash/timeout containment is tested; this is not a hardened sandbox, process-tree
-containment, resource quota or protection from malicious native code. No HTTP server
-is exposed. CLI/service callers are trusted local operators.
+containment, resource quota or protection from malicious native code. Studio binds
+its HTTP service to loopback only, with origin and token checks. CLI/service callers
+are trusted local operators.
 
 PurestGain's opaque state restoration fails on this engine; the failure is retained.
 Consolidated's wet algorithm is not sample-deterministic. Its strict state fixture

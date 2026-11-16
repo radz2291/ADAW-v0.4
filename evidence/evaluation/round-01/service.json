@@ -1,0 +1,64 @@
+{
+  "identity": {
+    "root": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\.local\\evaluation\\final-01-service\\project",
+    "rendition": "rendition-48d929e7d13641a3b95a087e1a9537e1",
+    "revision": "rev-397d00ff05607ec2c45a1953e61ceb9cfc7dd87c2fa102630aa46abf76c60316"
+  },
+  "checks": [
+    {
+      "name": "protected event/clip batches atomic",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "three undo redo plus unrelated and conflict",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "manual and pending proposals separate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "stable create duplicate delete and empty selection",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "native gain pan solo mute semantics",
+      "status": "PASS",
+      "detail": {
+        "gain_ratio": 0.5011872473430448,
+        "silence_peak": 0.0
+      }
+    }
+  ],
+  "audio": [
+    {
+      "revision": "rev-6894278752a7778e0383edb3d1445ddf73a8480368f8039a3ce7f50ca33b27ee",
+      "sha256": "43c7cc9deb5dad4591f3bf933f4d5b9a1889a20d588a5631fc3ee7f93ece2214",
+      "seconds": 1.6163450999883935,
+      "rate": 48000
+    },
+    {
+      "revision": "rev-882618645aad113cd9cf5785d039bd65ff4df25fc88f717f748c4e61afdcb6fc",
+      "sha256": "134407726731944f469177cb5a68057382f5b858a3d9195efbd3eda4fba6ed13",
+      "seconds": 1.5938632000470534,
+      "rate": 48000
+    },
+    {
+      "revision": "rev-c5c900ac2c5e2cc468b6ddc3b14fd5f6d411717786bcdf6d8d4b7c013d4f11f7",
+      "sha256": "d9973dff73a3c4fb7906ed0b2374b04759b4c64d0930eced62d725c9258255b2",
+      "seconds": 1.655687999969814,
+      "rate": 48000
+    },
+    {
+      "revision": "rev-b54f46e7fb374175125f9743675a2d614d45d678c39d29b2b6820ffe91965e93",
+      "sha256": "413635aa6230648433bd0002669c8b8686a937dfd530642e943f8a7e6d4669bb",
+      "seconds": 1.484777799982112,
+      "rate": 48000
+    }
+  ],
+  "final_revision": "rev-b54f46e7fb374175125f9743675a2d614d45d678c39d29b2b6820ffe91965e93"
+}

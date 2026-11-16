@@ -1,0 +1,10 @@
+[
+  {
+    "html": "<input type=\"range\" step=\"any\" min=\"0\" max=\"10560\" aria-valuetext=\"0\" style=\"border: 0px; clip-path: inset(50%); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; white-space: nowrap; width: 1px;\">",
+    "clip": "auto",
+    "clipPath": "inset(50%)",
+    "visibility": "visible",
+    "parent": "AUDIO-UI-TIMELINE-RULER",
+    "position": "absolute"
+  }
+]

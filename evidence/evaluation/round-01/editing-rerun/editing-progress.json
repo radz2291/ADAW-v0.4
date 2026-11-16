@@ -1,0 +1,54 @@
+{
+  "checks": [
+    {
+      "name": "E3A pointer move resize keyboard pitch timing velocity render",
+      "status": "FAIL",
+      "detail": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n960 !== 1200\n\n    at C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\editing-probe.cjs:6:601\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async check (C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\editing-probe.cjs:4:81)\n    at async C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\editing-probe.cjs:6:1"
+    },
+    {
+      "name": "E3B multiselect duplicate unique IDs relative note attributes",
+      "status": "FAIL",
+      "detail": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('audio-ui-piano-roll-note[note-id=\"eval-1\"]')\u001b[22m\n\n    at C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\editing-probe.cjs:7:286\n    at async check (C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\editing-probe.cjs:4:81)\n    at async C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\editing-probe.cjs:7:1"
+    },
+    {
+      "name": "E5A visible group move duplicate source refresh",
+      "status": "PASS",
+      "detail": {
+        "ids": [
+          "eval-0",
+          "event-42d59d24-fcb7-4862-92fc-523bf0a59e6c"
+        ],
+        "added": [
+          {
+            "duration_ticks": 240,
+            "id": "event-5b9b0beb-f323-40f6-ad7d-de762b053d65",
+            "note": 60,
+            "start_tick": 5760,
+            "velocity": 90
+          },
+          {
+            "duration_ticks": 360,
+            "id": "event-21d74895-7b30-47f2-abaf-e26382cfa1b0",
+            "note": 60,
+            "start_tick": 6120,
+            "velocity": 90
+          }
+        ]
+      }
+    },
+    {
+      "name": "E5B split trim native bounds and explicit sample limitation",
+      "status": "PASS",
+      "detail": {
+        "split_tick": 2040,
+        "trim_end": 1920
+      }
+    },
+    {
+      "name": "M4 numeric out of travel pointer keyboard reset pan and listening level separate",
+      "status": "PASS",
+      "detail": "Numeric expanded -72dB; keyboard .1dB; reset0dB; pan.01/center; listening level did not change source"
+    }
+  ],
+  "errors": []
+}

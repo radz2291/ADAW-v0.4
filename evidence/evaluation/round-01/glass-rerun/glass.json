@@ -1,0 +1,50 @@
+{
+  "checks": [
+    {
+      "name": "F3A Space Home ruler waveform section text isolation",
+      "status": "PASS"
+    },
+    {
+      "name": "F3B tempo meter sample boundaries fullsong",
+      "status": "FAIL",
+      "detail": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '104 BPM · 3/4'\n- '120 BPM · 4/4'\n\n    at C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\glass-probe.cjs:6:661\n    at async check (C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\glass-probe.cjs:3:81)\n    at async C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\glass-probe.cjs:6:1"
+    },
+    {
+      "name": "F4A visible loop wraps stop restarts no source mutation",
+      "status": "PASS"
+    },
+    {
+      "name": "F4B identified AB preserves position and stale identity",
+      "status": "PASS",
+      "detail": {
+        "a": "rev-d5125b81c64cde95cecae7c48b071781152d743ae6a2f6f53782599096cb21e5 · rendition-eeec01ce897d4c81a1b0be5a6c6b4ce3",
+        "b": "rev-d5125b81c64cde95cecae7c48b071781152d743ae6a2f6f53782599096cb21e5 · rendition-a839e81de0a7410bb6259ac25be49352",
+        "state": "Latest mix"
+      }
+    },
+    {
+      "name": "U5A complete song search zoom playback no errors",
+      "status": "PASS",
+      "detail": 162.307688
+    },
+    {
+      "name": "U2A 1440 and1280 identifiable names selection and active editor",
+      "status": "PASS"
+    },
+    {
+      "name": "U5B 390 no overflow reachable playback review local-only",
+      "status": "PASS"
+    },
+    {
+      "name": "S3B exact export hash actual playback unchanged source",
+      "status": "PASS",
+      "detail": {
+        "hash": "ac56815f8cfbf86a8153e8231d110f7a8ebb679d685e367ac8e2638a574e362b",
+        "revision": "rev-d5125b81c64cde95cecae7c48b071781152d743ae6a2f6f53782599096cb21e5"
+      }
+    }
+  ],
+  "errors": [],
+  "remote": [],
+  "revision": "rev-d5125b81c64cde95cecae7c48b071781152d743ae6a2f6f53782599096cb21e5"
+}

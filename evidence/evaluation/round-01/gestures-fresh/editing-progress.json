@@ -1,0 +1,107 @@
+{
+  "checks": [
+    {
+      "name": "E3A pointer move resize keyboard pitch timing velocity render",
+      "status": "FAIL",
+      "detail": "locator.fill: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#edit-velocity')\u001b[22m\n\n    at C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\editing-probe.cjs:6:1458\n    at async check (C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\editing-probe.cjs:4:81)\n    at async C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\editing-probe.cjs:6:1"
+    },
+    {
+      "name": "E3B multiselect duplicate unique IDs relative note attributes",
+      "status": "PASS",
+      "detail": {
+        "selection": [
+          "eval-0",
+          "eval-1"
+        ],
+        "added": [
+          {
+            "duration_ticks": 720,
+            "id": "note-70fd9dc3-0f7f-4113-b131-e3d7f450d409",
+            "note": 61,
+            "start_tick": 1440,
+            "velocity": 90
+          },
+          {
+            "duration_ticks": 480,
+            "id": "note-7adca153-f262-4ce0-929f-a3bfd2dda1f5",
+            "note": 61,
+            "start_tick": 1920,
+            "velocity": 90
+          }
+        ]
+      }
+    },
+    {
+      "name": "E5A visible group move duplicate source refresh",
+      "status": "PASS",
+      "detail": {
+        "ids": [
+          "eval-0",
+          "eval-1",
+          "eval-2",
+          "eval-3",
+          "note-70fd9dc3-0f7f-4113-b131-e3d7f450d409",
+          "note-7adca153-f262-4ce0-929f-a3bfd2dda1f5"
+        ],
+        "added": [
+          {
+            "duration_ticks": 720,
+            "id": "event-3f638309-3629-444e-b4e3-993b3cebca1f",
+            "note": 61,
+            "start_tick": 5280,
+            "velocity": 90
+          },
+          {
+            "duration_ticks": 480,
+            "id": "event-d448188d-1657-4708-ab9f-b8e64bab21b3",
+            "note": 61,
+            "start_tick": 5760,
+            "velocity": 90
+          },
+          {
+            "duration_ticks": 480,
+            "id": "event-216e1ad8-47c7-4946-a373-479b9d1bd937",
+            "note": 62,
+            "start_tick": 6720,
+            "velocity": 90
+          },
+          {
+            "duration_ticks": 480,
+            "id": "event-a1d8526d-98bd-497a-9308-4014409a63d1",
+            "note": 63,
+            "start_tick": 7680,
+            "velocity": 90
+          },
+          {
+            "duration_ticks": 720,
+            "id": "event-6da8707f-d28a-4d00-9fb8-10897d5a2395",
+            "note": 61,
+            "start_tick": 6240,
+            "velocity": 90
+          },
+          {
+            "duration_ticks": 480,
+            "id": "event-260710e0-5a82-4833-acf9-a3905021fddc",
+            "note": 61,
+            "start_tick": 6720,
+            "velocity": 90
+          }
+        ]
+      }
+    },
+    {
+      "name": "E5B split trim native bounds and explicit sample limitation",
+      "status": "PASS",
+      "detail": {
+        "split_tick": 1560,
+        "trim_end": 1920
+      }
+    },
+    {
+      "name": "M4 numeric out of travel pointer keyboard reset pan and listening level separate",
+      "status": "PASS",
+      "detail": "Numeric expanded -72dB; keyboard .1dB; reset0dB; pan.01/center; listening level did not change source"
+    }
+  ],
+  "errors": []
+}

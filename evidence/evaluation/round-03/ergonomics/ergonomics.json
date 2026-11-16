@@ -1,0 +1,65 @@
+{
+  "checks": [
+    {
+      "name": "U4A keyboard focus named surfaces dialog focus containment Escape",
+      "status": "PASS",
+      "detail": {
+        "dialog": [
+          {
+            "id": "close-help",
+            "inside": true,
+            "outline": "solid"
+          },
+          {
+            "id": "",
+            "inside": false,
+            "outline": "none"
+          },
+          {
+            "id": "reset-layout",
+            "inside": true,
+            "outline": "solid"
+          },
+          {
+            "id": "close-help",
+            "inside": true,
+            "outline": "solid"
+          }
+        ],
+        "essential": [
+          {
+            "tag": "BUTTON",
+            "id": "play",
+            "outline": "none",
+            "tabIndex": 0
+          },
+          {
+            "tag": "INPUT",
+            "id": "volume",
+            "outline": "solid",
+            "tabIndex": 0
+          },
+          {
+            "tag": "AUDIO-UI-PIANO-ROLL-GRID",
+            "id": "",
+            "outline": "solid",
+            "tabIndex": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "U3B shortcut reference matches clipboard resize octave select empty guidance",
+      "status": "FAIL",
+      "detail": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n70 !== 72\n\n    at C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\ergonomics-probe.cjs:6:707\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async check (C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\ergonomics-probe.cjs:3:81)\n    at async C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\tools\\evaluation\\ergonomics-probe.cjs:6:1"
+    },
+    {
+      "name": "M5B actual overflowing mixer retains unrelated scroll after edit",
+      "status": "PASS",
+      "detail": {
+        "scroll": 148
+      }
+    }
+  ],
+  "errors": []
+}

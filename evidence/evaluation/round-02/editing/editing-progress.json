@@ -1,0 +1,122 @@
+{
+  "checks": [
+    {
+      "name": "E3A pointer move resize keyboard pitch timing velocity render",
+      "status": "PASS",
+      "detail": {
+        "before": {
+          "duration_ticks": 480,
+          "id": "eval-0",
+          "note": 60,
+          "start_tick": 0,
+          "velocity": 90
+        },
+        "after": {
+          "duration_ticks": 720,
+          "id": "eval-0",
+          "note": 61,
+          "start_tick": 480,
+          "velocity": 77
+        }
+      }
+    },
+    {
+      "name": "E3B multiselect duplicate unique IDs relative note attributes",
+      "status": "PASS",
+      "detail": {
+        "selection": [
+          "eval-0",
+          "eval-1"
+        ],
+        "added": [
+          {
+            "duration_ticks": 720,
+            "id": "note-8058b1e6-732e-41bf-8fc6-81302491989c",
+            "note": 61,
+            "start_tick": 1440,
+            "velocity": 77
+          },
+          {
+            "duration_ticks": 480,
+            "id": "note-03bfebb1-195e-4251-a1cd-a2b4cc0b0b8b",
+            "note": 61,
+            "start_tick": 1920,
+            "velocity": 90
+          }
+        ]
+      }
+    },
+    {
+      "name": "E5A visible group move duplicate source refresh",
+      "status": "PASS",
+      "detail": {
+        "ids": [
+          "eval-0",
+          "eval-1",
+          "eval-2",
+          "eval-3",
+          "note-8058b1e6-732e-41bf-8fc6-81302491989c",
+          "note-03bfebb1-195e-4251-a1cd-a2b4cc0b0b8b"
+        ],
+        "added": [
+          {
+            "duration_ticks": 720,
+            "id": "event-7ac00c3e-f331-4e15-b903-11ffe2c99fdf",
+            "note": 61,
+            "start_tick": 5280,
+            "velocity": 77
+          },
+          {
+            "duration_ticks": 480,
+            "id": "event-d0b84213-7d89-40af-89c4-6974ef43ad7a",
+            "note": 61,
+            "start_tick": 5760,
+            "velocity": 90
+          },
+          {
+            "duration_ticks": 480,
+            "id": "event-e00ab8c6-6e81-44a5-b021-1416d79ae7fe",
+            "note": 62,
+            "start_tick": 6720,
+            "velocity": 90
+          },
+          {
+            "duration_ticks": 480,
+            "id": "event-2e002b33-0275-4b87-a0d0-050701c94fcd",
+            "note": 63,
+            "start_tick": 7680,
+            "velocity": 90
+          },
+          {
+            "duration_ticks": 720,
+            "id": "event-1495b8b1-aaa0-4a67-b5a9-7a5fce44a44d",
+            "note": 61,
+            "start_tick": 6240,
+            "velocity": 77
+          },
+          {
+            "duration_ticks": 480,
+            "id": "event-28877fc6-9204-4caa-82a8-605c9314efc0",
+            "note": 61,
+            "start_tick": 6720,
+            "velocity": 90
+          }
+        ]
+      }
+    },
+    {
+      "name": "E5B split trim native bounds and explicit sample limitation",
+      "status": "PASS",
+      "detail": {
+        "split_tick": 1560,
+        "trim_end": 1920
+      }
+    },
+    {
+      "name": "M4 numeric out of travel pointer keyboard reset pan and listening level separate",
+      "status": "PASS",
+      "detail": "Numeric expanded -72dB; keyboard .1dB; reset0dB; pan.01/center; listening level did not change source"
+    }
+  ],
+  "errors": []
+}

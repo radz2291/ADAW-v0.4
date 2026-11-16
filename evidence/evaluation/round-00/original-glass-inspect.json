@@ -1,0 +1,1 @@
+{"ok": false, "data": null, "error": {"code": "VALIDATION_ERROR", "message": "the following arguments are required: --timeout", "target": "parse", "retryable": false, "details": {}}, "schema_version": "adaw.result@1", "request_id": "0559c65ca39f4e48b8eb802230629758", "operation": "parse", "warnings": [], "evidence_refs": [], "time_utc": "2026-11-16T03:55:14.201251+00:00"}

@@ -1,0 +1,15 @@
+........................................................s......          [100%]
+============================== warnings summary ===============================
+tests/test_contracts.py: 1 warning
+tests/test_everyday_core.py: 3 warnings
+tests/test_faust_runtime_catalog.py: 2 warnings
+tests/test_project.py: 5 warnings
+tests/test_studio_api.py: 3 warnings
+tests/test_studio_audio.py: 4 warnings
+  C:\Users\RZ1\Desktop\RZ-Music\261113-ADAW-v0.4-studio\app\quality.py:18: WavFileWarning: Chunk (non-data) not understood, skipping it.
+    other_rate, other = wavfile.read(path)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_studio_api.py:224: Opt in to the approved native fixture
+62 passed, 1 skipped, 18 warnings in 87.44s (0:01:27)

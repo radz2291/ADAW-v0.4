@@ -1,0 +1,13 @@
+{
+  "hash": "ac56815f8cfbf86a8153e8231d110f7a8ebb679d685e367ac8e2638a574e362b",
+  "playback": {
+    "src": "http://127.0.0.1:8767/api/v1/exports/export-a3bc75212d8a0bb3209dc50eecd72c0c805f5500dbc763a84dcb560009ca923a/audio",
+    "time": 0.116898,
+    "duration": 162.307688
+  },
+  "originStatus": 403,
+  "tokenStatus": 403,
+  "staticStatus": 404,
+  "rubric": "904217d07d250e4fa1677b522372313fbf449c9a15177f022a229457f0d78253",
+  "source": "rev-d5125b81c64cde95cecae7c48b071781152d743ae6a2f6f53782599096cb21e5"
+}

@@ -1,0 +1,64 @@
+{
+  "identity": {
+    "root": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-studio\\.local\\evaluation\\final-03-service\\project",
+    "rendition": "rendition-128ed65205804a4cb9a01f05a2b791a6",
+    "revision": "rev-397d00ff05607ec2c45a1953e61ceb9cfc7dd87c2fa102630aa46abf76c60316"
+  },
+  "checks": [
+    {
+      "name": "protected event/clip batches atomic",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "three undo redo plus unrelated and conflict",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "manual and pending proposals separate",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "stable create duplicate delete and empty selection",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "name": "native gain pan solo mute semantics",
+      "status": "PASS",
+      "detail": {
+        "gain_ratio": 0.5011872473430448,
+        "silence_peak": 0.0
+      }
+    }
+  ],
+  "audio": [
+    {
+      "revision": "rev-41f25725bbf3b254bb6914903377b6392ac4fa8b033947844d3977dddd2da402",
+      "sha256": "fd06631e77935ed1df9652070c9e510ce0223f3c1ba5f97f0afcb50a0f69c69e",
+      "seconds": 2.004907299997285,
+      "rate": 48000
+    },
+    {
+      "revision": "rev-bcf9634c4f7473790e4a094ace7caf6bd7b511bd00e0d634045bce336c78d0e4",
+      "sha256": "0c1301c4e24bbce7ba59b2a975ee2ad244631995c9c7c1af9490b173645a6a62",
+      "seconds": 1.8132087999838404,
+      "rate": 48000
+    },
+    {
+      "revision": "rev-5164c94dc6f9a7a0962f1d9f1edd7fab70e1a7c5d010875a0dea70f79942ea81",
+      "sha256": "afb73d5e9c7d499d99ec98d01f3fb58acfd5a8334c66d0ffa030df599bb0b1e6",
+      "seconds": 1.8022907999693416,
+      "rate": 48000
+    },
+    {
+      "revision": "rev-7ff526a2192c4aee5c2cc332b6fccbd8646f6c6d8bced17c392d1d464223b20a",
+      "sha256": "9f5c16d27699dd6ae8db5df2479a5c20966dc96f0ecc0e2f6bdca9f598e51087",
+      "seconds": 1.8491148999892175,
+      "rate": 48000
+    }
+  ],
+  "final_revision": "rev-7ff526a2192c4aee5c2cc332b6fccbd8646f6c6d8bced17c392d1d464223b20a"
+}

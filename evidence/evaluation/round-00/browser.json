@@ -1,0 +1,573 @@
+{
+  "date": "2026-11-16T03:54:00.282Z",
+  "checks": [
+    {
+      "name": "Direct fader persistence",
+      "status": "FAIL",
+      "detail": "Gesture only staged; canonical revision unchanged"
+    },
+    {
+      "name": "Delete selected note",
+      "status": "FAIL",
+      "detail": "Delete rejected: This editor supports moving, resizing and changing velocity of existing notes. Adding or deleting notes is not available yet."
+    },
+    {
+      "name": "Protected piano locked",
+      "status": "PASS",
+      "detail": "Protected editor disabled"
+    },
+    {
+      "name": "Tempo/meter section navigation",
+      "status": "PASS",
+      "detail": 4.307692
+    },
+    {
+      "name": "Space and Home",
+      "status": "PASS"
+    },
+    {
+      "name": "Input typing transport isolation",
+      "status": "PASS"
+    },
+    {
+      "name": "Missing everyday controls inventory",
+      "status": "PASS",
+      "detail": [
+        "Refresh",
+        "Render head",
+        "Browser",
+        "History & review",
+        "evaluation-midiMIDI",
+        "evaluation-sampleAUDIO",
+        "evaluation-protectedMIDI",
+        "intro",
+        "bridge",
+        "turn",
+        "Instruments & effects",
+        "intro",
+        "bridge",
+        "turn",
+        "evaluation-midi",
+        "intro",
+        "bridge",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "evaluation-sample",
+        "intro",
+        "",
+        "evaluation-protected",
+        "intro",
+        "bridge",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "■",
+        "Play",
+        "Loop",
+        "A",
+        "B",
+        "Events",
+        "Mixer",
+        "Plugins",
+        "Mix console",
+        "Piano roll",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Inspect proposal",
+        "View arrangement",
+        "Render preview",
+        "Apply",
+        "View source",
+        "Render",
+        "Undo edit",
+        "Analyze"
+      ]
+    },
+    {
+      "name": "Full Glass navigation search zoom playback",
+      "status": "PASS",
+      "detail": {
+        "duration": 162.307688,
+        "src": "http://127.0.0.1:8767/api/v1/renditions/rendition-c5f46aaba20f47e4952590ab012c4eee/audio"
+      }
+    },
+    {
+      "name": "390px overflow and local assets",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "remote": [],
+  "browser": "157.0.4341.60",
+  "initial": {
+    "history": {
+      "exports": [],
+      "proposals": [],
+      "renditions": [
+        {
+          "id": "rendition-e19713328f894284a2106f11d065a20b",
+          "revision": "rev-397d00ff05607ec2c45a1953e61ceb9cfc7dd87c2fa102630aa46abf76c60316"
+        }
+      ],
+      "revisions": [
+        {
+          "id": "rev-397d00ff05607ec2c45a1953e61ceb9cfc7dd87c2fa102630aa46abf76c60316",
+          "parent": null,
+          "reason": "Initial composition"
+        }
+      ]
+    },
+    "plugins": [],
+    "project": {
+      "last_playable_rendition": "rendition-e19713328f894284a2106f11d065a20b",
+      "listening": "NOT_EVALUATED",
+      "revision": "rev-397d00ff05607ec2c45a1953e61ceb9cfc7dd87c2fa102630aa46abf76c60316",
+      "source": {
+        "block_size": 256,
+        "brief": "Disposable evaluation only",
+        "buses": [
+          {
+            "gain_db": 0,
+            "id": "music",
+            "inserts": []
+          },
+          {
+            "gain_db": 0,
+            "id": "other",
+            "inserts": []
+          }
+        ],
+        "fade_frames": 240,
+        "length_ticks": 10560,
+        "master": {
+          "gain_db": 0,
+          "inserts": []
+        },
+        "ppq": 960,
+        "profile": {
+          "channels": 2,
+          "dither_seed": 1,
+          "id": "evaluation",
+          "max_dc": 0.001,
+          "max_estimated_true_peak_dbfs": -1,
+          "max_lufs": -10,
+          "max_sample_peak_dbfs": -1,
+          "min_lufs": -40,
+          "purpose": "test only",
+          "sample_rate": 48000,
+          "status": "temporary_engineering_profile",
+          "subtype": "PCM_24",
+          "true_peak_margin_db": 0.25
+        },
+        "sample_rate": 48000,
+        "schema": "adaw.arrangement@2",
+        "sections": [
+          {
+            "end_tick": 3840,
+            "id": "intro",
+            "mood": "test",
+            "start_tick": 0,
+            "swing": 0.5
+          },
+          {
+            "end_tick": 7680,
+            "id": "bridge",
+            "mood": "test",
+            "start_tick": 3840,
+            "swing": 0.5
+          },
+          {
+            "end_tick": 10560,
+            "id": "turn",
+            "mood": "test",
+            "start_tick": 7680,
+            "swing": 0.5
+          }
+        ],
+        "tail_frames": 24000,
+        "tempo": 120,
+        "time_map": [
+          {
+            "bpm": 120,
+            "denominator": 4,
+            "numerator": 4,
+            "tick": 0
+          },
+          {
+            "bpm": 104,
+            "denominator": 4,
+            "numerator": 4,
+            "tick": 3840
+          },
+          {
+            "bpm": 104,
+            "denominator": 4,
+            "numerator": 3,
+            "tick": 7680
+          }
+        ],
+        "title": "Independent interaction fixture",
+        "tracks": [
+          {
+            "bus": "music",
+            "events": [
+              {
+                "duration_ticks": 480,
+                "id": "eval-0",
+                "note": 60,
+                "start_tick": 0,
+                "velocity": 90
+              },
+              {
+                "duration_ticks": 480,
+                "id": "eval-1",
+                "note": 61,
+                "start_tick": 960,
+                "velocity": 90
+              },
+              {
+                "duration_ticks": 480,
+                "id": "eval-2",
+                "note": 62,
+                "start_tick": 1920,
+                "velocity": 90
+              },
+              {
+                "duration_ticks": 480,
+                "id": "eval-3",
+                "note": 63,
+                "start_tick": 2880,
+                "velocity": 90
+              },
+              {
+                "duration_ticks": 480,
+                "id": "eval-4",
+                "note": 64,
+                "start_tick": 3840,
+                "velocity": 90
+              },
+              {
+                "duration_ticks": 480,
+                "id": "eval-5",
+                "note": 65,
+                "start_tick": 4800,
+                "velocity": 90
+              },
+              {
+                "duration_ticks": 480,
+                "id": "eval-6",
+                "note": 66,
+                "start_tick": 5760,
+                "velocity": 90
+              },
+              {
+                "duration_ticks": 480,
+                "id": "eval-7",
+                "note": 67,
+                "start_tick": 6720,
+                "velocity": 90
+              }
+            ],
+            "gain_db": -12,
+            "id": "evaluation-midi",
+            "inserts": [],
+            "instrument": {
+              "module_sha256": "7858fc7dbf50f58280f8311c4e78e2a3d1b4787ea5ca763d46d89a00910667da",
+              "parameters": {},
+              "release_seconds": 0.2,
+              "voices": 8
+            },
+            "kind": "faust_synth",
+            "pan": 0,
+            "protected": false,
+            "role": "lead"
+          },
+          {
+            "bus": "other",
+            "events": [
+              {
+                "duration_ticks": 960,
+                "id": "sample-1",
+                "note": 60,
+                "start_tick": 0,
+                "velocity": 90
+              }
+            ],
+            "gain_db": -12,
+            "id": "evaluation-sample",
+            "inserts": [],
+            "instrument": {
+              "asset_sha256": "90b31a874b335fb5fc3c313a5b4a514acc90a49d4502960828a84c6d4f96628e",
+              "fade_frames": 24
+            },
+            "kind": "samples",
+            "pan": 0,
+            "protected": false,
+            "role": "sample"
+          },
+          {
+            "bus": "other",
+            "events": [
+              {
+                "duration_ticks": 480,
+                "id": "protected-eval-0",
+                "note": 60,
+                "start_tick": 0,
+                "velocity": 90
+              },
+              {
+                "duration_ticks": 480,
+                "id": "protected-eval-1",
+                "note": 61,
+                "start_tick": 960,
+                "velocity": 90
+              },
+              {
+                "duration_ticks": 480,
+                "id": "protected-eval-2",
+                "note": 62,
+                "start_tick": 1920,
+                "velocity": 90
+              },
+              {
+                "duration_ticks": 480,
+                "id": "protected-eval-3",
+                "note": 63,
+                "start_tick": 2880,
+                "velocity": 90
+              },
+              {
+                "duration_ticks": 480,
+                "id": "protected-eval-4",
+                "note": 64,
+                "start_tick": 3840,
+                "velocity": 90
+              },
+              {
+                "duration_ticks": 480,
+                "id": "protected-eval-5",
+                "note": 65,
+                "start_tick": 4800,
+                "velocity": 90
+              },
+              {
+                "duration_ticks": 480,
+                "id": "protected-eval-6",
+                "note": 66,
+                "start_tick": 5760,
+                "velocity": 90
+              },
+              {
+                "duration_ticks": 480,
+                "id": "protected-eval-7",
+                "note": 67,
+                "start_tick": 6720,
+                "velocity": 90
+              }
+            ],
+            "gain_db": -12,
+            "id": "evaluation-protected",
+            "inserts": [],
+            "instrument": {
+              "module_sha256": "7858fc7dbf50f58280f8311c4e78e2a3d1b4787ea5ca763d46d89a00910667da",
+              "parameters": {},
+              "release_seconds": 0.2,
+              "voices": 8
+            },
+            "kind": "faust_synth",
+            "pan": 0,
+            "protected": true,
+            "role": "lead"
+          }
+        ]
+      },
+      "source_sha256": "397d00ff05607ec2c45a1953e61ceb9cfc7dd87c2fa102630aa46abf76c60316"
+    }
+  },
+  "buttons": [
+    "Refresh",
+    "Render head",
+    "Browser",
+    "History & review",
+    "evaluation-midiMIDI",
+    "evaluation-sampleAUDIO",
+    "evaluation-protectedMIDI",
+    "intro",
+    "bridge",
+    "turn",
+    "Instruments & effects",
+    "intro",
+    "bridge",
+    "turn",
+    "evaluation-midi",
+    "intro",
+    "bridge",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "evaluation-sample",
+    "intro",
+    "",
+    "evaluation-protected",
+    "intro",
+    "bridge",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "■",
+    "Play",
+    "Loop",
+    "A",
+    "B",
+    "Events",
+    "Mixer",
+    "Plugins",
+    "Mix console",
+    "Piano roll",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "Inspect proposal",
+    "View arrangement",
+    "Render preview",
+    "Apply",
+    "View source",
+    "Render",
+    "Undo edit",
+    "Analyze"
+  ],
+  "controls": [
+    {
+      "id": "browser-search",
+      "label": null,
+      "type": "search"
+    },
+    {
+      "id": "zoom",
+      "label": null,
+      "type": "select-one"
+    },
+    {
+      "id": "",
+      "label": null,
+      "type": "range"
+    },
+    {
+      "id": "position",
+      "label": null,
+      "type": "range"
+    },
+    {
+      "id": "volume",
+      "label": "Monitor volume",
+      "type": "range"
+    },
+    {
+      "id": "rendition-a",
+      "label": null,
+      "type": "select-one"
+    },
+    {
+      "id": "rendition-b",
+      "label": null,
+      "type": "select-one"
+    },
+    {
+      "id": "event-select",
+      "label": null,
+      "type": "select-one"
+    },
+    {
+      "id": "piano-section",
+      "label": null,
+      "type": "select-one"
+    },
+    {
+      "id": "",
+      "label": "evaluation-midi source gain in dB",
+      "type": "range"
+    },
+    {
+      "id": "",
+      "label": "evaluation-sample source gain in dB",
+      "type": "range"
+    },
+    {
+      "id": "",
+      "label": "evaluation-protected source gain in dB",
+      "type": "range"
+    },
+    {
+      "id": "",
+      "label": "music source gain in dB",
+      "type": "range"
+    },
+    {
+      "id": "",
+      "label": "other source gain in dB",
+      "type": "range"
+    },
+    {
+      "id": "",
+      "label": "master source gain in dB",
+      "type": "range"
+    },
+    {
+      "id": "",
+      "label": "Section beat position",
+      "type": "range"
+    }
+  ],
+  "glassInitial": "rev-d5125b81c64cde95cecae7c48b071781152d743ae6a2f6f53782599096cb21e5",
+  "glassFinal": "rev-d5125b81c64cde95cecae7c48b071781152d743ae6a2f6f53782599096cb21e5"
+}
