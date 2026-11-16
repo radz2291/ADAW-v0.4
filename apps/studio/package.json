@@ -1,0 +1,19 @@
+{
+  "name": "adaw-studio",
+  "version": "0.4.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24 <25" },
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node verify-desktop.cjs"
+  },
+  "dependencies": {
+    "@audio-ui/elements": "0.5.1",
+    "wavesurfer.js": "8.1.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "playwright": "1.65.1"
+  }
+}

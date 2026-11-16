@@ -9,7 +9,7 @@ async function checkCatalog(page, origin) {
   await page.goto(origin);
   await page.getByRole("heading", { name: "Night Circuit", exact: true }).waitFor();
   assert.equal(await page.locator(".timeline-row").count(), 12);
-  await page.getByRole("button", { name: "kick", exact: true }).click();
+  await page.locator("#track-kick").click();
   await page.locator("#event-select").selectOption({ index: 1 });
   assert.equal(await page.locator("#edit-start_tick").inputValue(), "15360");
   await page.getByRole("button", { name: "Plugins", exact: true }).click();
@@ -41,6 +41,7 @@ async function checkExport(page, origin, reportPath) {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(origin);
   await page.locator("#rendition-a").selectOption(expected.rendition);
+  await page.locator("#toggle-review").click();
   await page.getByText("Record listening decision", { exact: true }).click();
   const player = page.locator('audio[aria-label="Exact verified export playback"]');
   const src = await player.getAttribute("src");

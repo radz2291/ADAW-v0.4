@@ -1,0 +1,8 @@
+{
+  "browser": "Edge headless",
+  "mode": "export",
+  "exactExportSha256": "ac56815f8cfbf86a8153e8231d110f7a8ebb679d685e367ac8e2638a574e362b",
+  "exactExportPlayback": true,
+  "viewportWidth": 390,
+  "pageErrors": []
+}

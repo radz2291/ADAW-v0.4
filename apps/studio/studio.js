@@ -1,3 +1,7 @@
+import '@audio-ui/elements/timeline';
+import '@audio-ui/elements/piano-roll';
+import '@audio-ui/elements/fader';
+import { createDesktop } from './desktop.js';
 const byId = (id) => document.getElementById(id);
 const audio = byId("audio");
 const ui = {
@@ -99,6 +103,7 @@ function updateBusy() {
   for (const item of document.querySelectorAll("[data-project-action]")) {
     item.disabled = ui.busy || item.dataset.unavailable === "true";
   }
+  desktop.setBusy();
 }
 
 function projectAction(text, callback, unavailable = false, classes = "") {
@@ -131,6 +136,7 @@ function selectTrack(track, eventId = null, focusId = null) {
   if (eventId) ui.inspector = "edit";
   drawTimeline();
   drawInspector();
+  desktop.draw();
   if (focusId) document.getElementById(focusId)?.focus({ preventScroll: true });
 }
 
@@ -161,7 +167,8 @@ function tickAtTime(source, seconds) {
     const end = changes[index + 1]?.tick ?? source.length_ticks;
     const ticksPerSecond = source.ppq * change.bpm / 60;
     const duration = (end - change.tick) / ticksPerSecond;
-    if (seconds < duration) return change.tick + seconds * ticksPerSecond;
+    // Browser media time is rounded; match the engine's nearest-sample boundaries.
+    if (seconds < duration - .5 / source.sample_rate) return change.tick + Math.max(0, seconds) * ticksPerSecond;
     seconds -= duration;
   }
   return source.length_ticks;
@@ -173,14 +180,20 @@ function drawTimeline() {
   if (!source) return;
   const length = source.length_ticks;
   const zoom = Number(byId("zoom").value);
-  timeline.style.width = `${zoom * 100}%`;
+  const root = byId('arrangement-timeline');
+  root.setAttribute('duration', length);
+  root.setAttribute('snap-step', source.ppq / 4);
+  const headerWidth = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--track-width'));
+  const available = Math.max(160, byId('timeline-viewport').clientWidth - headerWidth);
+  root.zoom = zoom === 1 ? null : available * zoom / length;
+  timeline.style.width = '100%';
   const meters = barPositions(source);
   const rows = [];
   const addRow = (name, classes = "") => {
-    const row = node("div", { classes: `timeline-row ${classes}` });
-    const caption = node("div", { classes: "track-label" });
+    const row = node("audio-ui-timeline-track", { classes: `timeline-row ${classes}` });
+    const caption = node("audio-ui-timeline-track-header", { classes: "track-label" });
     caption.append(name);
-    const lane = node("div", { classes: "lane" });
+    const lane = node(classes === "ruler-row" ? "audio-ui-timeline-ruler" : "audio-ui-timeline-lane", { classes: "lane" });
     for (const meter of meters) {
       const grid = node("div", { classes: "bar-grid", attrs: { "aria-hidden": "true" } });
       markTime(grid, meter.tick, meter.end - meter.tick, length);
@@ -195,10 +208,14 @@ function drawTimeline() {
   const barCount = meters.reduce((total, meter) => total + Math.ceil((meter.end - meter.tick) / meter.barTicks), 0);
   const stride = Math.max(1, Math.ceil(barCount / (12 * zoom)));
   let barNumber = 1;
+  let lastLabelTick = -Infinity;
   for (const meter of meters) {
     const count = Math.ceil((meter.end - meter.tick) / meter.barTicks);
     for (let index = 0; index < count; index += stride) {
-      const number = node("span", { text: barNumber + index, classes: "ruler" });
+      const tick = meter.tick + index * meter.barTicks;
+      if ((tick - lastLabelTick) / length * available * zoom < 30) continue;
+      lastLabelTick = tick;
+      const number = node("audio-ui-timeline-mark", { text: barNumber + index, classes: "ruler", attrs: { value: meter.tick + index * meter.barTicks } });
       markTime(number, meter.tick + index * meter.barTicks, undefined, length);
       ruler.append(number);
     }
@@ -218,8 +235,7 @@ function drawTimeline() {
   const sections = addRow("Sections", "section-row");
   for (const section of source.sections) {
     const sectionLabel = label(section.id);
-    const marker = node("span", {
-      text: sectionLabel,
+    const marker = button(sectionLabel, () => desktop.selectSection(section.id), {
       classes: "section-marker",
       attrs: { title: `${sectionLabel} · ${section.mood} · Swing ${Math.round(section.swing * 100)}%` },
     });
@@ -232,7 +248,16 @@ function drawTimeline() {
       attrs: { id: trackFocus, "aria-pressed": track.id === ui.trackId, title: `${label(track.role)} · ${label(track.bus)}` },
     });
     const lane = addRow(trackButton);
-    lane.style.setProperty("--track-color", trackColors[track.role] ?? "#a0bcc3");
+    lane.parentElement.dataset.trackId = track.id;
+    lane.parentElement.classList.toggle('selected-track', track.id === ui.trackId);
+    for (const section of source.sections) {
+      const events = track.events.filter(e => e.start_tick >= section.start_tick && e.start_tick < section.end_tick);
+      if (!events.length) continue;
+      const clip = button(label(section.id), () => { selectTrack(track); desktop.selectSection(section.id); }, {classes: 'section-clip', attrs: {title: `${label(track.id)} · ${label(section.id)} · ${events.length} events`}});
+      markTime(clip, section.start_tick, section.end_tick-section.start_tick, length);
+      lane.append(clip);
+    }
+    lane.style.setProperty("--track-color", trackColors[track.role.toLowerCase()] ?? "#a0bcc3");
     for (const event of track.events) {
       const eventFocus = `event-${event.id}`;
       const eventLabel = `${label(track.id)} · tick ${event.start_tick}`;
@@ -416,6 +441,7 @@ function drawProject() {
   drawProposals();
   drawRevisions();
   drawRenditionSelectors();
+  desktop.draw();
   updateBusy();
 }
 
@@ -436,12 +462,13 @@ function stage(operation, reason) {
       command_id: `studio-${crypto.randomUUID()}`,
       base_revision: baseRevision,
       reason,
-      operations: [operation],
+      operations: Array.isArray(operation) ? operation : [operation],
     };
     await api("/proposals", command);
     await inspectProposal(command.command_id);
     await refresh();
-    notice("Proposal staged. Preview the sound or apply the source change in Production review.");
+    desktop.showReview();
+    notice("Edit staged. Apply it below, then Render head to hear your change. The current audio remains playable.");
   }, "Staging project edit…");
 }
 
@@ -560,6 +587,7 @@ function updateTransport() {
   byId("play").disabled = !ui.loadedAudio;
   byId("play").textContent = audio.paused ? "Play" : "Pause";
   byId("time").textContent = `${timestamp(audio.currentTime)} / ${timestamp(duration)}`;
+  desktop.sync();
   const playhead = byId("playhead");
   const lane = byId("timeline").querySelector(".lane");
   const renditionMatchesView = ui.rendition?.revision === ui.view?.revision;
@@ -573,31 +601,7 @@ function updateTransport() {
   }
 }
 
-function drawWaveform(peaks) {
-  const canvas = byId("waveform");
-  if (!peaks?.length) {
-    canvas.hidden = true;
-    return;
-  }
-  const context = canvas.getContext("2d");
-  const { width, height } = canvas;
-  context.clearRect(0, 0, width, height);
-  context.strokeStyle = "#4e5d65";
-  context.beginPath();
-  context.moveTo(0, height / 2);
-  context.lineTo(width, height / 2);
-  context.stroke();
-  context.strokeStyle = "#b7d970";
-  context.beginPath();
-  peaks.forEach((peak, index) => {
-    const x = width * (index + .5) / peaks.length;
-    const radius = Math.min(1, Math.abs(peak)) * (height / 2 - 3);
-    context.moveTo(x, height / 2 - radius);
-    context.lineTo(x, height / 2 + radius);
-  });
-  context.stroke();
-  canvas.hidden = false;
-}
+function drawWaveform(peaks) { desktop.waveform(peaks); }
 
 async function loadWaveform(id, signal) {
   if (!window.AudioContext) return;
@@ -617,7 +621,7 @@ async function loadWaveform(id, signal) {
         peaks[bin] = Math.max(peaks[bin], Math.abs(samples[index]));
       }
     }
-    drawWaveform(peaks);
+    desktop.waveform(peaks, sound.duration);
   } finally {
     await decoder.close();
   }
@@ -792,6 +796,8 @@ byId("measure").addEventListener("click", () => action(async () => {
   drawQuality();
   notice(`Measured rendition ${short(renditionId)}.`);
 }, "Analyzing rendered audio…"));
+const desktop = createDesktop({ ui, audio, byId, node, button, label, trackColors, stage, notice,
+  selectTrack, currentTrack, drawInspector, tickAtTime, timeChanges });
 action(async () => {
   await refresh({ viewHead: true });
   notice("");

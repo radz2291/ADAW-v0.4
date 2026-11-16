@@ -3,8 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ADAW Studio</title>
+  <title>ADAW · Studio</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/studio.css">
+  <link rel="stylesheet" href="/desktop.css">
   <script type="module" src="/studio.js"></script>
 </head>
 <body>
@@ -21,7 +23,17 @@
   </header>
   <main>
     <p id="notice" class="notice" role="status" aria-live="polite" hidden></p>
+    <div class="desktop-tools">
+      <nav aria-label="Workspace panels"><button id="toggle-browser" aria-pressed="true">Browser</button><button id="toggle-review" aria-pressed="false">History &amp; review</button></nav>
+      <span id="playback-state" role="status">Loading audio…</span><span class="shortcut-hint">Space · play / pause &nbsp; Home · start</span>
+    </div>
     <div class="workspace">
+      <aside class="browser panel" id="browser-panel" aria-label="Project browser">
+        <div class="panel-heading"><h2>Project browser</h2><span class="eyebrow">LOCAL</span></div>
+        <label class="sr-only" for="browser-search">Find track or section</label><input id="browser-search" type="search" placeholder="Find track or section…">
+        <div id="browser-content"></div>
+        <div class="browser-footer">DawDreamer engine<br><span>Source edits • rendered playback</span></div>
+      </aside>
       <section class="arrangement panel" aria-labelledby="arrangement-heading">
         <div class="panel-heading">
           <div><h2 id="arrangement-heading">Arrangement</h2><p id="timeline-context"></p></div>
@@ -31,13 +43,16 @@
             <button type="button" id="back-head" hidden>View head</button>
           </div>
         </div>
-        <div class="timeline-viewport" id="timeline-viewport" tabindex="0" aria-label="Scrollable arrangement timeline">
-          <div class="timeline" id="timeline"></div>
-        </div>
+        <audio-ui-timeline id="arrangement-timeline" duration="1" min-zoom="0.0001" max-zoom="2">
+          <audio-ui-timeline-viewport class="timeline-viewport" id="timeline-viewport" tabindex="0" aria-label="Scrollable arrangement timeline">
+            <div class="timeline" id="timeline"></div>
+          </audio-ui-timeline-viewport>
+        </audio-ui-timeline>
         <div class="transport" aria-label="Rendition playback">
-          <canvas id="waveform" width="960" height="48" role="img" aria-label="Waveform of the active rendition" hidden></canvas>
+          <div id="waveform" aria-label="Rendered audio waveform" hidden></div>
           <div class="transport-main">
-            <button type="button" class="primary" id="play" disabled>Play</button>
+            <button type="button" id="stop" title="Stop and return to start">■</button><button type="button" class="primary" id="play" disabled>Play</button>
+            <button type="button" id="loop" aria-pressed="false" title="Loop the selected section in matching rendered audio">Loop</button><output id="musical-position">1.1</output><output id="tempo-display">— BPM</output>
             <label class="sr-only" for="position">Playback position</label>
             <input id="position" type="range" min="0" max="0" step=".01" value="0" disabled>
             <span class="time" id="time">0:00 / 0:00</span>
@@ -66,7 +81,11 @@
         <div id="inspector-content" class="inspector-content"></div>
       </aside>
     </div>
-    <section class="review panel" aria-labelledby="review-heading">
+    <section class="dock panel" aria-label="Editor dock">
+      <div class="dock-heading"><nav aria-label="Editor views"><button data-dock="mixer" aria-pressed="true">Mix console</button><button data-dock="piano" aria-pressed="false">Piano roll</button></nav><span id="dock-context">Source gains · stage changes, apply, then render</span><label id="piano-section-label" hidden>Section <select id="piano-section"></select></label></div>
+      <div id="mix-console" class="mix-console"></div><div id="piano-editor" hidden></div>
+    </section>
+    <section id="review-panel" hidden class="review panel" aria-labelledby="review-heading">
       <div class="panel-heading"><h2 id="review-heading">Production review</h2></div>
       <div class="review-grid">
         <section aria-labelledby="proposal-heading">

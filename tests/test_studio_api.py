@@ -100,6 +100,33 @@ def response_data(response):
     return envelope["data"]
 
 
+def test_desktop_assets_are_local_and_scripts_remain_restricted(tmp_path):
+    root = tmp_path / "project"
+    create_fixture(root, tmp_path)
+    frontend = Path(__file__).resolve().parents[1] / "apps" / "studio"
+    server = make_server(root, port=0, studio_dir=frontend)
+    url = f"http://127.0.0.1:{server.server_port}"
+    thread = Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        for path in ("/", "/studio.js", "/studio.css", "/desktop.css", "/favicon.svg"):
+            status, headers, body = request(url, path)
+            assert status == 200 and body
+            policy = headers["Content-Security-Policy"]
+            assert "script-src 'self';" in policy
+            assert "style-src 'self' 'unsafe-inline';" in policy
+            assert "object-src 'none'" in policy
+        assert request(url, "/studio.js")[2] == (frontend / "dist" / "studio.js").read_bytes()
+        for forbidden in ("/package-lock.json", "/node_modules/wavesurfer.js/package.json",
+                          "/../AGENTS.md", "/dist/../desktop.js"):
+            assert request(url, forbidden)[0] == 404
+        assert request(url, "/studio.js", headers={"Origin": "https://example.invalid"})[0] == 403
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
+
+
 def test_independent_client_and_cli_share_one_project(tmp_path):
     root = tmp_path / "project"
     base = create_fixture(root, tmp_path)

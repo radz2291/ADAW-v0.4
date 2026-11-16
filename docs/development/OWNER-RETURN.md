@@ -1,5 +1,13 @@
 # ADAW G2–G5 owner handoff
 
+**Desktop UI fork, 16 November 2026:** current UI development is on
+`adaw/desktop-studio`, based on song commit `3897f30`, in the sibling
+`261113-ADAW-v0.4-studio` worktree. Its Glass Current project was copied through
+verified archive restore. Open port 8767 for that workspace. See
+[Studio instructions](../../apps/studio/README.md) and
+[UI verification](../../evidence/ui/desktop/REPORT.md).
+The G2–G5 checkpoint below describes its historical integration delivery.
+
 The G1 development milestone is owner-accepted. Its original Night Circuit
 master and arrangement preview retain their recorded feedback and identities.
 Use the `adaw/g2-g5` branch. Its latest checkpoint and the tested code commit

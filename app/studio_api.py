@@ -17,10 +17,12 @@ from app.reviews import ReviewStore
 MAX_COMMAND_BYTES = 8 * 1024 * 1024
 RENDER_TIMEOUT_SECONDS = 180
 STATIC_FILES = {
+    "/favicon.svg": ("favicon.svg", "image/svg+xml"),
     "/": ("index.html", "text/html; charset=utf-8"),
     "/index.html": ("index.html", "text/html; charset=utf-8"),
     "/studio.css": ("studio.css", "text/css; charset=utf-8"),
-    "/studio.js": ("studio.js", "text/javascript; charset=utf-8"),
+    "/desktop.css": ("desktop.css", "text/css; charset=utf-8"),
+    "/studio.js": ("dist/studio.js", "text/javascript; charset=utf-8"),
     "/styles.css": ("styles.css", "text/css; charset=utf-8"),
     "/app.js": ("app.js", "text/javascript; charset=utf-8"),
 }
@@ -46,7 +48,8 @@ def make_server(root, port=0, studio_dir=None):
             self.send_header("X-Content-Type-Options", "nosniff")
             self.send_header("Referrer-Policy", "no-referrer")
             self.send_header("Content-Security-Policy",
-                             "default-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'")
+                             "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
+                             "object-src 'none'; frame-ancestors 'none'; base-uri 'none'")
             for key, value in extra:
                 self.send_header(key, value)
             self.end_headers()

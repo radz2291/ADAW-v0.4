@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "browser": "Edge headless",
+  "sourceRevision": "rev-ee2b45326aa76d7ec01df9343ffee6d74dcd994c2af89db39b9406578747d732",
+  "finalRevision": "rev-500fd8d8dc9550916ddb9e50e1da79cb7f307834b3d13f4baa5482b24ea7bbec",
+  "rendition": "rendition-beb9b645f182483fa26fe22490684ab3",
+  "checks": [
+    "library elements loaded",
+    "local assets only",
+    "zoom and browser filter",
+    "tempo/meter seek",
+    "section loop playback",
+    "transport shortcuts",
+    "fader gesture -> proposal -> apply -> CLI",
+    "note keyboard edit -> proposal -> apply -> CLI",
+    "pointer note resize",
+    "unsupported deletion rejected",
+    "protected track lock",
+    "historical revision lock",
+    "real Faust rerender/playback",
+    "A/B stale audio identity",
+    "390px overflow",
+    "no browser/CSP errors"
+  ],
+  "audio_sha256": "060a525bfff158f57aeabe62d1f60ca54f1df7978f43764c588ee78c4888a4b1",
+  "audio_bytes_verified": true,
+  "sample_rate": 48000,
+  "duration_seconds": 6.538458333333334
+}

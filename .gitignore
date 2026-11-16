@@ -7,4 +7,5 @@ __pycache__/
 *.dll
 *.vst3/
 *.zip
+node_modules/
 

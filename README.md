@@ -7,14 +7,16 @@ renders and independent decoded-file measurement. G1 now produces an original
 verified PCM24 export. The owner accepted G1 as a development milestone.
 Musical feedback and rendition approvals are tracked separately.
 
-The `adaw/g2-g5` integration branch adds a local Studio, portable archives,
-measured comparison tools and offline timing and routing features.
+The `adaw/desktop-studio` development fork adds a library-backed desktop workspace
+on top of `adaw/g2-g5`: an audio/ui arrangement, piano roll and mix console, and
+WaveSurfer rendition navigation. See [Studio setup and controls](apps/studio/README.md).
+The service retains portable archives, comparison tools and offline timing/routing.
 
 ```powershell
-.\tools\start_studio.ps1
+.\tools\start_studio.ps1 -Project .local/glass-current-song -Port 8767
 ```
 
-Open [local Studio](http://127.0.0.1:8765/). Use `-Project` to choose a local
+Open [local Studio](http://127.0.0.1:8767/). Use `-Project` to choose a local
 project and `-ApiOnly` to run the service by itself. Project creation and asset
 import remain available in the CLI. [Owner handoff](docs/development/OWNER-RETURN.md).
 
@@ -35,7 +37,9 @@ The repository is [radz2291/ADAW-v0.4](https://github.com/radz2291/ADAW-v0.4).
 
 Tested Windows 11 x64 build 26100, CPython **3.12.14 x64**, DawDreamer **0.9.0**.
 All runtime/test wheels have exact version/hash locks in `requirements.lock`.
-Node is not used or required. No machine-wide Python/plugin installation occurs.
+Node is not required to launch the committed Studio build. UI development uses
+Node 24, pinned npm dependencies and esbuild; see `apps/studio/package-lock.json`.
+No machine-wide Python/plugin installation occurs.
 
 From this repository in PowerShell:
 
