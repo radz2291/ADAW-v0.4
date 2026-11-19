@@ -1,0 +1,222 @@
+{
+  "schema": "adaw.guitar-rig-compatibility@1",
+  "date": "2026-11-19",
+  "base_commit": "5e41769",
+  "plugin": {
+    "registry_id": "plugin-d029650b1077f3ee17666d7ae70626f08d9cd98986e13165bc8b5c8a16840e2f",
+    "path": "C:\\Program Files\\Common Files\\VST3\\Guitar Rig 7.vst3",
+    "files": {
+      "Guitar Rig 7.vst3": "53ceb6a3048f03aaf01dbef089547cf289dde38ebffe0d2e6cf6306b4fc56bd8"
+    },
+    "sha256": "d029650b1077f3ee17666d7ae70626f08d9cd98986e13165bc8b5c8a16840e2f",
+    "provenance": "Owner requested Guitar Rig integration test on 2026-11-19"
+  },
+  "environment": {
+    "os": "Windows-11-10.0.26100-SP0",
+    "machine": "AMD64",
+    "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+    "executable": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.venv\\Scripts\\python.exe",
+    "packages": {
+      "dawdreamer": "0.9.0",
+      "numpy": "2.2.6",
+      "scipy": "1.15.3",
+      "soundfile": "0.13.1",
+      "pyloudnorm": "0.1.1"
+    },
+    "native_module_sha256": "7ea9eaa679ef0e7f43166c75e2158a49735daf3b96ca5be1124a140e58ad3d81",
+    "import_seconds": 0.031708499998785555,
+    "isolation": "native subprocess crash containment only; same-user filesystem/network rights"
+  },
+  "scope": "RWT-11 effect loading subset and RWT-06 crash preservation subset; no full RWT acceptance",
+  "load_trials": [
+    {
+      "sample_rate": 48000,
+      "block_size": 256,
+      "error": {
+        "code": "WORKER_CRASHED",
+        "message": "Nonzero worker exit",
+        "target": "plugin-probe",
+        "retryable": false,
+        "details": {
+          "job_id": "af98b7491d54423dbe31953da6d41613",
+          "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-guitar-rig\\.local\\guitar-rig\\run-001\\project\\staging\\af98b7491d54423dbe31953da6d41613",
+          "worker": {
+            "ok": false,
+            "error": {
+              "code": "WORKER_CRASHED",
+              "message": "Nonzero worker exit"
+            },
+            "job_id": "af98b7491d54423dbe31953da6d41613",
+            "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-guitar-rig\\.local\\guitar-rig\\run-001\\project\\staging\\af98b7491d54423dbe31953da6d41613",
+            "exit_code": 3221225477,
+            "wall_seconds": 11.873065899999347
+          }
+        }
+      }
+    },
+    {
+      "sample_rate": 44100,
+      "block_size": 512,
+      "error": {
+        "code": "WORKER_CRASHED",
+        "message": "Nonzero worker exit",
+        "target": "plugin-probe",
+        "retryable": false,
+        "details": {
+          "job_id": "c82da109284f44fba097e2c3cf26129d",
+          "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-guitar-rig\\.local\\guitar-rig\\run-001\\project\\staging\\c82da109284f44fba097e2c3cf26129d",
+          "worker": {
+            "ok": false,
+            "error": {
+              "code": "WORKER_CRASHED",
+              "message": "Nonzero worker exit"
+            },
+            "job_id": "c82da109284f44fba097e2c3cf26129d",
+            "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-guitar-rig\\.local\\guitar-rig\\run-001\\project\\staging\\c82da109284f44fba097e2c3cf26129d",
+            "exit_code": 3221225477,
+            "wall_seconds": 7.016828399995575
+          }
+        }
+      }
+    }
+  ],
+  "protected_baseline_trial": {
+    "failure": {
+      "code": "WORKER_CRASHED",
+      "message": "Nonzero worker exit",
+      "details": {
+        "job_id": "1e13184ceadf4312a236d10a792d4eb9",
+        "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-guitar-rig\\.local\\guitar-rig\\run-002\\project\\staging\\1e13184ceadf4312a236d10a792d4eb9",
+        "worker": {
+          "ok": false,
+          "error": {
+            "code": "WORKER_CRASHED",
+            "message": "Nonzero worker exit"
+          },
+          "job_id": "1e13184ceadf4312a236d10a792d4eb9",
+          "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-guitar-rig\\.local\\guitar-rig\\run-002\\project\\staging\\1e13184ceadf4312a236d10a792d4eb9",
+          "exit_code": 3221225477,
+          "wall_seconds": 7.143372899998212
+        }
+      }
+    },
+    "checks": [
+      {
+        "id": "plugin_load_or_render",
+        "status": "FAIL",
+        "code": "WORKER_CRASHED"
+      },
+      {
+        "id": "last_playable_preserved",
+        "status": "PASS"
+      }
+    ],
+    "preservation": {
+      "before": {
+        "head": "36546bd9c67b4422bc5d4d156aba6749",
+        "last_playable": "da394ab703b312400cb51a10049b6b0bed9ceab9f5bb1f3543c832387907619b",
+        "revisions": [
+          {
+            "id": "36546bd9c67b4422bc5d4d156aba6749",
+            "parent": null,
+            "audio_sha256": "da394ab703b312400cb51a10049b6b0bed9ceab9f5bb1f3543c832387907619b"
+          }
+        ]
+      },
+      "after": {
+        "head": "36546bd9c67b4422bc5d4d156aba6749",
+        "last_playable": "da394ab703b312400cb51a10049b6b0bed9ceab9f5bb1f3543c832387907619b",
+        "revisions": [
+          {
+            "id": "36546bd9c67b4422bc5d4d156aba6749",
+            "parent": null,
+            "audio_sha256": "da394ab703b312400cb51a10049b6b0bed9ceab9f5bb1f3543c832387907619b"
+          }
+        ]
+      },
+      "baseline_sha256": "da394ab703b312400cb51a10049b6b0bed9ceab9f5bb1f3543c832387907619b"
+    },
+    "recovery": {
+      "ok": true,
+      "data": {
+        "os": "Windows-11-10.0.26100-SP0",
+        "machine": "AMD64",
+        "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+        "executable": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.venv\\Scripts\\python.exe",
+        "packages": {
+          "dawdreamer": "0.9.0",
+          "numpy": "2.2.6",
+          "scipy": "1.15.3",
+          "soundfile": "0.13.1",
+          "pyloudnorm": "0.1.1"
+        },
+        "native_module_sha256": "7ea9eaa679ef0e7f43166c75e2158a49735daf3b96ca5be1124a140e58ad3d81",
+        "import_seconds": 0.023751200002152473,
+        "isolation": "native subprocess crash containment only; same-user filesystem/network rights"
+      },
+      "warnings": [],
+      "job_id": "45bbc13c6b9c4994a6175454f89392b3",
+      "stage": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-guitar-rig\\.local\\guitar-rig\\run-002\\project\\staging\\45bbc13c6b9c4994a6175454f89392b3",
+      "exit_code": 0,
+      "wall_seconds": 0.6375761000090279
+    }
+  },
+  "baseline_audio_quality": {
+    "audio_sha256": "da394ab703b312400cb51a10049b6b0bed9ceab9f5bb1f3543c832387907619b",
+    "frames": 96000,
+    "sample_rate": 48000,
+    "channels": 2,
+    "subtype": "FLOAT",
+    "duration_seconds": 2.0,
+    "sample_peak": 0.10000000149011612,
+    "sample_peak_dbfs": -19.99999987057016,
+    "rms": 0.0707106782225614,
+    "dc_per_channel": [
+      9.251858538542971e-19,
+      9.251858538542971e-19
+    ],
+    "integrated_lufs": -20.9448347773041,
+    "loudness_method": "pyloudnorm ITU-R BS.1770-4 K-weighting and gating; 400 ms blocks",
+    "analyzer_versions": {
+      "pyloudnorm": "0.1.1",
+      "soundfile": "0.13.1",
+      "scipy": "1.15.3",
+      "numpy": "2.2.6"
+    },
+    "independent_decode": "PASS: libsndfile and scipy.io.wavfile agree",
+    "true_peak": {
+      "status": "NOT_EVALUATED",
+      "reason": "No calibrated true-peak meter in G0 subset"
+    },
+    "delivery_profile_status": "UNKNOWN: no owner-selected thresholds",
+    "listening": "NOT_EVALUATED"
+  },
+  "windows_events": [
+    {
+      "TimeCreated": "2026-11-19T21:52:41.0304844+08:00",
+      "Message": "Faulting application name: python.exe, version: 3.12.14150.1013, time stamp: 0x6a8da072\r\nFaulting module name: Guitar Rig 7.vst3, version: 7.0.2.0, time stamp: 0x6593f4dd\r\nException code: 0xc0000005\r\nFault offset: 0x000000000142ae9a\r\nFaulting process id: 0x1A44\r\nFaulting application start time: 0x1DD782D3D47D486\r\nFaulting application path: C:\\Users\\RZ1\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe\r\nFaulting module path: C:\\Program Files\\Common Files\\VST3\\Guitar Rig 7.vst3\r\nReport Id: 88fcc7bf-b2f6-486d-89d0-04794b4f5d52\r\nFaulting package full name: \r\nFaulting package-relative application ID: "
+    },
+    {
+      "TimeCreated": "2026-11-19T21:51:30.9188+08:00",
+      "Message": "Faulting application name: python.exe, version: 3.12.14150.1013, time stamp: 0x6a8da072\r\nFaulting module name: Guitar Rig 7.vst3, version: 7.0.2.0, time stamp: 0x6593f4dd\r\nException code: 0xc0000005\r\nFault offset: 0x000000000142ae9a\r\nFaulting process id: 0x3C3C\r\nFaulting application start time: 0x1DD782D13B3C080\r\nFaulting application path: C:\\Users\\RZ1\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe\r\nFaulting module path: C:\\Program Files\\Common Files\\VST3\\Guitar Rig 7.vst3\r\nReport Id: 4c7fe57f-46d9-4ba6-9b80-3396e724c3a8\r\nFaulting package full name: \r\nFaulting package-relative application ID: "
+    },
+    {
+      "TimeCreated": "2026-11-19T21:50:53.2133899+08:00",
+      "Message": "Faulting application name: python.exe, version: 3.12.14150.1013, time stamp: 0x6a8da072\r\nFaulting module name: Guitar Rig 7.vst3, version: 7.0.2.0, time stamp: 0x6593f4dd\r\nException code: 0xc0000005\r\nFault offset: 0x000000000142ae9a\r\nFaulting process id: 0x390C\r\nFaulting application start time: 0x1DD782CFAD58612\r\nFaulting application path: C:\\Users\\RZ1\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe\r\nFaulting module path: C:\\Program Files\\Common Files\\VST3\\Guitar Rig 7.vst3\r\nReport Id: 2e8c72c4-179f-49c1-ad32-f45c990e814e\r\nFaulting package full name: \r\nFaulting package-relative application ID: "
+    }
+  ],
+  "regression": {
+    "result": "16 passed",
+    "log": "................                                                         [100%]\n============================== warnings summary ===============================\ntests/test_contracts.py::test_native_render_preserves_frame_count_at_rounding_boundary\n  C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-guitar-rig\\app\\quality.py:18: WavFileWarning: Chunk (non-data) not understood, skipping it.\n    other_rate, other = wavfile.read(path)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n16 passed, 1 warning in 5.66s\n"
+  },
+  "status": {
+    "plugin_loading": "FAIL",
+    "processed_audio": "BLOCKED",
+    "parameters": "BLOCKED",
+    "state_restore": "BLOCKED",
+    "crash_recovery": "PASS",
+    "listening": "NOT_EVALUATED"
+  },
+  "runtime_root": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-guitar-rig\\.local\\guitar-rig",
+  "raw_report_sha256": "90fe51830d8323a773295950520d3528d444d79fc664cdb1810560f84ee73224"
+}
