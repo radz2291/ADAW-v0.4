@@ -100,7 +100,23 @@ class Service:
             raise AdawError("PLUGIN_MISSING", "Resolve and explicitly authorize the archived plugin", registry_id=registry_id)
         if binary_identity(identity["path"])["sha256"] != identity["sha256"]:
             raise AdawError("PLUGIN_CAPABILITY_UNVERIFIED", "Plugin files changed; reauthorize and probe")
-        return {**identity, "provenance": row[1], "probe": json.loads(row[2]) if row[2] else None}
+        with closing(self.connect()) as db:
+            policy = db.execute("SELECT value FROM metadata WHERE key=?", ("host-profile:"+registry_id,)).fetchone()
+        return {**identity, "provenance": row[1], "probe": json.loads(row[2]) if row[2] else None,
+                "host_profile": json.loads(policy[0])["profile"] if policy else "standard"}
+
+    def configure_plugin_host(self, registry_id, profile, reason):
+        if profile not in ("standard", "windows-stereo-zero-aux-isolated-v1") or not reason.strip():
+            raise AdawError("VALIDATION_ERROR", "Known host profile and explicit reason required")
+        if profile != "standard" and os.name != "nt":
+            raise AdawError("VALIDATION_ERROR", "This compatibility profile requires Windows")
+        identity = self.plugin(registry_id)  # Rechecks exact approved fingerprint.
+        record = {"profile": profile, "reason": reason, "binary_sha256": identity["sha256"]}
+        with closing(self.connect()) as db, db:
+            db.execute("INSERT OR REPLACE INTO metadata VALUES (?,?)", ("host-profile:"+registry_id, canonical(record)))
+            # I/O and host semantics changed; old probe must not be reused.
+            db.execute("UPDATE plugins SET probe=NULL WHERE id=?", (registry_id,))
+        return {"registry_id": registry_id, **record}
 
     def run_worker(self, request, timeout, staged_states=(), staged_assets=()):
         if not isinstance(timeout, (int, float)) or not 0 < timeout < float("inf"):
@@ -184,7 +200,8 @@ class Service:
         if type(sample_rate) is not int or type(block_size) is not int or sample_rate <= 0 or block_size <= 0:
             raise AdawError("VALIDATION_ERROR", "Rate/block size must be positive integers")
         identity = self.plugin(registry_id)
-        result = self.run_worker({"operation": "probe", "plugin_path": identity["path"], "sample_rate": sample_rate, "block_size": block_size}, timeout)
+        result = self.run_worker({"operation": "probe", "plugin_path": identity["path"], "sample_rate": sample_rate, "block_size": block_size,
+                                  "host_profile": identity["host_profile"]}, timeout)
         with closing(self.connect()) as db, db:
             db.execute("UPDATE plugins SET probe=? WHERE id=?", (canonical(result["data"]), registry_id))
         return result
@@ -205,7 +222,7 @@ class Service:
             if identity["probe"] is None:
                 raise AdawError("PLUGIN_CAPABILITY_UNVERIFIED", "Plugin needs isolated probe")
             plugins[c["registry_id"]] = {"path": identity["path"], "sha256": identity["sha256"],
-                "catalog_sha256": catalog_hash(identity["probe"]["parameters"])}
+                "catalog_sha256": catalog_hash(identity["probe"]["parameters"]), "host_profile": identity["host_profile"]}
             if c["state_sha256"]:
                 states.add(c["state_sha256"])
         if not set(record_nodes) <= {n["id"] for n in graph.value["nodes"]}:

@@ -1,5 +1,44 @@
 # Guitar Rig 7 — installed-plugin compatibility check
 
+## Follow-up: real rendering now works, with limitations
+
+The owner confirmed standalone works. Follow-up inspection corrects the initial
+loading diagnosis below: raw results contain 2,594 parameters before a shutdown
+crash. The original failed jobs remain failed. An opt-in Windows worker profile
+now produces verified audio; see [ADR-0007](../../../docs/decisions/ADR-0007-installed-vst-worker-completion.md).
+
+- Load, stereo render, real parameter/audio change and baseline preservation: PASS.
+- Normal DLL shutdown: still broken; explicitly bypassed after completed work.
+- Opaque state restore: FAIL, interface mismatch; retained as blocked for reuse.
+- Backend suite: 67 passed, one optional Dexed test skipped.
+- Eight-second original synthesized-string demo: `.local/guitar-rig/demo-001/`.
+  `dry.wav`, `guitar-rig.wav` and `quieter.wav` use the same source.
+- Runtime diagnostics and raw reports remain under `.local/guitar-rig/`.
+  [run-002.json](run-002.json) records the follow-up measurements and hashes.
+
+The tested level control is Rack Master Volume, discovered by name, index 261.
+Normalized .7 gives RMS .0185851; .4 gives .00402039 on this fixture. These are
+engineering test settings, not recommended mixing values. Listening is unevaluated.
+This does not certify all rack presets, live input or full Studio device editing.
+
+Reproduce in a fresh local folder:
+
+```powershell
+& 'C:/Users/RZ1/Desktop/RZ-Music/261113-ADAW-v0.4/.venv/Scripts/python.exe' -m tools.guitar_rig_demo --folder .local/guitar-rig/demo-002 --plugin 'C:/Program Files/Common Files/VST3/Guitar Rig 7.vst3' --approval 'Owner requested Guitar Rig test'
+```
+
+For an existing disposable project, register the exact plugin, then explicitly
+select its host profile and re-probe using the JSON CLI:
+
+```text
+plugin-host-profile --id <registry-id> --profile windows-stereo-zero-aux-isolated-v1 --reason <reason>
+plugin-probe --id <registry-id> --sample-rate 48000 --block-size 256
+```
+
+Each CLI call also requires the normal `--root` and `--timeout` arguments.
+
+## Historical initial attempt — retained
+
 19 November 2026. **BLOCKED: this installed plugin crashes during loading in
 the current DawDreamer worker. No Guitar Rig-processed audio was produced.**
 

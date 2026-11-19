@@ -15,7 +15,7 @@ from app.service import Service
 from tools.fixtures import graph, tone, vst_node
 
 
-def run(folder, plugin, approval, timeout):
+def run(folder, plugin, approval, timeout, host_profile='standard'):
     folder = Path(folder).resolve()
     local = Path(__file__).resolve().parents[1] / '.local'
     if not folder.is_relative_to(local):
@@ -38,12 +38,16 @@ def run(folder, plugin, approval, timeout):
     report['baseline'] = baseline
     before = service.inspect()
     report['plugin'] = service.authorize_plugin(plugin, approval)
+    if host_profile != 'standard':
+        report['host_profile'] = service.configure_plugin_host(report['plugin']['registry_id'], host_profile, approval)
     save()
     try:
         probe = service.probe_plugin(report['plugin']['registry_id'], 48000, 256, timeout)
         report['probe'] = probe
         report['checks'].append({'id': 'load', 'status': 'PASS'})
-        if (probe['data']['inputs'], probe['data']['outputs']) != (2, 2):
+        supported = (probe['data']['inputs'], probe['data']['outputs']) == (2, 2) or (
+            host_profile == 'windows-stereo-zero-aux-isolated-v1' and (probe['data']['inputs'], probe['data']['outputs']) == (4, 2))
+        if not supported:
             report['checks'].append({'id': 'stereo_render', 'status': 'NOT_EVALUATED',
                                      'reason': 'Discovered I/O does not match the explicit stereo fixture'})
         else:
@@ -78,8 +82,9 @@ def main():
     parser.add_argument('--plugin', required=True, help='Exact owner-approved plugin path')
     parser.add_argument('--approval', required=True)
     parser.add_argument('--timeout', type=float, default=60)
+    parser.add_argument('--host-profile', choices=['standard', 'windows-stereo-zero-aux-isolated-v1'], default='standard')
     args = parser.parse_args()
-    result = run(args.folder, args.plugin, args.approval, args.timeout)
+    result = run(args.folder, args.plugin, args.approval, args.timeout, args.host_profile)
     print(json.dumps({'checks': result['checks'], 'report': str(Path(args.folder).resolve() / 'report.json')}))
     return int(any(c['status'] == 'FAIL' for c in result['checks']))
 

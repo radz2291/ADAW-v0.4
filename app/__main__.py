@@ -42,6 +42,10 @@ def main(argv=None):
         probe.add_argument("--id", required=True)
         probe.add_argument("--sample-rate", type=int, required=True)
         probe.add_argument("--block-size", type=int, required=True)
+        host = sub.add_parser("plugin-host-profile")
+        host.add_argument("--id", required=True)
+        host.add_argument("--profile", choices=["standard", "windows-stereo-zero-aux-isolated-v1"], required=True)
+        host.add_argument("--reason", required=True)
         args = parser.parse_args(argv)
         operation = args.command
         service = Service(args.root)
@@ -55,6 +59,8 @@ def main(argv=None):
             data = service.authorize_plugin(args.path, args.provenance)
         elif args.command == "plugin-probe":
             data = service.probe_plugin(args.id, args.sample_rate, args.block_size, args.timeout)
+        elif args.command == "plugin-host-profile":
+            data = service.configure_plugin_host(args.id, args.profile, args.reason)
         elif args.command == "module-validate":
             if args.sample_rate <= 0 or args.block_size <= 0:
                 raise AdawError("VALIDATION_ERROR", "Rate and block size must be positive")

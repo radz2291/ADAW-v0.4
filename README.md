@@ -1,8 +1,8 @@
 # ADAW v0.4
 
 This checkout is the isolated `adaw/guitar-rig` branch, based on Studio `5e41769`.
-The installed Guitar Rig 7 test currently fails during native plugin loading;
-see [compatibility report](evidence/plugins/guitar-rig/REPORT.md). Runtime files
+Guitar Rig now renders with an opt-in Windows worker workaround; normal shutdown
+and preset-state replay remain limited. See [compatibility report](evidence/plugins/guitar-rig/REPORT.md). Runtime files
 stay under ignored `.local/guitar-rig/`; existing songs are not copied or edited.
 
 New implementation; no v0.3 code reused. Working JSON CLI, immutable validated

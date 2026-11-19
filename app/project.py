@@ -68,11 +68,12 @@ class ProjectService(Service):
         identity = self.plugin(registry_id)
         if not identity["probe"]:
             raise AdawError("PLUGIN_CAPABILITY_UNVERIFIED", "Probe before capturing state")
-        require(identity["probe"]["inputs"] in (0, 2) and identity["probe"]["outputs"] == 2, "G1 state initialization supports stereo instrument/effect")
+        effect_inputs = identity["probe"]["inputs"] == 4 and identity["host_profile"] == "windows-stereo-zero-aux-isolated-v1"
+        require((identity["probe"]["inputs"] in (0, 2) or effect_inputs) and identity["probe"]["outputs"] == 2, "G1 state initialization supports stereo instrument/effect")
         graph = {"schema": "adaw.g0.graph@1", "sample_rate": sample_rate, "block_size": block_size,
                  "frames": sample_rate, "output": "instrument", "nodes": [{"id": "instrument", "kind": "vst", "inputs": [], "channels": 2,
                  "config": {"registry_id": registry_id, "parameters": {}, "midi": [], "automation": {}, "state_sha256": None}}]}
-        if identity["probe"]["inputs"] == 2:
+        if identity["probe"]["inputs"] == 2 or effect_inputs:
             graph["nodes"][0]["inputs"] = ["tone"]
             graph["nodes"].insert(0, {"id": "tone", "kind": "tone", "inputs": [], "channels": 2,
                                      "config": {"frequency_hz": 440, "amplitude": .1, "onset_frame": 0}})
@@ -656,7 +657,8 @@ class ProjectService(Service):
         for instance_id, inst in instances.items():
             dep = self.plugin(inst["registry_id"])
             manifest["plugin_dependencies"][instance_id] = {"registry_id": inst["registry_id"], "binary_sha256": dep["sha256"],
-                "files": dep["files"], "catalog_sha256": inst["catalog_sha256"], "state_sha256": inst["state_sha256"]}
+                "files": dep["files"], "catalog_sha256": inst["catalog_sha256"], "state_sha256": inst["state_sha256"],
+                "host_profile": dep["host_profile"]}
         report = {"id": rendition_id, "revision": revision, "source": source, "manifest": manifest,
                   "graph": graph, "render": result, "listening": "NOT_EVALUATED"}
         self.put(canonical(report))

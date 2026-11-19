@@ -50,11 +50,22 @@ class DawDreamerBackend:
         e = self.daw.RenderEngine(request["sample_rate"], request["block_size"])
         start = time.perf_counter()
         p = e.make_plugin_processor("probe", request["plugin_path"])
+        self.configure_host(p, request.get("host_profile", "standard"))
         return {"parameters": p.get_parameters_description(),
                 "inputs": p.get_num_input_channels(), "outputs": p.get_num_output_channels(),
+                "host_profile": request.get("host_profile", "standard"),
                 "load_seconds": time.perf_counter() - start,
                 "values": {str(d["index"]): p.get_parameter(d["index"]) for d in p.get_parameters_description()},
                 "environment": self.environment()}
+
+    @staticmethod
+    def configure_host(processor, profile):
+        if profile == "standard":
+            return
+        if profile != "windows-stereo-zero-aux-isolated-v1" or os.name != "nt":
+            raise AdawError("VALIDATION_ERROR", "Unsupported plugin host profile")
+        if (processor.get_num_input_channels(), processor.get_num_output_channels()) not in ((2, 2), (4, 2)):
+            raise AdawError("ROUTING_UNSUPPORTED", "Stereo/zero-aux profile requires 2 or 4 inputs and 2 outputs")
 
     def render(self, request, stage):
         import numpy as np
@@ -137,6 +148,7 @@ class DawDreamerBackend:
             else:
                 resolved = request["plugins"][c["registry_id"]]
                 p = e.make_plugin_processor(n["id"], resolved["path"])
+                self.configure_host(p, resolved.get("host_profile", "standard"))
                 catalog = p.get_parameters_description()
                 if catalog_hash(catalog) != resolved["catalog_sha256"]:
                     raise AdawError("PLUGIN_CAPABILITY_UNVERIFIED", "Parameter catalog changed", catalog=catalog,
@@ -151,7 +163,8 @@ class DawDreamerBackend:
                         raise AdawError("PLUGIN_CAPABILITY_UNVERIFIED", "Opaque state restore failed: " + str(exc)) from exc
                     catalog = p.get_parameters_description()
                     if catalog_hash(catalog) != resolved["catalog_sha256"]:
-                        raise AdawError("PLUGIN_CAPABILITY_UNVERIFIED", "Restored state changed parameter interface")
+                        raise AdawError("PLUGIN_CAPABILITY_UNVERIFIED", "Restored state changed parameter interface",
+                                        catalog=catalog, expected_sha256=resolved["catalog_sha256"], actual_sha256=catalog_hash(catalog))
                 indices = {d["index"] for d in catalog}
                 for key, value in c["parameters"].items():
                     if int(key) not in indices:
@@ -171,12 +184,28 @@ class DawDreamerBackend:
                         lane[frame:end] = value
                     p.set_automation(int(key), lane)
             channels_in = sum(processors[i].get_num_output_channels() for i in n["inputs"])
+            actual_inputs = list(n["inputs"])
+            routing = None
+            if n["kind"] == "vst" and resolved.get("host_profile") == "windows-stereo-zero-aux-isolated-v1" and channels_in == 2 and p.get_num_input_channels() == 4:
+                # Profile explicitly supplies zero to the extra pair. No active
+                # sidechain or automatic truncation is claimed.
+                aux_name = n["id"] + "__host_aux_silence"
+                if aux_name in {item["id"] for item in g["nodes"]}:
+                    raise AdawError("VALIDATION_ERROR", "Host adapter node ID collision")
+                aux = e.make_playback_processor(aux_name, np.zeros((2, g["frames"]), dtype=np.float32))
+                graph.append((aux, []))
+                actual_inputs.append(aux_name)
+                channels_in += 2
+                routing = "stereo channels 0/1; explicit silence channels 2/3"
             if n["kind"] not in ("tone", "samples") and channels_in != p.get_num_input_channels():
                 raise AdawError("ROUTING_UNSUPPORTED", "Input channel mismatch", node=n["id"], supplied=channels_in, expected=p.get_num_input_channels())
             if p.get_num_output_channels() != n["channels"]:
                 raise AdawError("ROUTING_UNSUPPORTED", "Output channel mismatch", node=n["id"])
             reports[n["id"]] = {"catalog": catalog, "prepare_seconds": time.perf_counter() - node_started}
+            if routing:
+                reports[n["id"]]["host_routing"] = routing
             if n["kind"] == "vst":
+                reports[n["id"]]["host_profile"] = resolved.get("host_profile", "standard")
                 # Capture pre-render state, before MIDI/tails can change transient state.
                 state_path = stage / (n["id"] + ".state")
                 p.save_state(str(state_path))
@@ -186,7 +215,7 @@ class DawDreamerBackend:
             processors[n["id"]] = p
             if n["id"] in request.get("record_nodes", []):
                 p.record = True
-            graph.append((p, n["inputs"]))
+            graph.append((p, actual_inputs))
         e.load_graph(graph)
         prepare_seconds = time.perf_counter() - started
         start = time.perf_counter()
@@ -259,8 +288,27 @@ def main():
                   "message": str(exc), "details": getattr(exc, "details", {})}}
     warnings = []
     result = report_safe(result, warnings=warnings)
+    isolated_exit = request.get("host_profile") == "windows-stereo-zero-aux-isolated-v1" or any(
+        p.get("host_profile") == "windows-stereo-zero-aux-isolated-v1" for p in request.get("plugins", {}).values())
+    if isolated_exit and result["ok"]:
+        warnings.append({"code": "HOST_SHUTDOWN_BYPASSED", "profile": "windows-stereo-zero-aux-isolated-v1",
+                         "message": "Completed isolated worker skips DLL detach; normal plugin shutdown is not certified."})
     result["warnings"] = warnings
-    (stage / "result.json").write_text(json.dumps(result, indent=2, allow_nan=False), encoding="utf-8")
+    with (stage / "result.json").open("w", encoding="utf-8") as output:
+        output.write(json.dumps(result, indent=2, allow_nan=False))
+        output.flush()
+        os.fsync(output.fileno())
+    if isolated_exit and result["ok"] and os.name == "nt":
+        # Only after work and result publication complete. Earlier crashes/timeouts
+        # still fail, and Service independently verifies every referenced artifact.
+        import ctypes
+        sys.stdout.flush()
+        sys.stderr.flush()
+        kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel.GetCurrentProcess.restype = ctypes.c_void_p
+        kernel.TerminateProcess.argtypes = [ctypes.c_void_p, ctypes.c_uint]
+        if not kernel.TerminateProcess(kernel.GetCurrentProcess(), 0):
+            raise ctypes.WinError(ctypes.get_last_error())
     return 0 if result["ok"] else 1
 
 

@@ -1,0 +1,112 @@
+{
+  "schema": "adaw.guitar-rig-followup@1",
+  "date": "2026-11-19",
+  "historical_parent": "60e8b60",
+  "plugin_sha256": "d029650b1077f3ee17666d7ae70626f08d9cd98986e13165bc8b5c8a16840e2f",
+  "correction": "Plugin enumerates controls successfully; previous nonzero exits occur during process shutdown, not initial loading.",
+  "diagnostic_exits": {
+    "normal": "-1073741819",
+    "explicit": "-1073741819",
+    "com": "-1073741819",
+    "fast": "-1073741819",
+    "terminate": "0"
+  },
+  "profile": {
+    "registry_id": "plugin-d029650b1077f3ee17666d7ae70626f08d9cd98986e13165bc8b5c8a16840e2f",
+    "profile": "windows-stereo-zero-aux-isolated-v1",
+    "reason": "Owner requested Guitar Rig compatibility fix on 2026-11-19",
+    "binary_sha256": "d029650b1077f3ee17666d7ae70626f08d9cd98986e13165bc8b5c8a16840e2f"
+  },
+  "final_checks": [
+    {
+      "id": "load",
+      "status": "PASS"
+    },
+    {
+      "id": "stereo_render",
+      "status": "PASS"
+    },
+    {
+      "id": "last_playable_preserved",
+      "status": "PASS"
+    }
+  ],
+  "parameter_count": 2594,
+  "raw_io": [
+    4,
+    2
+  ],
+  "effective_routing": "stereo channels 0/1; explicit silence channels 2/3",
+  "completion_warnings": [
+    {
+      "code": "HOST_SHUTDOWN_BYPASSED",
+      "profile": "windows-stereo-zero-aux-isolated-v1",
+      "message": "Completed isolated worker skips DLL detach; normal plugin shutdown is not certified."
+    }
+  ],
+  "environment": {
+    "os": "Windows-11-10.0.26100-SP0",
+    "machine": "AMD64",
+    "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+    "executable": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4\\.venv\\Scripts\\python.exe",
+    "packages": {
+      "dawdreamer": "0.9.0",
+      "numpy": "2.2.6",
+      "scipy": "1.15.3",
+      "soundfile": "0.13.1",
+      "pyloudnorm": "0.1.1"
+    },
+    "native_module_sha256": "7ea9eaa679ef0e7f43166c75e2158a49735daf3b96ca5be1124a140e58ad3d81",
+    "import_seconds": 0.023768300015944988,
+    "isolation": "native subprocess crash containment only; same-user filesystem/network rights"
+  },
+  "audio": {
+    "dry": {
+      "rms": 0.04359296476494355,
+      "sha256": "cc38fa9451f96755ce60c6499c7c9b182f7f7a9553b5276572f49b3edf0f0de4",
+      "job": "7ba4245f0dd546639ba240abbc0d9059",
+      "readback": null
+    },
+    "guitar-rig": {
+      "rms": 0.018585098240746858,
+      "sha256": "c8a9c9a737bde7405bc28d5ae6b1902c227106e2ef3cca16e2f1f6ee7a4d7b36",
+      "job": "efcfadf88a2e4dd5b982ee11ffd7a217",
+      "readback": 0.699999988079071
+    },
+    "quieter": {
+      "rms": 0.0040203882648166675,
+      "sha256": "6bab05320555cd0dccf747a933e50b7f1e3d4a2f0fb0639240f4d25685ece0a3",
+      "job": "cc9e373c95444e2faa0aad44fcdbc72b",
+      "readback": 0.4000000059604645
+    }
+  },
+  "parameter_audio_change": "PASS",
+  "state_restore": {
+    "status": "FAIL",
+    "code": "PLUGIN_CAPABILITY_UNVERIFIED",
+    "message": "Restored state changed parameter interface",
+    "catalog_differences": [
+      {
+        "index": 0,
+        "changes": {
+          "min": [
+            "no sound",
+            "Rock Seeker"
+          ]
+        }
+      }
+    ],
+    "raw_report": "C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-guitar-rig\\.local\\guitar-rig\\demo-001\\report.json",
+    "raw_sha256": "4501063bc8adfecad008cf441c8d32b95acc15d0250e77dbec732bca3b2fdefd"
+  },
+  "listening": "NOT_EVALUATED",
+  "regression": ".............................................................s......     [100%]\n============================== warnings summary ===============================\ntests/test_contracts.py: 1 warning\ntests/test_everyday_core.py: 3 warnings\ntests/test_faust_runtime_catalog.py: 2 warnings\ntests/test_project.py: 5 warnings\ntests/test_studio_api.py: 3 warnings\ntests/test_studio_audio.py: 4 warnings\n  C:\\Users\\RZ1\\Desktop\\RZ-Music\\261113-ADAW-v0.4-guitar-rig\\app\\quality.py:18: WavFileWarning: Chunk (non-data) not understood, skipping it.\n    other_rate, other = wavfile.read(path)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n67 passed, 1 skipped, 18 warnings in 86.51s (0:01:26)\n",
+  "final_targeted_regression": ".....                                                                    [100%]\n5 passed in 3.66s\n",
+  "source_hashes": {
+    "app/worker.py": "d67e52d21924b589c08c5e277b87d2017155d2b4c775a1561134ac82f9d3c572",
+    "app/service.py": "8dd3a37fe38dd09ceec8e61688f4418f64ca0b222f5bd28a81c52e7b7802a11d",
+    "app/project.py": "8b05d2562dcac596c1c7bd0255e4c1d1d5b1f282f3cbc96017381ee561daca07",
+    "app/__main__.py": "411a1e08c8ec43b1d004c10368ea688bcaf517a7c019f88abee870024b8b9f32",
+    "tools/guitar_rig_demo.py": "b50ce5067d482c4c2f2236ac586d505d446cfd74edc942eec0ca41bdfda66a92"
+  }
+}
